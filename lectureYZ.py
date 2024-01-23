@@ -24,7 +24,7 @@ a = np.array([  [1, 2, 3], [4, 5, 6], [7, 8, 9] ])
 print(a, type(a))
 ------------------------------------------------------------------------------------
 
-Anımsanacağı gibi Python'daki list, tuple, gibi veri yapıları aslında değerlerin 
+Anımsanacağı gibi Python'daki list, tuple, gibi veri yapıları aslında değerlerin i
 kendisini tutmamaktadır. Değerlerin tutulduğu nesnelerin adreslerini tutmaktadır. 
 Bu biçimdeki çalışma yoğun sayısal işlemlerde oldukça hantal hale gelmektedir. Bu 
 nedenle NumPy dizileri değerleri Python'un listeleri gibi değil C Programlama 
@@ -345,9 +345,67 @@ print(np.matmul(a,b))
 
 
 #  ----------------------------- Pandas  -----------------------------
+"""
+------------------------------------------------------------------------------------
+Pandas kütüphanesi NumPy kütüphanesinin üzerine kurulmuş durumdadır. Yani seviye 
+bakımından NumPy'dan biraz daha yüksek seviyededir. 
+
+Pandas'ta sütunlardan ve satırlardan oluşan veri kümeleri DataFrame isimli bir 
+sınıf ile temsil edilmektedir. Veri kümesindeki belli bir sütun ise Series isimli 
+sınıfla temsil edilir. DataFrame sınıfını Series nesnelerini tutan bir sınıf 
+olarak düşünebiliriz. 
+------------------------------------------------------------------------------------
+
+Series nesnelerinin de tıpkı NumPy dizilerinde olduğu gibi bir dtype türü vardır. 
+Bir Series nesnesi yaratılırken nesnenin dtype türü dtype parametresiyle belirtilebilir. 
+Pandas içerisinde ayrı dtype sınıfları yoktur. Aslında Pandas Series bilgilerini 
+NumPy dizisi olarak saklamaktadır. Dolayısıyla Series nesnesi yaratılırken dtype 
+bilgisi NumPy dtype türü olarak belirtilir. Örneğin:
+
+import pandas as pd
+s = pd.Series([10, 20, 30, 40, 50], dtype=np.float32)
+print(s)
+
+!!! Series nesneleri MUTABLE nesnelerdir. Değiştirilebilir.
+------------------------------------------------------------------------------------
+
+Series nesnelerinin elemanlarına erişmek için üç yol vardır. Series nesnesi s olmak üzere:
+
+1) Doğrudan köşeli parantez operatörü ile. Yani s[...] biçiminde.
+2) loc örnek özniteliği ve köşeli parantez operatörü ile. Yani s.loc[...] biçiminde
+3) iloc örnek özniteliği ve köşeli parantez operatörü ile. Yani s.iloc[...] biçiminde
+
+Seeries nesneleri "değiştirilebilir (mutable)" nesnelerdir. Bir Series nesnesine 
+erişip onu değiştirebiliriz. 
+
+Series nesnesinin index ile belirtilen (ya da index belirten değerlerine) 
+"etiket (label)" da denilmektedir. Örneğin:
 
 
+------------------------------------------------------------------------------------
+s.iloc[...] biçimindeki erişimde ise köşeli parantez içerisine her zaman sıra 
+numarası yerleştirilmek zorundadır. Biz burada köşeli parantez içerisine etiket 
+yerleştiremeyiz.
+    
+Yani loc örnek özniteliği ile erişimde köşeli parantez içerisinde her zaman etiket 
+bulundurulması gerekmektedir. Bu bakımdan s[...] erişimi ile s.loc[...] erişime 
+arasında farklılık vardır.     
+------------------------------------------------------------------------------------
 
+Doğrudan indekslemede hem etiket hem de sıra numarası bir arada kullanılamz. 
+Ancak bunlardan biri kullanılabilir. Örneğin:
+
+import pandas as pd
+
+s = pd.Series([10, 20, 30, 40, 50], index=['a', 'b', 'c', 'd', 'e'], dtype='float32')
+k = s[['b', 'a', 'e']]
+print(k)
+print()
+
+k= s.iloc[[1, 3, 2]]
+print(k)
+------------------------------------------------------------------------------------
+"""
 
 
 
