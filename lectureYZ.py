@@ -388,8 +388,8 @@ numarası yerleştirilmek zorundadır. Biz burada köşeli parantez içerisine e
 yerleştiremeyiz.
     
 Yani loc örnek özniteliği ile erişimde köşeli parantez içerisinde her zaman etiket 
-bulundurulması gerekmektedir. Bu bakımdan s[...] erişimi ile s.loc[...] erişime 
-arasında farklılık vardır.     
+bulundurulması gerekmektedir. Bu bakımdan s[...] erişimi ile s.loc[...] erişimi
+birbirine benzemektedir fakat aralarında farklılık vardır.     
 ------------------------------------------------------------------------------------
 
 Doğrudan indekslemede hem etiket hem de sıra numarası bir arada kullanılamz. 
@@ -404,6 +404,17 @@ print()
 
 k= s.iloc[[1, 3, 2]]
 print(k)
+------------------------------------------------------------------------------------
+
+Series nesnesinin içerisindeki değerler values isimli örnek özniteliği ile bir 
+NumPy dizisi olarak elde edilebilmektedir. Aslında Series nesnesi zaten değerleri 
+NumPy dizisi içerisinde tutmaktadır. values elemanı da bize doğrudan aslıonda bu 
+diziyi verir. Bu dizide değişiklik yaptığımızda Series nesnesinin elemanında 
+değişiklik yapmış oluruz. Örneğin:
+
+s = pd.Series([10, 20, 30, 40, 50], dtype='float32')
+a = s.values
+print(a)
 ------------------------------------------------------------------------------------
 """
 
