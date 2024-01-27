@@ -505,8 +505,14 @@ Bir DataFrame nesnesi iki boyutlu bir NumPy dizisi ile de yaratılabilir. Örne�
 import numpy as np
 
 a = np.array([[1, 2, 3], [4, 5, 6], [7, 8, 9]], dtype='float32')
-df = pd.DataFrame(a, columns=['a', 'b', 'c'])
+df = pd.DataFrame(a, columns=['a', 'b', 'c'], index= [3,7,4])
 print(df)
+print()
+
+print(df.loc[7]) # df.loc[0] -> indexError
+print()
+
+print(df.iloc[1]) # df.iloc[7] -> indexError
 ------------------------------------------------------------------------------------
 
 DataFrame nesnesi bir sözlük ile de yaratılabilir. Bu durumda sözlüğün anahtarları 
@@ -516,6 +522,29 @@ d = {'Adı Soyadı': ['Kaan Aslan', 'Ali Serçe', 'Ayşe Er'], 'Boy': [182, 174,
 df = pd.DataFrame(d)
 print(df)
 ------------------------------------------------------------------------------------
+
+DataFrame üzerinde bir sütun insert etmek için DataFrame sınıfının insert metodu 
+metodu kullanılabilmektedir. insert metodunun birinci parametresi her zaman insert 
+edilecek sütunun indeks numarasını alır. İkinci parametre indeks edilecek sütunun 
+ismini (ayni etiketini), üçüncü parametre ise sütun bilgilerini almaktadır. insert 
+metodu "in-place" insert işlemi yapmaktadır. Yani DatFrame nesnesinin kendi 
+üzerinde ekleme yapılmaktadır.
+
+import pandas as pd
+d = {'Adı': ['Ali', 'Veli', 'Selami', 'Ayşe', 'Fatma'], 'Kilo': [48.3, 56.7, 92.3, 65.3, 72.3], 'Boy': [172, 156, 182, 153, 171]}
+df = pd.DataFrame(d)
+print(df)
+print('----------')
+
+bmi = df['Kilo'] / (df['Boy'] / 100) ** 2
+print(bmi)
+print(type(bmi))
+print('----------')
+
+df.insert(3, 'Vücut Kitle Endeksi', bmi)
+print(df)
+------------------------------------------------------------------------------------
 """
+
 
 
