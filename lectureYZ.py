@@ -416,8 +416,106 @@ s = pd.Series([10, 20, 30, 40, 50], dtype='float32')
 a = s.values
 print(a)
 ------------------------------------------------------------------------------------
+
+Series nesnesinden eleman silmek için Series sınıfının drop metodu kullanılmaktadır 
+(drop isimli bir fonksiyon yoktur). Bu metot her zaman etiket temelinde çalışır. 
+Hiçbir zaman sıra numarasıyla çalışmaz. Biz tek bir etiket de kullanabiliriz. Bir 
+grup etiketi dolaşılabilir bir nesne biçiminde de metoda verebiliriz. Metot default 
+durumda "inplace" silme işlemi yapmaz. Bize silinmiş yeni bir Series nesnesi verir. 
+Örneğin:
+        
+s = pd.Series([10, 20, 30, 40, 50], index=['a', 'b', 'c', 'd', 'e'], dtype='float32')
+print(s)
+result = s.drop(['a', 'e'])
+print()
+print(result)
+
+
+Metodun inplace parametresi True geçilirse silme işlemi nesne üzerinde yapılır. 
+Bu durumda metot None değerine geri döner.
+
+s.drop(['a', 'e'], inplace=True)
+print(s)            
+------------------------------------------------------------------------------------
+
+Series sınıfının pek çok faydalı metodu vardır. Bu metotlar bize yaptıklar işlem 
+sonucunda yeni bir Series nesnesi verirler. Aslında bu metotlar NumPy metotlarına 
+çok benzemektedir. NumPy'da pek çok işlem hem metotlarla hem de fonksiyonlarla 
+yapılabilmektedir. Ancak Pandas'ta ağırlıklı olarak metotlar bulundurulmuştur. 
+Yani pek çok fonksiyon yalnızca metot biçiminde bulundurulmuştur.
+
+abs metodu elemanların mutlak değerlerini elde eder. add metodu karşılıklı elemanları 
+toplar (yani + operatörü ile yapılanı yapar). argmax, argmin, argsort metotoları 
+sırasıyla en büyük elemanın indeksisni, en küçük elemanın indeksini ve sort 
+edilme durumundaki indeksleri vermektedir.
+
+s = pd.Series([12, 8, -4, 2, 9], dtype='float32')
+print(s.abs())
+print(s.argmin())
+print(s.argmax())
+print(s.argsort()) 
+------------------------------------------------------------------------------------
+
+dropna metodu eksik verileri atmak için kullanılmaktadır. Yani NaN değerleri 
+Series nesnesinden silinir.
+
+s = pd.Series([3, None, 7, 9, None, 10], dtype='float32')
+print(s)
+print()
+result = s.dropna()
+print(result)
+print()
+
+fillna isimli metot eksik verileri (yani NaN olan elemanları) spesifik bir değerle 
+doldurmaktadır. Örneğin biz eksik verileri aşağıdaki gibi ortalamayla doldurabiliriz:
+
+reul= s.fillna(s.mean())
+print(reul)        
+------------------------------------------------------------------------------------
 """
 
+# DataFrame
+"""
+------------------------------------------------------------------------------------
+Pandas'taki en önemli veri yapısı DataFrame denilen veri yapısıdır. DataFrame tipik 
+olarak istatistiksel veri kümesini temsil etmek için düşünülmüştür. DataFrame 
+nesnesinin sütunlardan oluşan matrisel bir yapısı vardır. Aslında DataFrame nesnesi 
+Series nesnelerinden oluşmaktadır. Yani DataFrame nesnelerinin sütunları Series 
+nesneleridir. 
 
+NumPy dizilerinin elemanları aynı türden olur. Her ne kadar elemanları aynı türden 
+olmayan NumPy dizileri de oluşturulabiliyorsa da (örneğin dtype='object' diyerek) 
+bu biçimde NumPy dizilerinin uygulamada kullanımı yoktur. O halde Pandas kütüphanesi 
+aslında sütunları farklı türlerden olabilen DataFrame denilen bir veri yapısı 
+sunmaktadır. İstatistik ve veri bilimindeki "veri kümeleri (datasets)" ham durumda 
+böyle bir yapıya sahiptir. Bu bakımdan veri kümeleri veritabanlarındaki tablolara 
+da benzetilebilir.
+
+DataFrame nesnesi iki boyutlu bir Python listesi ile oluşturulabilir. Eğer index 
+parametresi ve columns parametresi belirtilmezse oluşturulan DataFrame nesnesinin 
+satır etiketleri ve sütun etiketleri 0, 1, 2, ... biçiminde atanır
+------------------------------------------------------------------------------------
+import pandas as pd
+df = pd.DataFrame([[1, 2, 3], [4, 5, 6], [7, 8, 9]], index=['a', 'b', 'c'], columns=['x', 'y', 'z'])
+print(df)
+------------------------------------------------------------------------------------
+
+Bir DataFrame nesnesi iki boyutlu bir NumPy dizisi ile de yaratılabilir. Örneğin:
+
+import numpy as np
+
+a = np.array([[1, 2, 3], [4, 5, 6], [7, 8, 9]], dtype='float32')
+df = pd.DataFrame(a, columns=['a', 'b', 'c'])
+print(df)
+------------------------------------------------------------------------------------
+
+DataFrame nesnesi bir sözlük ile de yaratılabilir. Bu durumda sözlüğün anahtarları 
+sütun isimlerini, değerleri de sütunlardaki değerleri belirtir. Örneğin:
+    
+d = {'Adı Soyadı': ['Kaan Aslan', 'Ali Serçe', 'Ayşe Er'], 'Boy': [182, 174, 168], 'Kilo': [78, 69, 56]}
+df = pd.DataFrame(d)
+print(df)
+------------------------------------------------------------------------------------
+"""
 
 
