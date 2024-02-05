@@ -408,13 +408,46 @@ print(k)
 
 Series nesnesinin içerisindeki değerler values isimli örnek özniteliği ile bir 
 NumPy dizisi olarak elde edilebilmektedir. Aslında Series nesnesi zaten değerleri 
-NumPy dizisi içerisinde tutmaktadır. values elemanı da bize doğrudan aslıonda bu 
+NumPy dizisi içerisinde tutmaktadır. values elemanı da bize doğrudan aslında bu 
 diziyi verir. Bu dizide değişiklik yaptığımızda Series nesnesinin elemanında 
 değişiklik yapmış oluruz. Örneğin:
 
 s = pd.Series([10, 20, 30, 40, 50], dtype='float32')
 a = s.values
 print(a)
+
+Series sınıfının to_numpy metodu values örnek özniteliği gibidir. Ancak to_numpy 
+değişik seçeneklere de sahiptir. Default durumda to_numpy metodu ile values örnek 
+özniteliği aynı Numpy dizisini vermektedir. Fakat örneğin to_numpy metodunda 
+copy=True geçilirse metot bize kopyalama yaparak başka bir Numpy dizisi verir. 
+
+s = pd.Series([10, 20, 30, 40, 50], dtype='float32')
+
+a = s.values
+print(id(a))
+print(a)
+
+a = s.to_numpy()
+print(id(a))
+print(a)
+
+print('-----')
+
+a = s.to_numpy(copy=True)
+print(a)
+print(id(a))
+
+Özetle bir Series nesnesi içerisindeki değerleri NumPy dizisi olarak almak istersek 
+values örnek özniteliğini ya da to_numpy metodunu kullanabiliriz.
+
+a = s.to_numpy()
+print(a)
+
+
+Eğer Series nesnesi içerisindeki değerleri bir Python listesi biçiminde elde etmek 
+istersek Series sınıfının to_list metodunu kullanabiliriz. 
+
+Tabii to_list her çağrıldığında aslında bize farklı bir list nesnesi verecektir.
 ------------------------------------------------------------------------------------
 
 Series nesnesinden eleman silmek için Series sınıfının drop metodu kullanılmaktadır 
@@ -634,12 +667,15 @@ import numpy as np
 
 a = np.random.randint(1, 10, (20, 10))
 mr = scipy.stats.mode(a, axis=0)
+print(type(mr))  # <class 'scipy.stats._stats_py.ModeResult'>
 
 mr.mode
 #  array([[4, 1, 2, 3, 5, 8, 4, 6, 8, 1]])
 
 mr.count
 # array([[4, 4, 6, 4, 4, 4, 4, 4, 5, 4]])
+
+
 
 Pandas kütüphanesinde Series ve DataFrame sınıflarının mode metotları da mode 
 işlemi yapmaktadır.
@@ -648,6 +684,12 @@ import pandas as pd
 a = np.random.randint(1, 10, (20, 10))
 df = pd.DataFrame(a)
 df.mode()
+
+DataFrame sınıfının mode metodu bize bir DataFrame nesnesi vermektedir. Uygulamacı 
+genellikle bunun ilk satırı ile ilgilenir. Diğer satırlar eşit miktarda tekrarlanan 
+elemanlardan oluşmaktadır. Tabii belli bir sütunda eşit miktarda tekrarlanan elemanların
+sayısı az ise artık geri döndürülen DataFrame'in o sütuna ilişkin satırlarında 
+NaN değeri bulunacaktır.
 ------------------------------------------------------------------------------------
 """
 
