@@ -691,6 +691,51 @@ elemanlardan oluşmaktadır. Tabii belli bir sütunda eşit miktarda tekrarlanan
 sayısı az ise artık geri döndürülen DataFrame'in o sütuna ilişkin satırlarında 
 NaN değeri bulunacaktır.
 ------------------------------------------------------------------------------------
+------------------------------------------------------------------------------------
+
+Değerlerin merkezine ilişkin bilgiler dağılım hakkında iyi bir fikir vermeyebilir. 
+Örneğin iki ülkede kişi başına düşen ortalama yıllık gelir (gayri safi milli hasıla) 
+15000 dolar olabilir. Ancak bu iki ülke arasında gelir dağılımında önemli farklılıklar 
+bulunuyor olabilir. O halde değerlerin ortalamasının yanı sıra onların ortalamaya 
+göre nasıl yayıldıkları da önemlidir. İstatistikte değerlerin ortalamaya göre 
+yayılımı için "merkezi yayılım ölçüleri (measures of dispersion)" denilen bazı 
+ölçüler kullanılmaktadır. Merkezi yayılım ölçüleri aslında değerlerin ortalamadan 
+ortalama uzaklığını belirlemeyi hedeflemektedir
+
+Merkezi yayılım ölçüsü olarak "değerlerin ortalamadan ortalama mutlak uzaklığına" 
+başvurulabilir. Burada mutlak değer alınmasının nedeni uzaklıkları negatif olmaktan 
+kurmak içinidir. Bu durumda ortalama 0 çıkmaz. Ancak bu yöntem de aslında çok iyi 
+bir yöntem değildir. Aşağıda aynı dilimin ortalamadan ortalama mutlak uzaklığı 
+hesaplanmışır.
+
+   
+import numpy as np
+
+a = np.array([1, 4, 6, 8, 4, 2, 1, 8, 9, 3, 6, 8])
+mean = np.mean(a)
+print(mean)                # 5
+
+result = np.mean(np.abs(a - mean))
+print(result)               # 2.5
+------------------------------------------------------------------------------------
+
+Aslında ortalamadan ortalama uzaklık için "standart sapma (standard deviation)" 
+denilen ölçü tercih edilmektedir. Standart sapmada ortalamadan uzaklıkların mutlak 
+değeri değil kareleri alınarak negatiflikten kurtulunmaktadır. Kare alma işlemi 
+değerleri daha fazla farklılaştırmaktadır. Yani aynı değerlerin oluşma olasılığı 
+kare alma sayesinde daha azalmaktadır. Aynı zamanda bu işlem bazı durumlarda başka 
+faydalara da yol açmaktadır. (Örneğin ileride bu kare alma işlemlerinin optimizasyon
+problemlerinde uygun bir işlem olduğunu göreceğiz.)
+
+import numpy as np
+
+def sd(a, ddof = 0):
+    return np.sqrt(np.sum((a - np.mean(a)) ** 2)  / (len(a)  - ddof))
+
+a = [1, 4, 6, 8, 4, 2, 1, 8, 9, 3, 6, 8]
+result = sd(a)
+print(result)           # 2.7688746209726918
+------------------------------------------------------------------------------------
 """
 
 
