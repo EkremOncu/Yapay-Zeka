@@ -584,6 +584,71 @@ print(df)
 print()
 print(df.mean())
 ------------------------------------------------------------------------------------
+------------------------------------------------------------------------------------
+Diğer bir merkezi eğilim ölçüsü de "medyan (median)" denilen ölçüdür. Medyan sayıların 
+küçükten büyüğe sıraya dizildiğinde ortadaki değerdir. Ancak sayılar çift sayıda 
+ise sayıların tam ortasında bir değer olmadığı için ortadaki iki değerin aritmetik 
+ortalaması medyan olarak alınmaktadır. Medyan işlemi uç değerlerden (outliers) 
+etkilenmez. Ancak medyan işlemi aritmetik ortalamadan daha fazla zaman alan bir 
+işlemdir. Çünkü medyan için önce değerlerini sıraya dizilmesi gerekmektedir. 
+Dolayısıyla  medyan işlemi O(N log N) karmaşıklıta bir işlemdir.
+
+import statistics
+a = [1, 23, 56, 12, 45, 21]
+statistics.median(a)
+
+NumPy kütüphanesinde medyan işlemi eksensel biçimde median fonksiyonuyla yapılabilmektedir.
+
+import numpy as np
+a = np.random.randint(1, 100, (10, 10))
+
+np.median(a, axis=0)
+# array([33.5, 56.5, 69. , 48. , 57.5, 39. , 54.5, 32. , 61.5, 40.5])
+
+
+df = pd.DataFrame(a)
+df.median()
+------------------------------------------------------------------------------------
+------------------------------------------------------------------------------------
+Merkezi eğilim ölçülerinin bir diğeri de "mod" denilen ölçüdür. Bir grup verideki 
+en çok yinelenen değere "mod (mode)" denilmektedir. Mod özellikle kategorik ve 
+sıralı ölçeklerde ortalamanın yerini tutan bir işlem olarak kullanılmaktadır. 
+Mod işlemi genel olarak O(N log N) karmaşıklıkta yapılabilmektedir. (Tipik mod 
+algoritmasında değerler önce sıraya dzilir. Sonra yan yana aynı değerlerden kaç 
+tane olduğu tespit edilir.)
+
+import statistics
+a = [1, 3, 3, 4, 2, 2, 5, 2, 7, 9, 5, 3, 5, 7, 5]
+statistics.mode(a)
+
+NumPy kütüphanesinde mod işlemini yapan bir fonksiyon bulunmamaktadır. Ancak SciPy 
+kütüphanesinde mod işlemi için stats modülü içerisindeki mode fonksiyonu kullanılabilir. 
+Bu fonksiyon yine eksensel işlemler yapabilmektedir. mode fonksiyonu ModeResult 
+isimli bir sınıf türünden tuple sınıfından türetilen bir sınıf türünden bir nesne 
+verir. Bu sınııfın mode ve count örnek öznitelikleri en çok yinelenen değerleri ve 
+onların sayılarını bize vermektedir. ModeResult sınıfı bir çeşit demet özelliği 
+gösterdiği için demet gibi de kullanılabilir. 
+
+import scipy.stats
+import numpy as np
+
+a = np.random.randint(1, 10, (20, 10))
+mr = scipy.stats.mode(a, axis=0)
+
+mr.mode
+#  array([[4, 1, 2, 3, 5, 8, 4, 6, 8, 1]])
+
+mr.count
+# array([[4, 4, 6, 4, 4, 4, 4, 4, 5, 4]])
+
+Pandas kütüphanesinde Series ve DataFrame sınıflarının mode metotları da mode 
+işlemi yapmaktadır.
+
+import pandas as pd
+a = np.random.randint(1, 10, (20, 10))
+df = pd.DataFrame(a)
+df.mode()
+------------------------------------------------------------------------------------
 """
 
 
