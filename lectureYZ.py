@@ -736,6 +736,78 @@ a = [1, 4, 6, 8, 4, 2, 1, 8, 9, 3, 6, 8]
 result = sd(a)
 print(result)           # 2.7688746209726918
 ------------------------------------------------------------------------------------
+
+Python'ın Standart Kütüphanesinde statistics modülü içerisinde standart sapma hesabı 
+yapan stdev ve pstdev fonksiyonları bulunmaktadır. stdev fonksiyonu (n - 1)'e bölme 
+yaparken, pstdev  (buradaki 'p' harfi "population" sözcüğünden gelmektedir) fonksiyonu 
+n'e bölme yapmaktadır. 
+
+import statistics
+
+a = [1, 4, 6, 8, 4, 2, 1, 8, 9, 3, 6, 8]
+
+std = statistics.stdev(a)
+print(std)                          # 2.891995221924885  
+
+std = statistics.pstdev(a)
+------------------------------------------------------------------------------------
+
+NumPy kütüphanesinde std isimli fonksiyon eksensel standart sapma hesaplayabilmektedir. 
+Fonksiyonun ddof parametresi default durumda 0'dır. Yani default durumda fonksiyon 
+n'e bölme yapmaktadır.
+
+import numpy as np
+
+a = np.array([1, 4, 6, 8, 4, 2, 1, 8, 9, 3, 6, 8])
+result = np.std(a)
+print(result)                       # 2.7688746209726918 
+------------------------------------------------------------------------------------
+
+Pandas kütüphanesinde de Series ve DataFrame sınıflarının std isimli metotları
+eksensel standart sapma hesabı yapabilmektedir. Ancak bu metotlarda ddof parametresi 
+default 1 durumundadır. Yani bu metotlar default durumda (n - 1)'e bölme yapmaktadır.
+
+import pandas as pd
+
+s = pd.Series([1, 4, 6, 8, 4, 2, 1, 8, 9, 3, 6, 8])
+result = s.std()
+print(result)                       # 2.891995221924885        
+
+s = pd.Series([1, 4, 6, 8, 4, 2, 1, 8, 9, 3, 6, 8])
+result = s.std(ddof=0)
+print(result)                       # 2.7688746209726918 
+------------------------------------------------------------------------------------
+------------------------------------------------------------------------------------
+
+Standart sapmanın karesine "varyans (variance)" denilmektedir. Varyans işlemi standart 
+kütüphanedeki statistics modülünde bulunan variance ve pvariance fonksiyonlarıyla 
+yapılmaktadır. NumPy kütüphanesinde varyans işlemi var fonksiyonuyla ya da ndarray 
+sınıfının var metoduyla, Pandas kütüphenesinin Series ve DataFrame sınıflarındaki 
+var metoduyla yapılmaktadır. Yine NumPy'daki variance fonksiyonundaki ddof default 
+olarak 0, Pandas'taki ddof ise 1'dir.
+
+Pekiyi neden standart sapma varken ayrıca onun karesi için varyans terimi uydurulmuştur? 
+İşte istatistikte pek çok durumda aslında doğrudan ortalamadan farkların karesel 
+ortalamaları (yani standart sapmanın karesi) kullanılmaktadır. Bu nedenle bu hesaba 
+ayrı bir isim verilerek anlatımlar kolaylaştırılmıştır.
+
+
+import statistics
+import numpy as np
+import pandas as pd
+
+data = [1, 4, 6, 8, 4, 2, 1, 8, 9, 3, 6, 8]
+
+result = statistics.pvariance(data)
+print(result)               # 7.666666666666667
+
+result = np.var(data)
+print(result)               # 7.666666666666667
+
+s = pd.Series(data)
+result = s.var(ddof=0)
+print(result)               # 7.666666666666667
+------------------------------------------------------------------------------------
 """
 
 
