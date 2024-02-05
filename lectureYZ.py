@@ -546,5 +546,50 @@ print(df)
 ------------------------------------------------------------------------------------
 """
 
+#  ----------------------------- Statistics  -----------------------------
+"""
+------------------------------------------------------------------------------------
+İstatistikte verilerin merkezine ilişkin bilgi veren ölçülere "merkezi eğilim ölçüleri 
+(measures of central tendency)" denilmektedir. Merkezi eğilim ölçülerinin en yaygın 
+kullanılanı "aritmetik ortalamadır". Aritmetik ortalama (mean) değerlerin toplanarak 
+değer sayısına bölünmesiyle elde edilmektedir. 
+
+Aritmetik ortalama hesaplamak için çeşitli kütüphanelerde çeşitli fonksiyonlar hazır 
+olarak bulunmaktadır. Örneğin Python'ın standart kütüphanesindeki statistics modülünde 
+bulunan mean fonksiyonu aritmetik ortalama hesaplamaktadır. 
+
+import statistics
+a = [1, 2, 7, 8, 1, 5]
+statistics.mean(a)
+
+
+mean fonksiyonu herhangi bir dolaşılabilir nesneyi parametre olarak alabilmektedir. 
+
+NumPy kütüphanesindeki mean fonksiyonu axis temelinde (yani satırsal ve sütunsal biçimde) 
+ortalama hesaplayabilmektedir. Örneğin:
+
+import numpy as np
+a = np.array([[1, 2, 3], [5, 6, 7], [8, 9, 10]])
+np.mean(a, axis=0)
+# array([4.66666667, 5.66666667, 6.66666667])
+
+
+Pandas kütüphanesinde Series ve DataFrame sınıflarının mean metotları aritmetik 
+ortalama hesabı yapmaktadır. DataFrame sınıfının mean metodunda default axis 0 
+biçimindedir. Yani sütunsal ortalamalar elde edilmektedir. Örneğin:
+
+import pandas as pd
+df = pd.DataFrame([[1, 2, 3], [4, 5, 6], [7, 8, 9]])
+print(df)
+print()
+print(df.mean())
+------------------------------------------------------------------------------------
+"""
+
+
+
+
+
+
 
 
