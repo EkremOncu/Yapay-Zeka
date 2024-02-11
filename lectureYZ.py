@@ -595,6 +595,8 @@ import statistics
 a = [1, 2, 7, 8, 1, 5]
 statistics.mean(a)
 
+axis=0  -> satır
+axis=1  -> sutun
 
 mean fonksiyonu herhangi bir dolaşılabilir nesneyi parametre olarak alabilmektedir. 
 
@@ -809,8 +811,72 @@ result = s.var(ddof=0)
 print(result)               # 7.666666666666667
 ------------------------------------------------------------------------------------
 """
+"""
+------------------------------------------------------------------------------------
+Bir deney sonucunda oluşacak durum baştan tam olarak belirlenemiyorsa böyle deneylere 
+"rassal deney (random experiment)" denilmektedir. Örneğin bir paranın atılması 
+deneyinde para "yazı" ya da "tura" gelebilir. O halde "paranın atılması" rassal 
+bir deneydir. Benzer biçimde bir zarın atılması, bir at yarışında hangi atın birinci 
+olacağı gibi deneyler rassal deneylerdir. 
+
+Bir deneyin sonucu öndecen bilinebiliyorsa bu tür deneylere "deterministik deneyler" 
+de denilmektedir. 
+
+Bir rassal deney sonucunda oluşabilecek tüm olası durumların kümesine "örnek uzayı 
+(sample space)" denilmektedir.
+
+Olasılığın (probablity) değişik tanımları yapılabilmektedir. Olasılığın en yaygın 
+tanımlarından birisi ------>>  "göreli sıklık (relative frequency)" tanımıdır. 
+
+Bu tanıma göre bir rassal olay çok sayıda yinelendikçe elde edilen olasılık değeri 
+belli bir değere yakınsamaya başlar. Örneğin bir paranın 100 kere atılmasında 
+50 kere yazı 50 tura gelmeyebilir. 
 
 
+Ancak para sonsuz sayıda atılırsa (ya da çok fazla sayıda atılırsa) tura gelme 
+sayısının paranın atılma sayısına oranı 0.5'e yakınsayacaktır. 
+
+Buna istatistike ---->> "büyük sayılar yasası (law of large numbers)" da denilmektedir. 
+
+------------------------------------------------------------------------------------
+------------------------------------------------------------------------------------
+Olasılıkta ve istatistikte en çok kullanılan temel kavramlardan biri "rassal değişken 
+(random variable)" denilen kavramdır. Her ne kadar "rassal değişken" isminde bir 
+"değişken" geçiyorsa da aslında rassal değişken bir fonksiyon belirtmektedir. 
+Rassal değişken bir rassal deney ile ilgilidir. Bir rassal deneyde örnek uzayın 
+her bir elemanını (yani basit olayını) reel bir değere eşleyen bir fonksiyon 
+belirtmektedir. Rassal değişkenler genellikle "sözel biçimde" ifade edilirler. 
+Ancak bir fonksiyon belirtirler. Rassal değişkenler matematiksel gösterimlerde 
+genellikle büyük harflerle belirtilmektedir. Örneğin:
+
+- R rassal değişkeni "iki zar atıldığında zarların üzerindeki sayıların toplamını"
+belirtiyor olsun. Burada aslında R bir fonksiyondur. Örnek uzayın her bir elemanını 
+bir değere eşlemektedir. Matematiksel gösterimle R rassal değişkeni şöyle belirtilebilir:
+
+R: S -> R
+
+Burada R'nin  örnek uzayından R'ye bir fonksiyon belirttiği anlaşılmalıdır. Burada 
+R fonksiyonu aşağıdaki gibi eşleme yapmaktadır:
+
+(1, 1) -> 2
+(1, 2) -> 3
+(1, 3) -> 4
+...
+(6, 5) -> 11
+(6, 6) -> 12
+
+K rassal değişkeni "rastgele seçilen bir kişinin kilosunu belirtiyor" olsun. Bu 
+durumda örnek uzayı aslında dünyaki tüm insanlardır. Burada K fonksiyonu da her 
+insanı onun kilosuna eşleyen bir fonksiyondur. 
+
+C rassal değişkeni "rastgele seçilen bir rengin RGB değerlerinin ortalamasını" 
+belirtiyor olsun. Bu durumda her rengin bir RGB ortalaması vardır. Bu fonksiyon 
+belli bir rengi alıp onun ortalamasını belirten bir sayıya eşlemektedir. 
+
+Rassal değişkenler kümeler üzerinde işlemler yapmak yerine gerçek sayılar üzerinde 
+işlem yapmamızı sağlayan, anlatımlarda ve gösterimlerde kolaylık sağlayan bir kavramdır. 
+------------------------------------------------------------------------------------
+"""
 
 
 
