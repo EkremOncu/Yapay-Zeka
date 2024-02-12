@@ -875,6 +875,21 @@ belli bir rengi alıp onun ortalamasını belirten bir sayıya eşlemektedir.
 
 Rassal değişkenler kümeler üzerinde işlemler yapmak yerine gerçek sayılar üzerinde 
 işlem yapmamızı sağlayan, anlatımlarda ve gösterimlerde kolaylık sağlayan bir kavramdır. 
+
+
+Rassal değişkenler tıpkı matematiksel diğer fonksiyonlarda olduğu gibi "kesikli 
+(discrete)" ya da "sürekli (continuous)" olabilmektedir. eğer bir rassal değişken 
+(yani fonksiyon) teorik olarak belli bir aralıkta tüm gerçek sayı değerlerini 
+alabiliyorsa böyle rassal değişkenlere "sürekli (continous)" rassal değişkenler 
+denilmektedir. Ancak bir rassal değişken belli bir aralıkta yalnızca belli gerçek 
+sayı değerlerini alabiliyorsa bu rassal değişkenlere "kesikli (discrete)" rassal
+değişkenler denilmektedir.
+Örneğin "iki zarın atılmasında üste gelen sayılar toplamını belirten R rassal 
+değişkeni" kesiklidir. Çünkü yalnızca belli değerleri alabilmektedir. Ancak 
+"rastgele seçilen bir kişinin kilosunu belirten" K rassal değişkeni süreklidir. 
+Çünkü teorik olarak belli bir aralıkta tüm gerçek değerleri alabilir.(Biz kişilerin 
+kilolarını yuvarlayarak ifade etmekteyiz. Ancak aslında onların kiloları belli 
+aralıktaki tüm gerçek değerlerden biri olabilir.)
 ------------------------------------------------------------------------------------
 """
 
