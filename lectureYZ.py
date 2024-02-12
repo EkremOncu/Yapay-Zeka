@@ -890,6 +890,25 @@ değişkeni" kesiklidir. Çünkü yalnızca belli değerleri alabilmektedir. Anc
 Çünkü teorik olarak belli bir aralıkta tüm gerçek değerleri alabilir.(Biz kişilerin 
 kilolarını yuvarlayarak ifade etmekteyiz. Ancak aslında onların kiloları belli 
 aralıktaki tüm gerçek değerlerden biri olabilir.)
+
+------------------------------------------------------------------------------------
+Yapay zeka ve makine öğrenmesinde sürekli rassal değişkenler daha fazla karşımıza 
+çıkmaktadır. Bu nednele biz sürekli rassal değişkenler ve onların olasılıkları 
+üzerinde biraz daha duracağız. 
+
+Sürekli bir rassal değişkenin aralıksal olasılıklarını hesaplama aslında bir 
+"intergral" hesabı akla getirmektedir. İşte sürekli rassal değişkenlrin aralıksal 
+olasılıklarının hesaplanması için kullanılan fonksiyonlara "olasılık yoğunluk 
+fonksiyonları (probability density functions)" denilmektedir. Birisi bize bir 
+rassal değişkenin belli bir aralıktaki olasılığını soruyorsa o kişiin bize o 
+rassal değişkene ilişkin "olasılık yoğunluk fonksiyonunu" vermiş olması gerekir. 
+Biz de örneğin P{x0 < X < x1} olasılığını x0'dan x1'e f(x)'in integrali ile elde 
+ederiz. 
+
+Bir fonksiyonun olasılık yoğunluk fonksiyonu olabilmesi için -sonsuzdan + sonsuze 
+integralinin (yani tüm eğri altında kalan alanın) 1 olması gerekir. Bir rassal 
+değişkenin olasılık yoğunluk fonksiyonuna "o rassal değişkenin dağılımı" da 
+denilmektedir.
 ------------------------------------------------------------------------------------
 """
 
