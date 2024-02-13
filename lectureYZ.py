@@ -909,6 +909,107 @@ Bir fonksiyonun olasılık yoğunluk fonksiyonu olabilmesi için -sonsuzdan + so
 integralinin (yani tüm eğri altında kalan alanın) 1 olması gerekir. Bir rassal 
 değişkenin olasılık yoğunluk fonksiyonuna "o rassal değişkenin dağılımı" da 
 denilmektedir.
+
+------------------------------------------------------------------------------------
+	
+Değişik ortalama ve standart sapmaya ilişkin sonsuz sayıda Gauss eğrisi çizilebilir. 
+Ortalaması 0, standart sapması 1 olan normal dağılıma "standart normal dağılım" da 
+denilmektedir. Genellikle istatistiktre standart normal dağılımdaki X değerlerine
+"Z değerleri" denilmektedir. Aşağıdaki örnekte Gauss eğrisi çizdirilmiştir.
+
+import numpy as np
+import matplotlib.pyplot as plt
+
+def gauss(x, mu = 0, std = 1):
+    return 1 / (std * np.sqrt(2 * np.pi)) * np.e ** (-0.5 * ((x - mu) / std) ** 2)
+
+# yukarıdaki formül -->  'probability denstiy function'    
+
+x = np.linspace(-5, 5, 1000)
+y = gauss(x)
+
+plt.title('Gauss Function')
+plt.plot(x, y)
+plt.show()
+
+------------------------------------------------------------------------------------
+Yukarıdaki çizimde eksenleri kartezyen koordinat sistemindeki gibi de gösterbiliriz. 
+ 
+import numpy as np
+import matplotlib.pyplot as plt
+
+def gauss(x, mu = 0, std = 1):
+    return 1 / (std * np.sqrt(2 * np.pi)) * np.e ** (-0.5 * ((x - mu) / std) ** 2)
+  
+    
+def draw_gauss(mu = 0, std = 1):
+    x = np.linspace(-5 * std + mu, 5 * std + mu, 1000)
+    y = gauss(x, mu, std)
+    
+    mu_y = gauss(mu, mu, std)
+    
+    plt.figure(figsize=(10, 4))
+    plt.title('Gauss Function', pad=10, fontweight='bold')
+    axis = plt.gca()
+    
+    axis.set_ylim([-mu_y * 1.1, mu_y * 1.1])
+    axis.set_xlim([-5 * std + mu, 5 * std + mu])
+    axis.set_xticks(np.arange(-4 * std + mu, 5 * std + mu, std))
+    # axis.set_yticks(np.round(np.arange(-mu_y, mu_y, mu_y / 10), 2))
+    axis.spines['left'].set_position('center')
+    axis.spines['top'].set_color(None)
+    axis.spines['bottom'].set_position('center')
+    axis.spines['right'].set_color(None)
+    axis.plot(x, y)
+    plt.show()
+
+draw_gauss(100, 15)
+
+------------------------------------------------------------------------------------
+Normal dağılımda eğri altında kalan toplam alanın 1 olduğunu belirtmiştik. Bu dağılımda 
+toplaşmanın ortalama civarında olduğu eğirinin şeklinden anlaşılmaktadır. Gerçektende 
+normal dağılımda ortalamadan bir standart sapma soldan ve sağdan kaplanan alan 
+yani P{mu - std < X < mu + std} olasılığı 0.6827, ortalamadna iki standart sapma 
+soldan ve sağdan kaplanan alan yani P{mu - std * 2< X < mu + std * 2} olasılığı 
+0.9545 biçimindedir. 
+
+Matplotlib'te bir eğrinin altındaki aalanı boyamak için fill_between isimli fonksiyon 
+kullanılmaktadır. Bu fonksiyon axis sınıfının bir metodu olarak da bulundurulmuştur. 
+Aşağıdaki örnekte eğrinin altındaki belli bir alan fill_between metodu ile boyanmıştır.
+
+import numpy as np
+import matplotlib.pyplot as plt
+
+def gauss(x, mu = 0, std = 1):
+    return 1 / (std * np.sqrt(2 * np.pi)) * np.e ** (-0.5 * ((x - mu) / std) ** 2)
+      
+def draw_gauss(mu = 0, std = 1, fstart= 0, fstop = 0):
+    x = np.linspace(-5 * std + mu, 5 * std + mu, 1000)
+    y = gauss(x, mu, std)
+    
+    mu_y = gauss(mu, mu, std)
+    
+    plt.figure(figsize=(10, 4))
+    plt.title('Gauss Function', pad=10, fontweight='bold')
+    axis = plt.gca()
+    
+    axis.set_ylim([-mu_y * 1.1, mu_y * 1.1])
+    axis.set_xlim([-5 * std + mu, 5 * std + mu])
+    axis.set_xticks(np.arange(-4 * std + mu, 5 * std + mu, std))
+   # axis.set_yticks(np.round(np.arange(-mu_y, mu_y, mu_y / 10), 2))
+    axis.spines['left'].set_position('center')
+    axis.spines['top'].set_color(None)
+    axis.spines['bottom'].set_position('center')
+    axis.spines['right'].set_color(None)
+    axis.plot(x, y)
+    
+    x = np.linspace(fstart, fstop, 1000)
+    y = gauss(x, mu, std)
+    axis.fill_between(x, y)
+    plt.show()
+
+draw_gauss(100, 15, 85, 115)
+
 ------------------------------------------------------------------------------------
 """
 
