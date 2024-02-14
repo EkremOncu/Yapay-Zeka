@@ -1011,8 +1011,52 @@ def draw_gauss(mu = 0, std = 1, fstart= 0, fstop = 0):
 draw_gauss(100, 15, 85, 115)
 
 ------------------------------------------------------------------------------------
+------------------------------------------------------------------------------------
+Kümülatif dağılım fonksiyonu (cummulative distribution function) belli bir değere 
+kadar tüm birikimli olsılıkları veren fonksiyondur. Genellikle F harfi gösterilmektedir. 
+Mrneğin F(x0) aslında P{X < x0} anlamına gelmektedir. Normal dağılımda F(x0) değeri 
+aslında eğride X değerinin x0 olduğu noktadan soldaki tüm eğri altında kalan alanı 
+belirtmektedir. (Başka bir deyişle sürekli dağılımlarda F(x0) değeri "-sonsuzdan 
+x0'a kadar olasılık yoğunluk fonksiyonunun integraline eşittir)
+------------------------------------------------------------------------------------
+------------------------------------------------------------------------------------
+Normal dağılımla ilgili işlemleri yapabilmek için Python standart kütüphanesinde 
+statistics modülü içerisinde NormalDist isimli bir sınıf bulundurulmuştur. Programcı 
+bu sınıf türünden bir nesne yaratır. İşlemlerini bu sınıfın metotlarıyla yapar.
+NormalDist nesnesi yaratılırken __init__ metodu için ortalama ve standart sapma 
+değerleri girilir. (Bu değerler girilmezse ortalama için sıfır, standart sapma 
+için 1 default değerleri kullanılmaktadır.)
+
+------------------------------------------------------------------------------------
+NormalDist sınıfının cdf (cummulative distribution function) isimli metodu verilen 
+x değeri için eğrinin solunda kalan toplam alanı yani kümülatif olasılığı bize 
+vermektedir. Örneğin standart normal dağılımda x = 0'ın solunda alan 0.5'tir.
+
+import statistics
+
+nd = statistics.NormalDist()
+
+result = nd.cdf(0)
+print(result)           # 0.5
+
+------------------------------------------------------------------------------------
+Örneğin biz ortalaması 100, standart sapması 15 olan bir normal dağılımda 
+P{130 < x < 140} olasılığını aşağıdaki gibi elde edebiliriz:
+
+nd = statistics.NormalDist(100, 15)
+result = nd.cdf(140) - nd.cdf(130)
+
+Şöyle bir soru sorulduğunu düşünelim: "İnsanların zekaları ortalaması 100, standart 
+sapması 15 olan normal dağılıma uygundur. Bu durumda zeka puanı 140'ın yukarısında 
+olanların toplumdaki yüzdesi nedir?". Bu soruda istenen şey aslında normal dağılımdaki
+P{X > 140} olasılığıdır. Yani x ekseninde belli bir noktanın sağındaki kümülatif 
+alan sorulmaktadır. Bu alanı veren doğrudan bir fonksiyon olmadığı için bu işlem 
+1 - F(140) biçiminde ele alınarak sonuç elde edilebilir. Yani örneğin:
+
+nd = statistics.NormalDist(100, 15)
+result = 1 - nd.cdf(140)
+
+------------------------------------------------------------------------------------
 """
-
-
 
 
