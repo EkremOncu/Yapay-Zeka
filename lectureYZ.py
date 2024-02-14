@@ -1011,6 +1011,7 @@ def draw_gauss(mu = 0, std = 1, fstart= 0, fstop = 0):
 draw_gauss(100, 15, 85, 115)
 
 ------------------------------------------------------------------------------------
+
 ------------------------------------------------------------------------------------
 Kümülatif dağılım fonksiyonu (cummulative distribution function) belli bir değere 
 kadar tüm birikimli olsılıkları veren fonksiyondur. Genellikle F harfi gösterilmektedir. 
@@ -1019,6 +1020,7 @@ aslında eğride X değerinin x0 olduğu noktadan soldaki tüm eğri altında ka
 belirtmektedir. (Başka bir deyişle sürekli dağılımlarda F(x0) değeri "-sonsuzdan 
 x0'a kadar olasılık yoğunluk fonksiyonunun integraline eşittir)
 ------------------------------------------------------------------------------------
+
 ------------------------------------------------------------------------------------
 Normal dağılımla ilgili işlemleri yapabilmek için Python standart kütüphanesinde 
 statistics modülü içerisinde NormalDist isimli bir sınıf bulundurulmuştur. Programcı 
@@ -1057,6 +1059,83 @@ nd = statistics.NormalDist(100, 15)
 result = 1 - nd.cdf(140)
 
 ------------------------------------------------------------------------------------
+Belli bir kümülatif olasılık değeri için x değerinin bulunması işlemi de NormalDist 
+sınıfının inv_cdf metoduyla yapılmaktadır. Örneğin standart normal dağılımda 0.99 
+olan kümülatif olasılığın Z değeri aşağıdaki gibi bulunabilir:
+
+nd = statistics.NormalDist()
+result = nd.inv_cdf(0.99)
+print(result)                       # 2.3263478740408408
+
+result = nd.cdf(2.3263478740408408) # 0.99
+print(result)
+------------------------------------------------------------------------------------
+
+Belli bir x değeri için Gauss fonksiyonunda ona karşı gelen y değeri sınıfın pdf 
+metduyla elde edilmektedir. Örneğin x = 0 için standart normal dağılımda Gauss 
+fonksiyonu değerini aşağıdaki gibi elde edebiliriz:
+
+nd = statistics.NormalDist()
+result = nd.pdf(0)
+print(result)   # 0.3989422804014327
+------------------------------------------------------------------------------------
+
+Normal dağılmış rasgele n tane sayı üretmek için NormalDist sınıfının samples isimli 
+metodu kullanılmaktadır. Bu metot bize bir liste olarak n tane float değer verir. Örneğin:
+
+nd = statistics.NormalDist()
+result = nd.samples(10)
+print(result) 
+
+Bu işlemden biz normal dağılmış 10 tane rasgele değerden oluşan bir liste elde ederiz. 
+
+Biz normal dağılmış rastgele sayılardan histogram çizersek histogramımızın 
+Gauss eğrisine benzemesi gerekir.
+
+
+import statistics
+
+nd = statistics.NormalDist()
+
+result = nd.samples(10000)
+
+import matplotlib.pyplot as plt
+
+plt.hist(result, bins=30)
+plt.show()
+------------------------------------------------------------------------------------
+
+Python'ın statistics modülündeki NormalDist sınıfı vektörel işlemler yapamamaktadır. 
+Maalesef NumPy ve Pandas kütüphanelerinde normal dağılım üzerinde vektörel işlem 
+yapan öğeler yoktur. Ancak SciPy kütüphanesi içerisinde pek çok dağılım üzerinde 
+vektörel işlemler yapan sınıflar bulunmaktadır. Bu nedenle pratikte Python kütüphanesi 
+yerine bu tür işlemler için SciPy kütüphanesi tercih edilmektedir. 
+------------------------------------------------------------------------------------
+
+------------------------------------------------------------------------------------
+scipy.stats modülü içerisindeki norm isimli singleton nesne normal dağılım üzerinde 
+vektörel işlem yapan metotlara sahiptir. norm bir sınıf nesnesidir ve zaten yaratılmış 
+bir biçimde bulunmaktadır. Dolayısıyla programcı doğrudan bu nesne ile ilgili sınıfın 
+metotlarını çağırabilir. Genellikle programcılar bu tür nesneleri kullanmak için 
+from import deyimini tercih ederler:
+
+from scipy.stats import norm
+ 
+norm nesnesine ilişkin sınıfın cdf isimli metodu üç parametre almaktadır:
+
+cdf(x, loc=0, scale=1)
+
+Buradaki x bir NumPy dizisi ya da Python dolaşılabilir nesnesi olabilir. Bu durumda 
+tüm x değerlerinin kümülatif olasılıkları hesaplanıp bir NumPy dizisi olarak 
+verilmektedir. Burada loc ortalamayı, scale ise standart sapmayı belirtmektedir. 
+Örneğin:
+
+from scipy.stats import norm
+result = norm.cdf([100, 130, 140], 100, 15)
+print(result)
+
+------------------------------------------------------------------------------------
 """
+
 
 
