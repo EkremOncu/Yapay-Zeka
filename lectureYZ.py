@@ -683,7 +683,7 @@ Pandas kütüphanesinde Series ve DataFrame sınıflarının mode metotları da 
 işlemi yapmaktadır.
 
 import pandas as pd
-a = np.random.randint(1, 10, (20, 10))
+a = np.random.randint(1, 10, (2, 10))
 df = pd.DataFrame(a)
 df.mode()
 
@@ -869,10 +869,6 @@ K rassal değişkeni "rastgele seçilen bir kişinin kilosunu belirtiyor" olsun.
 durumda örnek uzayı aslında dünyaki tüm insanlardır. Burada K fonksiyonu da her 
 insanı onun kilosuna eşleyen bir fonksiyondur. 
 
-C rassal değişkeni "rastgele seçilen bir rengin RGB değerlerinin ortalamasını" 
-belirtiyor olsun. Bu durumda her rengin bir RGB ortalaması vardır. Bu fonksiyon 
-belli bir rengi alıp onun ortalamasını belirten bir sayıya eşlemektedir. 
-
 Rassal değişkenler kümeler üzerinde işlemler yapmak yerine gerçek sayılar üzerinde 
 işlem yapmamızı sağlayan, anlatımlarda ve gösterimlerde kolaylık sağlayan bir kavramdır. 
 
@@ -884,6 +880,7 @@ alabiliyorsa böyle rassal değişkenlere "sürekli (continous)" rassal değişk
 denilmektedir. Ancak bir rassal değişken belli bir aralıkta yalnızca belli gerçek 
 sayı değerlerini alabiliyorsa bu rassal değişkenlere "kesikli (discrete)" rassal
 değişkenler denilmektedir.
+
 Örneğin "iki zarın atılmasında üste gelen sayılar toplamını belirten R rassal 
 değişkeni" kesiklidir. Çünkü yalnızca belli değerleri alabilmektedir. Ancak 
 "rastgele seçilen bir kişinin kilosunu belirten" K rassal değişkeni süreklidir. 
@@ -893,19 +890,21 @@ aralıktaki tüm gerçek değerlerden biri olabilir.)
 
 ------------------------------------------------------------------------------------
 Yapay zeka ve makine öğrenmesinde sürekli rassal değişkenler daha fazla karşımıza 
-çıkmaktadır. Bu nednele biz sürekli rassal değişkenler ve onların olasılıkları 
+çıkmaktadır. Bu nedenle biz sürekli rassal değişkenler ve onların olasılıkları 
 üzerinde biraz daha duracağız. 
 
 Sürekli bir rassal değişkenin aralıksal olasılıklarını hesaplama aslında bir 
 "intergral" hesabı akla getirmektedir. İşte sürekli rassal değişkenlrin aralıksal 
-olasılıklarının hesaplanması için kullanılan fonksiyonlara "olasılık yoğunluk 
-fonksiyonları (probability density functions)" denilmektedir. Birisi bize bir 
-rassal değişkenin belli bir aralıktaki olasılığını soruyorsa o kişiin bize o 
-rassal değişkene ilişkin "olasılık yoğunluk fonksiyonunu" vermiş olması gerekir. 
-Biz de örneğin P{x0 < X < x1} olasılığını x0'dan x1'e f(x)'in integrali ile elde 
-ederiz. 
+olasılıklarının hesaplanması için kullanılan fonksiyonlara -----> 
 
-Bir fonksiyonun olasılık yoğunluk fonksiyonu olabilmesi için -sonsuzdan + sonsuze 
+"olasılık yoğunluk fonksiyonları (probability density functions)" denilmektedir. 
+
+Birisi bize bir rassal değişkenin belli bir aralıktaki olasılığını soruyorsa o 
+kişiin bize o rassal değişkene ilişkin "olasılık yoğunluk fonksiyonunu" vermiş 
+olması gerekir. Biz de örneğin P{x0 < X < x1} olasılığını x0'dan x1'e f(x)'in 
+integrali ile elde ederiz. 
+
+Bir fonksiyonun olasılık yoğunluk fonksiyonu olabilmesi için -sonsuzdan + sonsuza 
 integralinin (yani tüm eğri altında kalan alanın) 1 olması gerekir. Bir rassal 
 değişkenin olasılık yoğunluk fonksiyonuna "o rassal değişkenin dağılımı" da 
 denilmektedir.
@@ -1014,8 +1013,8 @@ draw_gauss(100, 15, 85, 115)
 
 ------------------------------------------------------------------------------------
 Kümülatif dağılım fonksiyonu (cummulative distribution function) belli bir değere 
-kadar tüm birikimli olsılıkları veren fonksiyondur. Genellikle F harfi gösterilmektedir. 
-Mrneğin F(x0) aslında P{X < x0} anlamına gelmektedir. Normal dağılımda F(x0) değeri 
+kadar tüm birikimli olasılıkları veren fonksiyondur. Genellikle F harfi gösterilmektedir. 
+Örneğin F(x0) aslında P{X < x0} anlamına gelmektedir. Normal dağılımda F(x0) değeri 
 aslında eğride X değerinin x0 olduğu noktadan soldaki tüm eğri altında kalan alanı 
 belirtmektedir. (Başka bir deyişle sürekli dağılımlarda F(x0) değeri "-sonsuzdan 
 x0'a kadar olasılık yoğunluk fonksiyonunun integraline eşittir)
@@ -1047,6 +1046,7 @@ P{130 < x < 140} olasılığını aşağıdaki gibi elde edebiliriz:
 
 nd = statistics.NormalDist(100, 15)
 result = nd.cdf(140) - nd.cdf(130)
+print(result)   # 0.018919751380589434
 
 Şöyle bir soru sorulduğunu düşünelim: "İnsanların zekaları ortalaması 100, standart 
 sapması 15 olan normal dağılıma uygundur. Bu durumda zeka puanı 140'ın yukarısında 
@@ -1080,8 +1080,9 @@ result = nd.pdf(0)
 print(result)   # 0.3989422804014327
 ------------------------------------------------------------------------------------
 
-Normal dağılmış rasgele n tane sayı üretmek için NormalDist sınıfının samples isimli 
-metodu kullanılmaktadır. Bu metot bize bir liste olarak n tane float değer verir. Örneğin:
+!!!! Normal dağılmış !!!! rastgele n tane sayı üretmek için NormalDist sınıfının 
+samples isimli metodu kullanılmaktadır. Bu metot bize bir liste olarak n tane 
+float değer verir. Örneğin:
 
 nd = statistics.NormalDist()
 result = nd.samples(10)
