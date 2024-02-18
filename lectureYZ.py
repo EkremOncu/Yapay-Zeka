@@ -1391,10 +1391,12 @@ belirtir. Örneğin örneklem büyüklüğü 10 ise serbestlik derecesi 9'dur.
 kütüphanesinde de t dağılımına ilişkin bir öğe bulunmamaktadır. Ancak SciPy 
 kütüphanesindeki stats modülünde t isimli singleton nesne t dağılımı ile işlem yapmak 
 için kullanılmaktadır. t isimli singleton nesnenin metotları norm nesnesinin 
-metotlarıyla aynıdır. Bu fonksiyonlar genel olarak önce x değerlerini sonra serbestlik 
-derecesini, sonra da ortalama değeri ve standart sapma değerini parametre olarak 
-almaktadır. Ancak yukarıda da belirttiğimiz gibi t dağılımı denildiğinde genel 
-olarak ortalaması 0, standart sapması 1 olan t dağılımı anlaşılır.
+metotlarıyla aynıdır. 
+
+Bu fonksiyonlar genel olarak önce x değerlerini sonra serbestlik derecesini, 
+sonra da ortalama değeri ve standart sapma değerini parametre olarak almaktadır. 
+Ancak yukarıda da belirttiğimiz gibi t dağılımı denildiğinde genel olarak ortalaması 
+0, standart sapması 1 olan t dağılımı anlaşılır.
 
 ------------------------------------------------------------------------------------
 Aşağıdaki programda standart normal dağılım ile 5 serbestlik derecesi ve 30 30 
@@ -1407,7 +1409,7 @@ import numpy as np
 from scipy.stats import norm, t
 import matplotlib.pyplot as plt
 
-plt.figure(figsize=(10, 5))
+plt.figure(figsize=(20, 15))
 x = np.linspace(-5, 5, 1000)
 y = norm.pdf(x)
 
@@ -1420,15 +1422,80 @@ axis.spines['right'].set_color(None)
 axis.set_xticks(range(-4, 5))
 plt.plot(x, y)
 
-y = t.pdf(x, 5)
+y = t.pdf(x, 1)                 # 1 --> serbestlik derecesi
 plt.plot(x, y)
 
 plt.legend(['Standart Normal Dağılım', 't Dağılımı (DOF = 5)', 't dağılımı (DOF = 30)'])
 
-y = t.pdf(x, 30)
-plt.plot(x, y, color='red')
+y = t.pdf(x, 30)                # 30 --> serbestlik derecesi
+plt.plot(x, y, color='red')     
+                    
+                # >= 30'dan sonra normal dağılımla hemen hemen aynı grafik oluyor  
+plt.show()
+------------------------------------------------------------------------------------
+
+Değişik Serbestlik Derecelerine İlişkin t Dağılımı Grafikleri
+
+
+from scipy.stats import norm,  t
+import numpy as np
+import matplotlib.pyplot as plt
+
+x = np.linspace(-5, 5, 1000)
+
+plt.figure(figsize=(15, 10))
+plt.title('Değişik Serbestlik Derecelerine İlişkin t Dağılımı Grafikleri', fontweight='bold')
+axis = plt.gca()
+axis.set_ylim(-0.5, 0.5)
+axis.spines['left'].set_position('center')
+axis.spines['bottom'].set_position('center')
+axis.spines['top'].set_color(None)
+axis.spines['right'].set_color(None)
+
+y_norm = norm.pdf(x)
+plt.plot(x, y_norm, color='blue')
+
+df_info = [(2, 'red'), (5, 'green'), (10, 'black')]
+
+for df, color in df_info:
+    y_t = t.pdf(x, df)
+    plt.plot(x, y_t, color=color)
+    
+plt.legend(['Standart Normal Dağılım'] + [f'{t[0]} Serbestlik Derecesi' for t in df_info], fontsize=14)
 
 plt.show()
 
 ------------------------------------------------------------------------------------
-"""   
+Tabii standart normal dağılımla t dağılının olasılık yoğunluk fonksiyonları farklı 
+olduğuna göre aynı değerlere ilişkin kümülatif olasılık değerleri de farklı olacaktır. 
+
+
+from scipy.stats import norm,  t
+
+x = [-0.5, 0, 1, 1.25]
+result = norm.cdf(x)
+print(result)               # [0.30853754 0.5        0.84134475 0.89435023]
+
+x = [-0.5, 0, 1, 1.25]
+result = t.cdf(x, 5)    
+print(result)               # [0.31914944 0.5        0.81839127 0.86669189]
+
+------------------------------------------------------------------------------------
+"""  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
