@@ -1136,7 +1136,157 @@ result = norm.cdf([100, 130, 140], 100, 15)
 print(result)
 
 ------------------------------------------------------------------------------------
-"""
 
+norm nesnesinin ilişkin olduğu sınıfın ppf (percentage point function) isimli metodu 
+cdf işleminin tersini yapmaktadır. Yani kümülatif olasılığı bilindiği durumda bize 
+bu kümalatif olasılığa karşı gelen x değerini verir. (Yani ppf NormalDist sınıfındaki 
+inv_cdf metoduna karşılık gelmektedir.):
+
+ppf(q, loc=0, scale=1)
+
+from scipy.stats import norm
+
+result = norm.ppf([0.50, 0.68, 0.95], 100, 15)
+print(result)
+
+ppf (percentage point function) ismi size biraz tuhaf gelebilir. Bu isim birikimli 
+dağılım fonksiyonunun tersini belirtmek için kullanılmaktadır. ppf aslında 
+"medyan (median)" kavramının genel biçimidir. Anımsanacağı gibi medyan ortadan ikiye 
+bölen noktayı belirtiyordu. Örneğin standart normal dağılımda medyan 0'dır. 
+Yani ortalamaya eşittir. 
+
+İstatistikte tam ortadan bölen değil de diğer noktalardan bölen değerler için 
+"percentage point" de denilmektedir. Örneğin normal dağılımda 1/4 noktasından bölen 
+değer aslında birikimli dağılm fonksiyonunun 0.25 için değeridir. 
+
+------------------------------------------------------------------------------------
+norm nesnesinin ilişkin olduğu sınıfın pdf (probability density function) isimli 
+metodu yine x değerlerinin Gaus eğrisindeki Y değerlerini vermektedir. Metodun 
+parametrik yapısı şöyledir:
+
+pdf(x, loc=0, scale=1) 
+
+------------------------------------------------------------------------------------
+import numpy as np
+from scipy.stats import norm
+import matplotlib.pyplot as plt
+
+x = np.linspace(40, 160, 1000)
+y = norm.pdf(x, 100, 15)
+
+plt.plot(x, y)
+
+x = np.full(200, 100)       # 200 tane 100'lerden oluşan dizi
+yend = norm.pdf(100, 100, 15)
+y = np.linspace(0, yend, 200)
+plt.plot(x, y, linestyle='--')
+
+plt.show()
+
+------------------------------------------------------------------------------------
+norm nesnesinin ilişkin olduğu sınıfın rvs metodu ise normal dağılıma ilişkin rassal 
+sayı üretmek için kullanılmaktadır. Metodun parametrik yapısı şöyledir:
+
+    rvs(loc=0, scale=1, size=1)
+
+statistics.NormalDist()'in sample metodunun bezeri
+------------------------------------------------------------------------------------
+
+import numpy as np
+from scipy.stats import norm
+import matplotlib.pyplot as plt
+
+x = norm.rvs(100, 15, 10000)
+
+plt.hist(x, bins=20)
+plt.show()
+
+------------------------------------------------------------------------------------
+Normal dağılımda ortalamadan birer standart sapma arasındaki bölgenin olasılığı, 
+yani P{mu - sigma < x < mu + sigma} olasılığı 0.68 civarındadır.
+
+
+import numpy as np
+from scipy.stats import norm
+import matplotlib.pyplot as plt
+
+result = norm.cdf(1) - norm.cdf(-1)
+print(result)
+
+x = np.linspace(-5, 5, 1000)
+y = norm.pdf(x)
+
+plt.title('Ortalamadan 1 Standart Sapma Arası Bölge', fontweight='bold')
+axis = plt.gca()
+axis.set_ylim(-0.5, 0.5)
+axis.spines['left'].set_position('center')
+axis.spines['bottom'].set_position('center')
+axis.spines['top'].set_color(None)
+axis.spines['right'].set_color(None)
+
+axis.set_xticks(range(-4, 5))
+axis.text(2, 0.3, f'{result:.3f}', fontsize=14, fontweight='bold')
+
+plt.plot(x, y)
+
+x = np.linspace(-1, 1, 1000)
+y = norm.pdf(x)
+plt.fill_between(x, y)
+axis.arrow(2.5, 0.25, -2, -0.1, width=0.0255)
+
+plt.show()
+
+------------------------------------------------------------------------------------
+Normal dağılımda ortalamadan iki standart sapma arasındaki bölgenin olasılığı, yani 
+P{mu - 2 * sigma < x < mu + 2 * sigma} olasılığı 0.95 civarındadır.
+
+
+import numpy as np
+from scipy.stats import norm
+import matplotlib.pyplot as plt
+
+result = norm.cdf(2) - norm.cdf(-2)
+print(result)
+
+x = np.linspace(-5, 5, 1000)
+y = norm.pdf(x)
+
+plt.title('Ortalamadan 2 Standart Sapma Arası Bölge', fontweight='bold')
+axis = plt.gca()
+
+axis.set_ylim(-0.5, 0.5)
+axis.spines['left'].set_position('center')
+axis.spines['bottom'].set_position('center')
+axis.spines['top'].set_color(None)
+axis.spines['right'].set_color(None)
+
+axis.set_xticks(range(-4, 5))
+axis.text(2, 0.3, f'{result:.3f}', fontsize=14, fontweight='bold')
+
+plt.plot(x, y)
+
+x = np.linspace(-2, 2, 1000)
+y = norm.pdf(x)
+plt.fill_between(x, y)
+axis.arrow(2.5, 0.25, -2, -0.1, width=0.0255)
+
+plt.show()
+
+------------------------------------------------------------------------------------
+"""
+"""
+------------------------------------------------------------------------------------
+Diğer çok karşılaşılan sürekli dağılım "sürekli düzgün dağılım (continous uniform distribution)" 
+denilen dağılımdır. Burada dağılımı temsil eden a ve b değerleri vardır. Sürekli 
+düzgün dağılımın olasılık yoğunluk fonksiyonu dikdörtgensel bir alandır. Dolayısıyla 
+kümülatif dağılım fonksiyonu x değeriyle orantılı bir değer vermektedir. Sürekli 
+düzgün dağılımın olasılık yoğunluk fonksiyonu şöyle ifade edilebilir:
+
+f(x) = {
+            1 / (b - a)     a < x < b
+            0               diğer durumlarda    
+       }
+------------------------------------------------------------------------------------
+"""    
 
 
