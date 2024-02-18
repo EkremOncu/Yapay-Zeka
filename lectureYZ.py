@@ -1309,6 +1309,49 @@ uniform nesnesinin metotlarındaki ikinci parametrenin (loc) a değeri olduğuna
 üçüncü parametrenin a'dan uzaklık belirttiğine (scale) dikkat ediniz.
 
 ------------------------------------------------------------------------------------
+import numpy as np
+from scipy.stats import uniform
+import matplotlib.pyplot as plt
+
+A = 10
+B = 20
+
+x = np.linspace(A - 5, B + 5, 1000)
+y = uniform.pdf(x, A, B - A)
+
+plt.title('Continupos Uniform Distribution', fontweight='bold')
+plt.plot(x, y)
+
+x = np.linspace(10, 12.5, 1000)  # 12.5'in cdf'sini boyamak icin
+y = uniform.pdf(x, A, B - A)
+plt.fill_between(x, y)
+plt.show()
+
+result = uniform.cdf(12.5, A, B - A)
+print(result)                               # 0.25
+
+result = uniform.ppf(0.5, A, B - A)
+print(result)                               # 15
+------------------------------------------------------------------------------------
+
+Düzgün dağılmış rastgele sayı aslında bizim aşina olduğumuz klasik rastgele üretimidir. 
+Örneğin Python standart kütüphanesindeki random modülünde bulnan random fonksiyonu 
+0 ile 1 arasında rastgele bir sayı veriyordu. Aslında bu fonksiyon a = 0, b = 1 olan
+düzgün dağılımda rastegele sayı veren fonksiyonla tamamne aynıdır. Bnezer biçimde 
+NumPy'daki random modülündeki random fonksiyonu 0 ile 1 arasında düzgün dağılmış 
+rastgele sayı üretmektedir. Örneğin:
+
+result = uniform.rvs(10, 10, 10)
+print(result)  
+
+Burada a = 10, b = 20 olan sürekli düzgün dağılımda 10 tane rastgele noktalı sayı 
+elde edilecektir. 
+
+Örneğin 100 ile 200 arasında rastgele 10 tane gerçek sayı üretmek istesek bu işlemi 
+şöyle yapmalıyız:
+
+uniform.rvs(100, 200, 10)
+------------------------------------------------------------------------------------
 """    
 
-
+# t Dağılımı
