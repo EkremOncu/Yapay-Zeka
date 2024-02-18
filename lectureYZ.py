@@ -1286,6 +1286,28 @@ f(x) = {
             1 / (b - a)     a < x < b
             0               diğer durumlarda    
        }
+
+------------------------------------------------------------------------------------
+Sürekli düzgün dağılım için Python'ın standart kütüphanesinde bir sınıf bulunmamaktadır. 
+NumPy'da da böyle bir sınıf yoktur. Ancak SciPy içerisinde stats modülünde uniform 
+isimli bir singleton nesne bulunmaktadır. Bu nesneye ilişkin sınıfın yine cdf, ppf, 
+pdf ve rvs metotları vardır. Bu metotlar sırasıyl a değerini ve a'dan uzunluğu 
+parametre olarak almaktadır. Örneğin:
+
+result = uniform.pdf(15, 10, 10)
+
+Burada aslında a = 10, b = 20 olan bir sürekli düzgün dağılımdaki olasılık yoğunluk 
+fonksiyon değeri elde edilmektedir. Tabii aslında 10 ile 20 arasındaki tüm olasılık 
+yoğunluk fonksiyon değerleri 1 / 10 olacaktır.
+
+
+result = uniform.cdf(15, 10, 10)
+
+Burada a = 10, b = 20 olan bir sürekli düzgün dağılımda 15'in solundaki alan elde 
+edilecektir. 15 burada orta nokta olduğunda göre elde edilecek bu değer 0.5'tir.
+uniform nesnesinin metotlarındaki ikinci parametrenin (loc) a değeri olduğuna ancak 
+üçüncü parametrenin a'dan uzaklık belirttiğine (scale) dikkat ediniz.
+
 ------------------------------------------------------------------------------------
 """    
 
