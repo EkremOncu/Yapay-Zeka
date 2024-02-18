@@ -1352,6 +1352,83 @@ elde edilecektir.
 
 uniform.rvs(100, 200, 10)
 ------------------------------------------------------------------------------------
-"""    
+"""
+
 
 # t Dağılımı
+
+"""   
+------------------------------------------------------------------------------------
+Özellikle güven aralıklarında (confidence interval) ve hipotez testlerinde kullanılan 
+diğer önemli bir sürekli dağılım da "t dağılımı (t distribution)" denilen dağılımdır.
+
+t dağılımı standart normal dağılıma oldukça benzemektedir. Bu dağılımın ortalaması 0'dır. 
+Ancak standart sapması "serbestlik derecesi (degrees of freedom)" denilen bir değere 
+göre değişir. t dağılımının standart sapması sigma = karekök(df / (df - 2)) biçimindedir. 
+t dağılımın olasılık yoğunluk fonksiyonu biraz karmaşık bir görüntüdedir. Ancak 
+fonksiyon standart normal dağılıma göre "daha az yüksek ve biraz daha şişman" gibi 
+gözükmektedir. t dağılımının serbestlik derecesi artırıldığında dağılım standart 
+normal dağılıma çok benzer hale gelir. Serbestlik derecesi >= 30 durumunda standart 
+normal dağılımla oldukça örtüşmektedir. Yani serbestlik derecesi >= 30 durumunda 
+artık t dağılımı kullanmakla standart normal dağılım kullanmak arasında önemli bir 
+farklılık kalmamaktadır.
+
+t dağılımı denildiğinde her zaman ortalaması 0 olan standart sapması 1 olan (bu 
+konuda bazı ayrıntılar vardır) dağılım anlaşılmaktadır. Tabii t dağılımı da eksende 
+kaydırılabilir ve standart sapma değiştirilebilir.
+
+t dağılımı teorik bir dağılımdır. Yukarıda da belirttiğimiz gibi özellikle "güven 
+aralıklarının oluşturulması" ve "hipotez testlerinde" kullanım alanı bulmaktadır. 
+Bu tür durumlarda anakütle standart sapması bilinmediği zaman örnek standart sapması
+anakütle standart sapması olarak kullanılmakta ve t dağılımından faydalanılmaktadır.
+
+t dağılımının önemli bir parametresi "serbestlik derecesi (degrees of freedom)" 
+denilen parametresidir. Serbestlik derecesi örneklem büyüklüğünden bir eksik değeri 
+belirtir. Örneğin örneklem büyüklüğü 10 ise serbestlik derecesi 9'dur. 
+
+------------------------------------------------------------------------------------
+ t dağılımına ilişkin Python standart kütüphanesinde bir sınıf yoktur. NumPy 
+kütüphanesinde de t dağılımına ilişkin bir öğe bulunmamaktadır. Ancak SciPy 
+kütüphanesindeki stats modülünde t isimli singleton nesne t dağılımı ile işlem yapmak 
+için kullanılmaktadır. t isimli singleton nesnenin metotları norm nesnesinin 
+metotlarıyla aynıdır. Bu fonksiyonlar genel olarak önce x değerlerini sonra serbestlik 
+derecesini, sonra da ortalama değeri ve standart sapma değerini parametre olarak 
+almaktadır. Ancak yukarıda da belirttiğimiz gibi t dağılımı denildiğinde genel 
+olarak ortalaması 0, standart sapması 1 olan t dağılımı anlaşılır.
+
+------------------------------------------------------------------------------------
+Aşağıdaki programda standart normal dağılım ile 5 serbestlik derecesi ve 30 30 
+serbestlik derecesine ilişkin t dağılımlarının olasılık yoğunluk fonksiyonları 
+çizdirilmiştir. Burada özellikle 30 serbestlik derecesine ilişkin t dağılımının 
+grafiğinin standart normal dağılım grafiği ile örtüşmeye başladığına dikkat ediniz. 
+
+
+import numpy as np
+from scipy.stats import norm, t
+import matplotlib.pyplot as plt
+
+plt.figure(figsize=(10, 5))
+x = np.linspace(-5, 5, 1000)
+y = norm.pdf(x)
+
+axis = plt.gca()
+axis.set_ylim(-0.5, 0.5)
+axis.spines['left'].set_position('center')
+axis.spines['bottom'].set_position('center')
+axis.spines['top'].set_color(None)
+axis.spines['right'].set_color(None)
+axis.set_xticks(range(-4, 5))
+plt.plot(x, y)
+
+y = t.pdf(x, 5)
+plt.plot(x, y)
+
+plt.legend(['Standart Normal Dağılım', 't Dağılımı (DOF = 5)', 't dağılımı (DOF = 30)'])
+
+y = t.pdf(x, 30)
+plt.plot(x, y, color='red')
+
+plt.show()
+
+------------------------------------------------------------------------------------
+"""   
