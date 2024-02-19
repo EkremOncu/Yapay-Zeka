@@ -1564,3 +1564,85 @@ print(result)
 
 ------------------------------------------------------------------------------------
 """
+"""
+------------------------------------------------------------------------------------
+
+# Bernoulli dağılımı
+
+Bernoulli dağılımında X değeri 0 ya da 1 olabilir. X = 0 durumu bir olayın olumsuz 
+olma ya da gerçekleşmeme olasılığını, X = 1 durumu ise bir olayın olumlu olma ya 
+da gerçekleşme olasılığını belirtmektedir. Bu rassal değişkenin yalnızca iki değer 
+aldığına dikkat ediniz. Sonucu iki değerden biri olan rassal deneylere 
+"Bernoulli deneyleri" de denilmektedir. Bernoulli dağılımının olasılık kütle 
+fonksiyonu şöyle ifade edilebilir:
+
+P{X = x} =  {
+                p           X = 1 ise
+                1 - p       X = 0 ise
+
+            }
+
+Ya da bu olasılık kütle fonksiyonunu aşağıdaki gibi de ifade edebiliriz:
+
+P{X = x} = p^x * (1 - p)^(1 - x)
+
+Burada X = 0 için 1 - p değerinin X = 1 için p değerinin elde edildiğine dikkat ediniz. 
+
+
+Bernoulli dağılımı için de SciPy kütüphanesinde stats modülü içerisinde bernoulli 
+isimli bir singleton nesne bulundurulmuştur. Tabii bu dağılım çok basit olduğu 
+için bu nesnenin kullanılması da genellikle gereksiz olmaktadır. bernoulli nesnesinin
+ilikin olduğu sınıfın metotları bizden X değerini (0 ya da 1 olabilir) ve X = 1 
+için p değerini almaktadır. Örneğin:
+
+from scipy.stats import bernoulli
+bernoulli.pmf(0, 0.7)               # 0.3
+
+
+buradan 0.3 değeri elde edilecektir. 
+------------------------------------------------------------------------------------
+"""
+"""
+------------------------------------------------------------------------------------
+
+# binom dağılım
+
+Binom dağılımında bir Bernoulli deneyi (yani iki sonucu olan bir deney) toplam 
+n defa yinelenmektedir. Bu n defa yinelenmede olayın tam olarak kaç defa olumlu
+sonuçlanacağının olasılığı hesaplanmak istenmektedir. Dolayısıyla binom dağılımının 
+olasılık kütle fonksiyonunda X değerleri 0, 1, 2, ... gibi tamsayı değerler alır. 
+
+Örneğin bir para 5 kez atılıyor olsun. Biz de bu 5 kez para atımında tam olarak 
+3 kez Tura gelme olasılığını hesaplamak isteyelim. Burada paranın atılması bir 
+Bernoulli deneyidir. Bu deney 5 kez yinelenmiş olumlu kabul ettiğimiz Tura gelme 
+durumunun toplamda 3 kez olmasının olasılığı elde edilmek istenmiştir. 
+ 
+Binom dağılımının olasılık kütle fonksiyonu şöyledir:
+
+    P{X = x} = C(n, x) *  p^x  *  (1 - p)^(n - x)
+
+
+Binom dağılımı için SciPy kütüphanesindeki stats modülünde bulunan binom isimli 
+singleton nesne kullanılabilir. Nesnenin kullanılması diğer singleton nesnelere 
+benzemektedir. Örneğin ilgili sınıfın pmf fonksiyonu olasılık kütle fonlsiyonunu 
+belirtmektedir. 
+
+
+Örneğin yukarıda belirttiğimiz paranın 5 kez atılmasında tam olarak 3 kez tura 
+gelme olsaılığı şöyle elde edilebilir:
+
+from scipy.stats import binom
+binom.pmf(3, 5, 0.5)    
+
+Bu fonksiyonlarda birinci parametre "olumlu gerçekleşme sayısını", ikinci parametre 
+"toplam deney sayısını"  ve üçüncü parametre de "olumlu gerçekleşme olasılığını" 
+belirtmektedir. 
+------------------------------------------------------------------------------------
+"""
+
+
+#   Merkezi limit teoremi (central limit theorem)
+
+
+
+
