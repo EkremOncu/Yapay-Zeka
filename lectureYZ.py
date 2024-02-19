@@ -1484,18 +1484,83 @@ print(result)               # [0.31914944 0.5        0.81839127 0.86669189]
 """  
 
 
+# Kesikli (discrete) dağılım
+"""  
+------------------------------------------------------------------------------------
+ Kesikli dağılımlarda X değerleri her gerçek değeri almamaktadır. Dolayısıyla bunların 
+fonksiyonları çizildiğinde sürekli fonksiyonlar elde edilemeyecek yalnızca noktalar 
+elde edilecektir. Kesikli dağılımlarda X değerlerini onların olasılıklarına eşleyen 
+fonksiyonlara "olasılık kütle fonksiyonu (probability mass function)" denilmektedir. 
+Sürekli rassal değişkenlerin olasılık yoğunluk fonksiyonları integral hesap için 
+kullaılırken kesikli rassal değişkenler için olasılık kütle fonksiyonları doğrudan 
+rassal değişkeninin ilgili noktadaki olasılığını vermektedir. Tabii olasılık kütle 
+fonksiyonu f(x) olmak üzere her x için f(x) değerlerinin toplamının yine 1 olması 
+gerekmektedir.
+
+------------------------------------------------------------------------------------
+
+# Poisson dağılımı
+
+En çok karşılaşılan kesikli dağılımlardan biri "poisson (genellikle "puason" biçiminde 
+okumuyor)" dağılımıdır. Bu kesikli dağılım adeta normal dağılımın kesikli versiyonu 
+gibidir. Poisson dağılımının olasılık kütle fonksiyonu şöyledir:
+
+    P(X = x) = (e^-lambda * lambda^x) / x!
+
+Buradaki x olasılığını hesaplamak istediğimiz kesikli değeri belirtmektedir. Lamda 
+ise ortalama olay sayısını belirtmektedir. Lambda değeri ortalama belirttiği için 
+gerçek bir değer olabilir. Ancak x değerleri 0, 1, 2, ... n biçiminde o ve pozitif 
+tamsayılardan oluşmaktadır.
+
+Yukarıda da belirttiğimiz gibi poisson dağılımı adeta normal dağılımın kesikli hali 
+gibidir. Dolayısıyla doğada da çok karşılaşılan kesikli dağılımlardandır.
+
+Poisson dağılımı için de Python standart kütüphanesinde ya da Numpy ve Pandas 
+kütüphanelerinde özel fonksiyonlar ve sınıflar bulunmamaktadır. Ancak SciPy 
+kütüphanesinin stats modülü içerisinde poisson isimli bir single nesne ile bu 
+dağılımla ilgili işlemler kolaylıkla yapılabilmektedir. 
+
+SciPy'da kesikli dağılımlar üzerinde işlemler yapan singleton nesneler sürekli 
+dağılımlarla işlemler yapan single nesnelere kullanım bakımından oldukça benzemektedir. 
+Ancak kesikli dağılımlar için fonksiyonun ismi "pdf değil pmf" biçimindedir. Burada 
+"pmf" ismi "probability mass function" sözcükleridnen kısaltılmıştır. 
+
+SciPy'daki poisson nesnesinin fonksiyonları genel olarak bizden x değerini ve lambda 
+değerini parametre olarak istemektedir. Örneğin maçlardaki gol sayısının poisson 
+dağılıma uyduğunu varsayalım. Maçlardaki ortalama gol sayısının 2 olduğunu kabul 
+edelim. Bu durumda bir maçta 5 gol olma olasılığı aşağıdaki gibi elde edilebilir:
+
+from scipy.stats import poisson    
+result = poisson.pmf(5, 2)
+print(result)           # 0.03608940886309672
 
 
+Yukarıdaki gibi poisson dağılımı sorularında genellikle soruyu soran kişi belli bir 
+olayın ortalama gerçekleşme sayısını verir. Sonra kişiden bazı değerleri bulmasını 
+ister. Pekiyi soruda "bir maçta 2'den fazla gol olma olasılığı sorulsaydı biz soruyu 
+nasıl çözerdik? poisson nesnesi ile cdf fonksiyonunu çağırdığımızda bu cdf fonksiyonu 
+bize x değerine kadarki (x değeri de dahil olmak üzere) kümülatif olasılığı verecektir. 
+Bu değeri de 1'den çıkartırsak istenen olasılığı elde edebiliriz:
 
+result = 1 - poisson.cdf(2, 2)
+print(result)   # 0.3233235838169366
 
+------------------------------------------------------------------------------------
+Poisson dağılımında lamda değeri yüksek tutulursa saçılma grafiğinin Gauss 
+eğrisine benzediğine dikkat ediniz. 
 
+from scipy.stats import poisson
+import matplotlib.pyplot as plt
 
+plt.title('Poisson Distribution with Lambda 100', fontweight='bold')
+x = range(0, 200)
+y = poisson.pmf(x, 100)
 
+plt.scatter(x, y)
+plt.show()
 
+result = poisson.pmf(3, 4)
+print(result)
 
-
-
-
-
-
-
+------------------------------------------------------------------------------------
+"""
