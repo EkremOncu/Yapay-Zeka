@@ -1643,6 +1643,58 @@ belirtmektedir.
 
 #   Merkezi limit teoremi (central limit theorem)
 
+"""
+------------------------------------------------------------------------------------
+Bu teoreme göre bir "anakütleden (population)" çekilen belli büyüklükteki örneklerin 
+ortalamaları normal dağılmaktadır. Örneğin elimizde 1000,000 elemanlı bir anakütle 
+olsun. Bu anakütleden 50'lik tüm alt kümeleri yani örnekleri elde edip bunların 
+ortalamalarını heaplayalım. İşte bu ortalamalar normal dağılmaktadır. Bir anakütleden 
+alınan altkümelere "örnek (sample)" denilmektedir. Bu işleme de genel olarak 
+"örnekleme (sampling)" denir. Örneğimizdeki 1000,000 elemanın 50'li alt kümelerinin 
+sayısı çok fazladır. O halde deneme için 1000,000 elemanlı anakütlenin tüm alt 
+kümelerini değil belli sayıda alt kümelerini elde ederek histogram çizebiliriz. Bu 
+histogramın teoreme göre Gauss eğrisine benzemesi gerekir. 
 
+------------------------------------------------------------------------------------
+import numpy as np
+import matplotlib.pyplot as plt
 
+POPULATION_RANGE = 1_000_000_000
+POPULATION_SIZE = 1_000_000
+NSAMPLES = 10000
+SAMPLE_SIZE = 50
+
+population = np.random.randint(0, POPULATION_RANGE, POPULATION_SIZE)
+samples = np.random.choice(population, (NSAMPLES, SAMPLE_SIZE))
+samples_means = np.mean(samples, axis=1)
+
+plt.hist(samples_means, bins=50)
+
+plt.show()
+
+------------------------------------------------------------------------------------
+Tabii yukarıdaki örneği hiç NumPy kullanmadan tamamen Python standart kütüphanesi 
+ile de yapabilirdik.
+
+import random
+import statistics
+
+POPULATION_RANGE = 1_000_000_000
+POPULATION_SIZE = 1_000_000
+NSAMPLES = 10000
+SAMPLE_SIZE = 50
+
+population = random.sample(range(POPULATION_RANGE), POPULATION_SIZE)
+
+samples_means = [statistics.mean(random.sample(population, SAMPLE_SIZE)) for _ in range(NSAMPLES)]
+
+samples_means_mean = statistics.mean(samples_means)
+
+import matplotlib.pyplot as plt
+
+plt.title('Central Limit Theorem', fontweight='bold')
+plt.hist(samples_means, bins=50)
+plt.show()
+------------------------------------------------------------------------------------
+"""
 
