@@ -1379,8 +1379,11 @@ kaydırılabilir ve standart sapma değiştirilebilir.
 
 t dağılımı teorik bir dağılımdır. Yukarıda da belirttiğimiz gibi özellikle "güven 
 aralıklarının oluşturulması" ve "hipotez testlerinde" kullanım alanı bulmaktadır. 
+
+!!!!!
 Bu tür durumlarda anakütle standart sapması bilinmediği zaman örnek standart sapması
 anakütle standart sapması olarak kullanılmakta ve t dağılımından faydalanılmaktadır.
+!!!!!
 
 t dağılımının önemli bir parametresi "serbestlik derecesi (degrees of freedom)" 
 denilen parametresidir. Serbestlik derecesi örneklem büyüklüğünden bir eksik değeri 
@@ -1537,7 +1540,7 @@ print(result)           # 0.03608940886309672
 
 Yukarıdaki gibi poisson dağılımı sorularında genellikle soruyu soran kişi belli bir 
 olayın ortalama gerçekleşme sayısını verir. Sonra kişiden bazı değerleri bulmasını 
-ister. Pekiyi soruda "bir maçta 2'den fazla gol olma olasılığı sorulsaydı biz soruyu 
+ister. Peki soruda "bir maçta 2'den fazla gol olma olasılığı sorulsaydı biz soruyu 
 nasıl çözerdik? poisson nesnesi ile cdf fonksiyonunu çağırdığımızda bu cdf fonksiyonu 
 bize x değerine kadarki (x değeri de dahil olmak üzere) kümülatif olasılığı verecektir. 
 Bu değeri de 1'den çıkartırsak istenen olasılığı elde edebiliriz:
@@ -1646,12 +1649,12 @@ belirtmektedir.
 """
 ------------------------------------------------------------------------------------
 Bu teoreme göre bir "anakütleden (population)" çekilen belli büyüklükteki örneklerin 
-ortalamaları normal dağılmaktadır. Örneğin elimizde 1000,000 elemanlı bir anakütle 
+ortalamaları normal dağılmaktadır. Örneğin elimizde 100,000 elemanlı bir anakütle 
 olsun. Bu anakütleden 50'lik tüm alt kümeleri yani örnekleri elde edip bunların 
-ortalamalarını heaplayalım. İşte bu ortalamalar normal dağılmaktadır. Bir anakütleden 
+ortalamalarını hesaplayalım. İşte bu ortalamalar normal dağılmaktadır. Bir anakütleden 
 alınan altkümelere "örnek (sample)" denilmektedir. Bu işleme de genel olarak 
-"örnekleme (sampling)" denir. Örneğimizdeki 1000,000 elemanın 50'li alt kümelerinin 
-sayısı çok fazladır. O halde deneme için 1000,000 elemanlı anakütlenin tüm alt 
+"örnekleme (sampling)" denir. Örneğimizdeki 100,000 elemanın 50'li alt kümelerinin 
+sayısı çok fazladır. O halde deneme için 100,000 elemanlı anakütlenin tüm alt 
 kümelerini değil belli sayıda alt kümelerini elde ederek histogram çizebiliriz. Bu 
 histogramın teoreme göre Gauss eğrisine benzemesi gerekir. 
 
@@ -1729,5 +1732,117 @@ print(f'Anakütle ortalaması: {population_mean}')
 print(f'Örnek ortalamalarının Ortalaması: {samples_means_mean}')
 
 ------------------------------------------------------------------------------------
+------------------------------------------------------------------------------------
+
+Peki bir anakütleden alınan örnek ortalamaları normal dağılmaktadır ve bu normal 
+dağılımın ortalaması anakütle ortalamasına eşittir. Peki örnek ortalamalarına 
+ilişkin normal dağılımın standart sapması nasıldır? İşte merkezi limit teoremine 
+göre örnek ortalamalarının standart sapması ------------->
+
+"anakütle kütle standart sapması / karekök(n)" biçimindedir.   n->(örnek büyüklüğü)
+
+Yani örnek ortalamalarının standart sapması anakütle sapmasından oldukça küçüktür 
+ve örnek büyüklüğüne bağlıdır. Buradaki n örnek büyüklüğünü belirtmektedir. Örnek 
+ortalamalarının standart sapmasına "standard error" de denilmektedir. Görüldüğü 
+gibi eğer örnek ortalamalarına ilişkin normal dağılımın standart sapması düşürülmek 
+isteniyorsa (başka bir deyişle standart hata azaltılmak isteniyorsa) örnek büyüklüğü
+artırılmalıdır. 
+
+------------------------------------------------------------------------------------
+import numpy as np
+import matplotlib.pyplot as plt
+
+POPULATION_RANGE = 1_000_000_000
+POPULATION_SIZE = 1_000_000
+NSAMPLES = 10000
+SAMPLE_SIZE = 50
+
+population = np.random.randint(0, POPULATION_RANGE, POPULATION_SIZE)
+samples = np.random.choice(population, (NSAMPLES, SAMPLE_SIZE))
+
+population_mean = np.mean(population)
+population_std = np.std(population)
+
+samples_means = np.mean(samples, axis=1)
+samples_means_mean = np.mean(samples_means)
+sample_means_std = np.std(samples_means)
+
+plt.hist(samples_means, bins=50)
+
+plt.show()
+
+print(f'Anakütle ortalaması: {population_mean}')
+print(f'Örnek ortalamalarının Ortalaması: {samples_means_mean}')
+print(f'Fark: {np.abs(population_mean - samples_means_mean)}')
+print("------------------")
+
+print(f'Merkezi limit teroreminden elde edilen örnek ortalamalarının standart sapması: {population_std / np.sqrt(SAMPLE_SIZE)}')
+print()
+print(f'Örnek ortalamalarının standart sapması: {sample_means_std}')
+
+------------------------------------------------------------------------------------
+
+Merkezi limit teoremine göre eğer anakütleden çekilen örnekler büyükse yani tipik 
+olarak n örnek büyüklüğü N ise anakütle büyüklüğü olmak üzere n / N >= 0.05 ise 
+bu durumda örneklem dağılımın standart sapması için "anakütle standart sapması / kök(n)" 
+değeri "düzeltme faktörü (correction factor)" denilen bir çarpanla çarpılmalıdır. 
+Düzeltme faktörü karekök((N - n)/(N -1)) biçimindedir. Bu konunun ayrıntıları için 
+başka kaynaklara başvurabilirsiniz. Örneğin ana kütle 100 elemandan oluşuyor olsun. 
+Biz 30 elemanlı örnekler çekersek bu düzeltme faktörünü kullanmalıyız. Tabii 
+paratikte genellikle n / N değeri 0.05'ten oldukça küçük olmaktadır.
+
+------------------------------------------------------------------------------------
+
+Merkezi limit teoreminde anakütlenin normal dağılmış olması gerekmez. Nitekim 
+yukarıdaki örneklerimizde bir anakütleyi "düzgün dağılıma (uniform distribution)" 
+ilişkin olacak biçimde oluşturduk. Ancak eğer anakütle normal dağılmamışsa örneklem 
+ortalamalarının dağılımının normal olması için örnek büyüklüklerinin belli bir 
+değerden büyük olması gerekmektedir. Bu değer tipik olarak >= 30 biçimindedir.
+Özet olarak:
+    
+- Eğer anakütle normal dağılmışsa örnek büyüklüğü ne olursa olsun örneklem 
+ortalamalarının dağılımı normaldir. 
+
+- Eğer anakütle normal dağılmamışsa örneklem ortalamalarının dağılımının normal 
+olması için örnek büyüklüğünün >= 30 olması gerekir. Tabii n < 30 durumunda yine 
+örneklem dağılımı normale benzemektedir ancak kusurlar oluşmaktadır.
+
+Özetle anakütle normal dağılmamışsa örnek büyüklüklerinin artırılması gerekmektedir. 
+
+------------------------------------------------------------------------------------
 """
 
+
+# Normalliğin Test Edilmesi
+
+"""
+------------------------------------------------------------------------------------
+ 
+Sonuç çıkartıcı istatistikte (inferential statisics) bazen anakütlenin normal dağılıp 
+dağılmadığını örneğe dayalı olarak test etmek gerebilir. Bunun için anakütleden 
+bir örnek alınır. Sonra bu örneğe bakılarak anakütlenin normal dağılıp dağılmadığı 
+belli bir "güven düzeyinde (confidence level)" belirlenir. 
+
+Buna "normallik testleri" denilmektedir. Aslında normallik testi gözle de üstünkörü 
+yapılabilmektedir. Anakütle içerisinden bir örnek çekip onun histogramını çizersek 
+eğer bu histogram Gauss eğrisine benziyorsa biz anakütlenin de normal dağılmış 
+olduğu sonucunu gözle tespit edebiliriz. Ancak anakütlenin normal dağılıp 
+dağılmadığının tespit edilmesi için aslında "hipotez testleri (hypothesis testing)" 
+denilen özel testler kullanılmaktadır. Normal dağılıma ilişkin iki önemli hipotez 
+testi vardır: 
+
+"Kolmogorov-Smirnov" testi ve "Shapiro-Wilk" testidir. Bu testlerin istatistiksel 
+açıklaması biraz karmaşıktır ve bizim konumuz içerisinde değildir. Ancak bu testler 
+SciPy kütüphanesindeki stats modülü içerisinde bulunan fonksiyonlarla yapılabilmektedir. 
+
+Hipotez testlerinde bir hipotez öne sürülür ve bu hipotezin belirli güven düzeyi 
+içerisinde doğrulanıp doğrulanmadığına bakılır. Genel olarak bizim doğrulanmasını 
+istediğimiz hipoteze H0 hipotezi, bunun tersini belirten yani arzu edilmeyen durumu 
+belirten hipoteze de H1 hipotezi denilmektedir. Örneğin normal testindeki H0 ve H1 
+hipotezleri şöyle oluşturulabilir:
+
+    H0: Seçilen örnek normal bir anakütleden gelmektedir. 
+    H1: Seçilen örnek normal dağılmış bir anakütleden gelmemektedir.
+    
+------------------------------------------------------------------------------------
+"""
