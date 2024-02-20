@@ -1845,4 +1845,24 @@ hipotezleri şöyle oluşturulabilir:
     H1: Seçilen örnek normal dağılmış bir anakütleden gelmemektedir.
     
 ------------------------------------------------------------------------------------
+scipy.stats modülündeki kstest fonksiyonunun ilk iki parametresi zorunlu parametrelerdir. 
+Birinci parametre anakütleden rastgele seçilen örneği alır. İkinci parametre testi 
+yapılacak dağılımın kümülatif dağılım fonksiyonunu parametre olarak almaktadır. 
+Ancak bu parametre kolaylık olsun diye yazısal biçimde girilebilmektedir. Normallik 
+testi için bu parametre 'norm' ya da norm.cdf biçiminde girilebilir. 
+
+------------------------------------------------------------------------------------
+kstest fonksiyonu çağrıldığktan sonra bize "isimli bir demet (named tuple) verir. 
+Demetin birinci elemanı test istatistiğini, ikinci elemanı p değerini belirtir. 
+Bizim burada yapmamız gereken bu p değerinin kendi seçtiğimiz belli bir kritik
+değerden büyük olup olmadığına bakmaktır. Bu kritik değer tipik olarak 0.05 olarak 
+alınmaktadır. Ancak testi daha katı yapacaksanız bu değeri 0.01 gibi küçük tutabilirsiniz.
+
+Eğer "p değeri belirlediğimiz kritik değereden (0.05) büyükse H0 hipotezi kabul edilir, 
+H1 hipotezi reddedilir. Eğer p değeri bu kritik değerden küçükse H0 hipotezi reddelip, 
+H1 hipotezi kabul edilmektedir. Yani özetle bu p değeri 0.05 gibi bir kritik değerden 
+büyükse örnek normal dağılmış bir anakütleden gelmektedir, 0.05 gibi bir kritik 
+değerden küçükse örnek normal dağılmamış bir anakütleden gelmektedir.
+
+------------------------------------------------------------------------------------    
 """
