@@ -1,4 +1,4 @@
-"""
+    """
 ---------------------------------------------------------------------------
 C ve Sistem Programcıları Derneği Sınıfta Yapılan Örnekler ve Özet Notlar
                                 
@@ -1709,9 +1709,6 @@ Aşağıdaki programda bu durum gösterilmiştir.
 import numpy as np
 import matplotlib.pyplot as plt
 
-import numpy as np
-import matplotlib.pyplot as plt
-
 POPULATION_RANGE = 1_000_000_000
 POPULATION_SIZE = 1_000_000
 NSAMPLES = 10000
@@ -1864,5 +1861,78 @@ H1 hipotezi kabul edilmektedir. Yani özetle bu p değeri 0.05 gibi bir kritik d
 büyükse örnek normal dağılmış bir anakütleden gelmektedir, 0.05 gibi bir kritik 
 değerden küçükse örnek normal dağılmamış bir anakütleden gelmektedir.
 
+Aşağıdaki örnekte normal dağılmış bir anakütleden ve düzgün dağılmış bir anakütleden 
+rastgele örnekler çekilip kstest fonksiyonuna sokulmuştur.
+    
+    
+from scipy.stats import norm, uniform, kstest
+
+sample_norm = norm.rvs(size=1000)
+
+result = kstest(sample_norm, 'norm')
+print(result.pvalue)        # 1'e yakın bir değer             
+
+sample_uniform = uniform.rvs(size=1000) 
+
+result = kstest(sample_uniform, norm.cdf)
+print(result.pvalue)        # 0'a çok yakın bir değer
+
 ------------------------------------------------------------------------------------    
+kstest fonksiyonunda ikinci parametreye 'norm' girildiğinde birinci parametredeki 
+değerler ortalaması 0, standart sapması 1 olan standart normal dağılıma uygun değerler 
+olmalıdır. Eğer ortalama ve standart sapması farklı bir normal dağılım testi 
+yapılacaksa dağılımın parametreleri de ayrıca args parametresiyle verilmelidir. 
+Örneğin biz ortalaması 100 standart sapması 15 olan bir dağılıma ilişkin test yapmak 
+isteyelim. Bu durumda test aşağıdaki gibi yapılmalıdır. 
+
+
+from scipy.stats import norm, uniform, kstest
+
+sample_norm = norm.rvs(100, 15, size=1000)  # ort=100 std'si 15 olan rastgele değerler
+
+result = kstest(sample_norm, 'norm', args=(100, 15))
+print(result.pvalue)                   
+
+sample_uniform = uniform.rvs(100, 100, size=1000) # 100 ile 200 arasında rastgele değerler
+
+result = kstest(sample_uniform, norm.cdf, args=(100, 100))
+print(result.pvalue)
+
+------------------------------------------------------------------------------------  
+Shapiro-Wilk testi de tamamen benzer biçimde uygulanmaktadır. Ancak bu fonksiyonun 
+kullanılması daha kolaydır. Bu fonksiyonun tek bir parametresi vardır. Bu parametre 
+anakütleden çekilen örneği belirtir. Buradaki normal dağılım herhangi bir ortalama ve 
+standart sapmaya ilişkin olabilir. Yani bizim dağılım değerlerini ortalaması 0, 
+standart sapması 1 olacak biçimde ölçeklendirmemiz gerekmemektedir. 
+
+Ayrıca anakütleden çekilen örnekler küçükse (tipik olarak <= 50) Shapiro-Wilk testi 
+Kolmogorov-Simirnov testine göre daha iyi bir sonunun elde edilmesine yol açmaktadır. 
+Yani örneğiniz küçükse Shapiro-Wilk testini tercih edebilirsiniz. 
+
+Aşağıdaki örnekte ortalaması 100, standart sapması 15 olan normal dağılmış ve düzgün 
+dağılmış bir anakütleden 100'lük bir örnek seçilip Shapiro-Wilk testine sokulmuştur. 
+Buradan elde edine pvalue değerlerine dikkat ediniz. 
+
+
+from scipy.stats import norm, uniform, shapiro
+
+sample_norm = norm.rvs(100, 15, size=1000)
+
+result = shapiro(sample_norm)
+print(result.pvalue)                   
+
+sample_uniform = uniform.rvs(100, 100, size=1000) 
+
+result = shapiro(sample_uniform)
+print(result.pvalue)
+
+------------------------------------------------------------------------------------  
 """
+
+# Örnekten Hareketle Anakütle Parametrelerinin Tahmin Edilmesi
+
+
+
+
+
+
