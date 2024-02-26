@@ -1929,9 +1929,88 @@ print(result.pvalue)
 ------------------------------------------------------------------------------------  
 """
 
+
 # Örnekten Hareketle Anakütle Parametrelerinin Tahmin Edilmesi
 
+"""
+------------------------------------------------------------------------------------  
+İstatistikte örneğe dayalı olarak anakütlenin ortalamasını (ve/veya standart sapmasını) 
+tahmin etmeye "parametre tahmini (parameter estimation)" denilmektedir. Parametre 
+tahmini "noktasal olarak (point estimate)" ya da "aralıksal olarak (interval estimate)" 
+yapılabilmektedir. Anakütle ortalamasının aralıksal tahminine "güven aralıkları 
+(confidence interval)" da denilmektedir. Güven aralıkları tamamen merkezi limit 
+teroremi kullanılarak oluşturulmaktadır.
 
+------------------------------------------------------------------------------------  
+Bizim anakütle ortalamasını bilmediğimizi ancak anakütle standart sapmasını bildiğimizi 
+varsayalım. (Genellikle aslında anakütle standart sapmasını da bilmeyiz. Ancak 
+burada bildiğimizi varsayıyoruz.) Bu anakütleden rastgele bir örnek seçtiğimizde 
+o örneğin ortalamasına bakarak anakütle ortalamasını belli bir aralıkta belli bir 
+güven düzeyinde tahmin edebiliriz. 
+
+Şöyle ki: Örneğin seçtiğimiz güven düzeyi %95 olsun. Bu durumda bizim örneğimiz 
+örnek ortalamalarının dağılımında en kötü olasılıkla soldan 0.025 ve sağdan 0.975 
+kümülatif olasılığa karşı gelen x değerlerinden biri olabilir. Tabii seçtiğimiz 
+örneğin ortalamasının bu aralıkta olma olasılığı %95'tir Bu durumda yapacağımız 
+şey örnek ortalamasının örneklem dağılımına göre seçtiğimiz örneğin ortalamasının 
+%47.5 soluna ve %47.5 sağına ilişkin değerlerin elde edilmesidir. Bu durumda anakütle 
+ortalaması %95 güven düzeyi içerisinde bu aralıkta olacaktır. Tabii aslında bu 
+işlemi daha basit olarak "rastgele elde ettiğimiz örneğin ortalamasını normal 
+dağılımın merkezine alarak soldan 0.025 ve sağdan 0.975 kümülatif olasılık değerlerine 
+karşı gelen noktaların elde edeilmesi yoluyla" da yapabiliriz.  
+
+------------------------------------------------------------------------------------  
+Örneğin standart sapması 15 olan bir anakütleden rastgele 60 elemanlık bir örnek 
+elde etmiş olalım. Bu örneğin ortalamasının 109 olduğunu varsayalım. Bu durumda 
+%95 güven düzeyi içerisinde anakütle ortalamasına ilişkin güven aralıkları aşağıdaki 
+gibi elde edilebilir:
+
+    
+import numpy as np
+from scipy.stats import norm
+
+sample_size = 60
+population_std = 15
+sample_mean = 109
+sampling_mean_std = population_std / np.sqrt(sample_size)
+
+lower_bound = norm.ppf(0.025, sample_mean, sampling_mean_std)
+upper_bound = norm.ppf(0.975,  sample_mean, sampling_mean_std)
+
+print(f'{lower_bound}, {upper_bound}')              # 105.20454606435501, 112.79545393564499
+
+
+Burada biz anakütlenin standart sapmasını bildiğimiz için örnek ortalamalarına 
+ilişkin normal dağılımın standart sapmasını hesaplayabildik. Buradan elde ettiğimiz 
+güven aralığı şöyle olmaktadır:
+
+105.20454606435501, 112.79545393564499
+------------------------------------------------------------------------------------ 
+
+Güven düzeyini yükseltirsek güven aralığının genişleyeceği açıktır. Örneğin bu 
+problem için güven düzeyini %99 olarak belirlemiş olalım:
+
+import numpy as np
+from scipy.stats import norm
+
+sample_size = 60
+population_std = 15
+sample_mean = 109
+sampling_mean_std = population_std / np.sqrt(sample_size)
+
+lower_bound = norm.ppf(0.005, sample_mean, sampling_mean_std)
+upper_bound = norm.ppf(0.995,  sample_mean, sampling_mean_std)
+
+print(f'{lower_bound}, {upper_bound}')     # 104.01192800234102, 113.98807199765896
+
+
+Burada güven aralığının aşağıdaki gibi olduğunu göreceksiniz:
+
+104.01192800234102, 113.98807199765896
+
+Gördüünüz gibi aralık büyümüştür.
+------------------------------------------------------------------------------------  
+"""
 
 
 
