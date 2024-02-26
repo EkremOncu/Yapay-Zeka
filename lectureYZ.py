@@ -2065,6 +2065,67 @@ gerekiyordu. O halde güven aralıklarını oluştururken eğer anakütle normal
 bizim örnekleri >= 30 biçiminde seçmemiz uygun olur.
 
 ------------------------------------------------------------------------------------  
+Örnekten hareketle anakütle ortalamaları aslında tek hamlede norm nesnesinin ilişkin 
+olduğu sınıfın interval metoduyla da elde edilebilmektedir. interval metodunun 
+parametrik yapısı şöyledir:
+
+interval(confidence, loc=0, scale=1)
+
+Metodun birinci parametresi olan confidence güven düzeyini belirtmektedir. Örneğin 
+%95 güven düzeyi için bu parametre 0.95 girilmelidir. Metodun ikinci ve üçüncü 
+parametreleri örnek ortalamalarının dağılımına ilişkin ortalama ve standart sapmayı 
+belirtir. Tabii ikinci parametre elde etmiş olduğumuz örneğin ortalaması olarak 
+girilmelidir. Metot güven aralığını belirten bir demetle geri döner. Demetin ilk 
+elemanı lower_bound ikinci elemanı upper_bound değerlerini vermektedir.
+
+Bu durumda yukarıdaki problemi interval metoduyla aşağıdaki gibi de çözebiliriz:
+
+import numpy as np
+from scipy.stats import norm
+
+sample_size = 60
+population_std = 15
+sample_mean = 109
+
+sampling_mean_std = population_std / np.sqrt(sample_size)
+lower_bound, upper_bound = norm.interval(0.95, sample_mean, sampling_mean_std)
+print(f'{lower_bound}, {upper_bound}')     
+
+------------------------------------------------------------------------------------  
+Aşağıdaki örnekte ortalaması 100, standart sapması 15 olan normal dağılıma uygun 
+rastgele 1,000,000 değer üretilmiştir. Bu değerlerin anakütleyi oluşturduğu varsayılmıştır. 
+Sonra bu anakütle içerisinden rastgele 60 elemanlık bir örnek elde edilmiştir. Bu 
+örneğe dayanılarak ana kütle ortalaması norm nesnesinin interval metoduyla elde 
+edilip ekrana yazdırılmıştır.
+
+
+import numpy as np
+from scipy.stats import norm
+
+POPULATION_SIZE = 1_000_000
+SAMPLE_SIZE = 60
+
+population = norm.rvs(100, 15, POPULATION_SIZE)
+
+population_mean = np.mean(population)
+population_std = np.std(population)
+
+print(f'population mean: {population_mean}')
+print(f'population std: {population_std}')
+print("----------------------")
+
+sample = np.random.choice(population, SAMPLE_SIZE)
+sample_mean = np.mean(sample)
+sampling_mean_std = population_std / np.sqrt(SAMPLE_SIZE)
+
+print(f'sample mean: {sample_mean}')
+
+
+lower_bound, upper_bound = norm.interval(0.95, sample_mean, sampling_mean_std)
+
+print(f'[lower_bound= {lower_bound}, upper_bound= {upper_bound}]')
+
+------------------------------------------------------------------------------------  
 """
 
 
