@@ -1,4 +1,4 @@
-    """
+"""
 ---------------------------------------------------------------------------
 C ve Sistem Programcıları Derneği Sınıfta Yapılan Örnekler ve Özet Notlar
                                 
@@ -2008,7 +2008,62 @@ Burada güven aralığının aşağıdaki gibi olduğunu göreceksiniz:
 
 104.01192800234102, 113.98807199765896
 
-Gördüünüz gibi aralık büyümüştür.
+Gördüğünüz gibi aralık büyümüştür.
+
+------------------------------------------------------------------------------------  
+Anımsanacağı gibi örnek ortalamalarına ilişkin dağılımın standart sapmasın "standart hata 
+(standard error)" deniliyordu. Örnek ortalamalarına ilişkin dağılımın standart sapması 
+azaltılırsa (yani satndart hata düşürülürse) değerler ortalamaya yaklaşacağına göre 
+güven aralıkları da daralacaktır. O halde anakütle ortalamasını tahmin ederken 
+büyük örnek seçmemiz güven aralıklarını daraltacaktır. Aşağıdaki örnekte yukarıdaki 
+problemin 30'dan 100'e kadar beşer artırımla örnek büyüklükleri için %99 güven 
+düzeyinde güven aralıkları elde edilmiştir. Elde edilen aralıklar şöyledir:
+
+import numpy as np
+from scipy.stats import norm
+
+population_std = 15
+sample_mean = 109
+
+for sample_size in range(30, 105, 5):
+    
+    sampling_mean_std = population_std / np.sqrt(sample_size)
+    
+    lower_bound = norm.ppf(0.025, sample_mean, sampling_mean_std)
+    upper_bound = norm.ppf(0.975,  sample_mean, sampling_mean_std)
+    
+    print(f'sample size: {sample_size}: [{lower_bound}, {upper_bound}]')  
+
+    
+ sample size: 30: [103.63241756884852, 114.36758243115148]
+ sample size: 35: [104.03058429805395, 113.96941570194605]
+ sample size: 40: [104.35153725771579, 113.64846274228421]
+ sample size: 45: [104.61738729711709, 113.38261270288291]
+ sample size: 50: [104.84228852695097, 113.15771147304903]
+ sample size: 55: [105.03577765357056, 112.96422234642944]
+ sample size: 60: [105.20454606435501, 112.79545393564499]
+ sample size: 65: [105.3534458105975, 112.6465541894025]
+ sample size: 70: [105.48609245861904, 112.51390754138096]
+ sample size: 75: [105.60524279777148, 112.39475720222852]
+ sample size: 80: [105.71304047283782, 112.28695952716218]
+ sample size: 85: [105.81118086644236, 112.18881913355763]
+ sample size: 90: [105.9010248384772, 112.0989751615228]
+ sample size: 95: [105.98367907149301, 112.01632092850699]
+ sample size: 100: [106.06005402318992, 111.93994597681008]
+
+
+Buradan da gördüğünüz gibi örneği büyüttüğümüzde güven aralıkları daralmakta ve 
+anakütle ortalaması daha iyi tahmin edilmektedir. Örnek büyüklüğünün artırılması 
+belli bir noktaya kadar aralığı iyi bir biçimde daraltıyorsa da belli bir noktadan 
+sonra bu daraltma azalmaya başlamaktadır. Örneklerin elde edilmesinin belli bir 
+çaba gerektirdiği durumda örnek büyüklüğünün makul seçilmesi önemli olmaktadır.
+
+------------------------------------------------------------------------------------  
+Anımsanacağı gibi anakütle normal dağılmamışsa merkezi limit teoreminin yeterli 
+bir biçimde uygulanabilmesi için örneklerin büyük olması (tipik olarak >= 30) 
+gerekiyordu. O halde güven aralıklarını oluştururken eğer anakütle normal dağılmamışsa
+bizim örnekleri >= 30 biçiminde seçmemiz uygun olur.
+
 ------------------------------------------------------------------------------------  
 """
 
