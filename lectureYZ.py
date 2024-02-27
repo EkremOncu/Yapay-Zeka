@@ -2126,6 +2126,80 @@ lower_bound, upper_bound = norm.interval(0.95, sample_mean, sampling_mean_std)
 print(f'[lower_bound= {lower_bound}, upper_bound= {upper_bound}]')
 
 ------------------------------------------------------------------------------------  
+------------------------------------------------------------------------------------  
+"""
+"""
+------------------------------------------------------------------------------------  
+Biz yukarıdaki örneklerde güven aralıklarını oluştururken anakütle standart sapmasının 
+bilindiğini varsaydık. Halbuki genellikle anakütle ortalamasının bilinmediği durumda 
+anakütle standart sapması da bilinmemektedir. Peki bu durumda örnekten hareketle 
+anakütle ortalamasının aralık tahmini nasıl yapılacaktır? İşte bu durumda çektiğimiz 
+örneğin standart sapması anakütlenin standart sapması gibi işleme sokulmaktadır.
+
+Ancak dağılım olarak normal dağılım değil t dağılımı kullanılmaktadır. Zaten Gosset 
+t dağılımını tamamen böyle bir problemi çözerken geliştirmiştir. Yani t dağılımı 
+zaten "anakütle standart sapmasının bilinmediği durumda örneğin standart sapmasının 
+anakütle standart sapması olarak alınmasıyla" elde edilen bir dağılımdır. t dağılımının 
+serbestlik derecesi denilen bir değere sahip olduğunu anımsayınız. Serbestlik 
+derecesi örnek büyüklüğünün bir eksik değeridir. Ayrıca 30 serbestlik derecesinden 
+sonra zaten t dağılımının normal dağılıma çok benzediğini de belirtmiştik.
+
+Çektiğimiz örneğin standart sapmasını anakütle standart sapması olarak kullanırken 
+örneğin standrat sapması N'e değil (N - 1)'e bölünerek hesaplanmalıdır. Burada 
+bölmenin neden (N - 1)'e yapıldığının açıklaması biraz karmaşıktır. Burada bu 
+konu üzerinde durmayacağız. Ancak Internet'te bu konuyu açıklayan pek çok kaynak 
+bulunmaktadır.İstatistikte çekilen örneklerin standart sapmaları genellikle sigma 
+sembolü ile değil s harfiyle belirtilmektedir.
+
+Anımsanacağı gibi pek çok kütüphanede standart sapma ya da varyans hesaplanırken 
+bölmenin neye yapılacağına "ddof (delta degrees of freedom)" deniyordu. Standart 
+sapma ya da varyans hesabı yapan fonksiyonların ddof parametreleri vardı. NumPy'da 
+bu ddof parametresi default 0 iken Pandas'da 1'dir. Bu ddof parametresi (N - değer)
+'deki değeri belirtmektedir. Yani ddof = 0 ise bölme N'e ddof = 1 ise bölme 
+(N - 1)'e yapılmaktadır. 
+
+------------------------------------------------------------------------------------  
+sample = np.array([101.93386212, 106.66664836, 127.72179427,  67.18904948, 87.1273706 ,  76.37932669,  87.99167058,  95.16206704,
+    101.78211828,  80.71674993, 126.3793041 , 105.07860807, 98.4475209 , 124.47749601,  82.79645255,  82.65166373, 92.17531189, 
+    117.31491413, 105.75232982,  94.46720598, 100.3795159 ,  94.34234528,  86.78805744,  97.79039692, 81.77519378, 117.61282039, 
+    109.08162784, 119.30896688, 98.3008706 ,  96.21075454, 100.52072909, 127.48794967, 100.96706301, 104.24326515, 101.49111644])
+
+Anakütlein standart sapmasının da bilinmediğini varsayalım. Bu değerlerden hareketle 
+%95 güven düzeyinde güven aralığını şöyle oluşturabiliriz:
+
+import numpy as np
+from scipy.stats import t
+
+sample = np.array([101.93386212, 106.66664836, 127.72179427,  67.18904948, 87.1273706 ,  76.37932669,  
+                87.99167058,  95.16206704, 101.78211828,  80.71674993, 126.3793041 , 105.07860807, 
+                98.4475209 , 124.47749601,  82.79645255,  82.65166373, 92.17531189, 117.31491413, 
+                105.75232982,  94.46720598, 100.3795159 ,  94.34234528,  86.78805744,  97.79039692, 
+                81.77519378, 117.61282039, 109.08162784, 119.30896688, 98.3008706 ,  96.21075454, 
+                100.52072909, 127.48794967, 100.96706301, 104.24326515, 101.49111644])
+
+sample_mean = np.mean(sample)
+sample_std = np.std(sample, ddof=1)
+sampling_mean_std = sample_std / np.sqrt(len(sample))
+
+lower_bound = t.ppf(0.025, len(sample) - 1, sample_mean, sampling_mean_std)
+upper_bound = t.ppf(0.975, len(sample) - 1, sample_mean, sampling_mean_std)
+
+print(f'[{lower_bound}, {upper_bound}]')
+
+
+Burada örneğin standart sapmasını hesaplarken ddof=1 kullandığımıza dikkat ediniz. 
+Güven aralıkları normal dağılım kullanılarak değil t dağılımı kullanılarak elde 
+edilmiştir. t dağılımındaki serbestlik derecesinin (ppf fonksiyonun ikinci parametresi) 
+örnek büyüklüğünün bir eksik değeri olarak alındığını anımsayınız.
+
+Serbestlik derecesi 30'dan sonra artık t dağılımın normal dağılımla örtüşmeye 
+başladığını anımsayınız. Buradaki örneğimizde örnek büyüklüğü 35'tir. Örnek 
+büyüklüğü >= 30 durumunda t dağılı ile normal dağılım birbirine çok benzediği 
+için aslında bu örnekte t dağılımı yerine normal dağılım da kullanabilirdi.
+
+------------------------------------------------------------------------------------  
+
+------------------------------------------------------------------------------------  
 """
 
 
