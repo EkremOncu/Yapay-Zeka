@@ -1956,14 +1956,14 @@ kümülatif olasılığa karşı gelen x değerlerinden biri olabilir. Tabii se�
 %47.5 soluna ve %47.5 sağına ilişkin değerlerin elde edilmesidir. Bu durumda anakütle 
 ortalaması %95 güven düzeyi içerisinde bu aralıkta olacaktır. Tabii aslında bu 
 işlemi daha basit olarak "rastgele elde ettiğimiz örneğin ortalamasını normal 
-dağılımın merkezine alarak soldan 0.025 ve sağdan 0.975 kümülatif olasılık değerlerine 
-karşı gelen noktaların elde edeilmesi yoluyla" da yapabiliriz.  
+dağılımın merkezine alarak soldan 0.025 ve sağdan 0.975 kümülatif olasılık 
+değerlerine karşı gelen noktaların elde edilmesi yoluyla da yapabiliriz.  
 
 ------------------------------------------------------------------------------------  
 Örneğin standart sapması 15 olan bir anakütleden rastgele 60 elemanlık bir örnek 
 elde etmiş olalım. Bu örneğin ortalamasının 109 olduğunu varsayalım. Bu durumda 
-%95 güven düzeyi içerisinde anakütle ortalamasına ilişkin güven aralıkları aşağıdaki 
-gibi elde edilebilir:
+%95 güven düzeyi içerisinde anakütle ortalamasına ilişkin güven aralıkları 
+aşağıdaki gibi elde edilebilir:
 
     
 import numpy as np
@@ -2013,7 +2013,7 @@ Gördüğünüz gibi aralık büyümüştür.
 ------------------------------------------------------------------------------------  
 Anımsanacağı gibi örnek ortalamalarına ilişkin dağılımın standart sapmasın "standart hata 
 (standard error)" deniliyordu. Örnek ortalamalarına ilişkin dağılımın standart sapması 
-azaltılırsa (yani satndart hata düşürülürse) değerler ortalamaya yaklaşacağına göre 
+azaltılırsa (yani standart hata düşürülürse) değerler ortalamaya yaklaşacağına göre 
 güven aralıkları da daralacaktır. O halde anakütle ortalamasını tahmin ederken 
 büyük örnek seçmemiz güven aralıklarını daraltacaktır. Aşağıdaki örnekte yukarıdaki 
 problemin 30'dan 100'e kadar beşer artırımla örnek büyüklükleri için %99 güven 
@@ -2035,21 +2035,21 @@ for sample_size in range(30, 105, 5):
     print(f'sample size: {sample_size}: [{lower_bound}, {upper_bound}]')  
 
     
- sample size: 30: [103.63241756884852, 114.36758243115148]
- sample size: 35: [104.03058429805395, 113.96941570194605]
- sample size: 40: [104.35153725771579, 113.64846274228421]
- sample size: 45: [104.61738729711709, 113.38261270288291]
- sample size: 50: [104.84228852695097, 113.15771147304903]
- sample size: 55: [105.03577765357056, 112.96422234642944]
- sample size: 60: [105.20454606435501, 112.79545393564499]
- sample size: 65: [105.3534458105975, 112.6465541894025]
- sample size: 70: [105.48609245861904, 112.51390754138096]
- sample size: 75: [105.60524279777148, 112.39475720222852]
- sample size: 80: [105.71304047283782, 112.28695952716218]
- sample size: 85: [105.81118086644236, 112.18881913355763]
- sample size: 90: [105.9010248384772, 112.0989751615228]
- sample size: 95: [105.98367907149301, 112.01632092850699]
- sample size: 100: [106.06005402318992, 111.93994597681008]
+sample size: 30: [103.63241756884852, 114.36758243115148]
+sample size: 35: [104.03058429805395, 113.96941570194605]
+sample size: 40: [104.35153725771579, 113.64846274228421]
+sample size: 45: [104.61738729711709, 113.38261270288291]
+sample size: 50: [104.84228852695097, 113.15771147304903]
+sample size: 55: [105.03577765357056, 112.96422234642944]
+sample size: 60: [105.20454606435501, 112.79545393564499]
+sample size: 65: [105.3534458105975, 112.6465541894025]
+sample size: 70: [105.48609245861904, 112.51390754138096]
+sample size: 75: [105.60524279777148, 112.39475720222852]
+sample size: 80: [105.71304047283782, 112.28695952716218]
+sample size: 85: [105.81118086644236, 112.18881913355763]
+sample size: 90: [105.9010248384772, 112.0989751615228]
+sample size: 95: [105.98367907149301, 112.01632092850699]
+sample size: 100: [106.06005402318992, 111.93994597681008]
 
 
 Buradan da gördüğünüz gibi örneği büyüttüğümüzde güven aralıkları daralmakta ve 
