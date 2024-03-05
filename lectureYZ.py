@@ -2260,8 +2260,66 @@ daha az güvenilir sonuçlar vermektedir.
 
 #  --------------------- Verilerin Kullanıma Hazır Hale Getirilmesi ---------------------
 
+"""
+------------------------------------------------------------------------------------  
+Veriler toplandıktan sonra hemen işleme sokulamayabilir. Veriler üzerinde çeşitli 
+ön işlemler yapmak gerekebilir. Bu ön işlemlere "verilerin hazır hale getirilmesi 
+(data preparation)" denilmektedir. Biz bu bölümde verilerin hazır hale getirilmesi 
+için bazı temel işlemler üzerinde duracağız. Diğer bazı işlemler başka bölümlerde 
+ele alınacaktır. Ancak verilerin kullanıma hazır hale getirilmesi tipik olarak 
+aşağıdaki gibi süreçleri içermektedir:
+
+1) Verilerin Temizlenmesi (Data Cleaning): Veriler eksiklikler içerebilir ya da 
+geçersiz değerler içerebilir. Bazen de aşırı uç değerlerden (outliers) kurtulmak 
+gerekebilir. Bu faaliyetlere verilerin temizlenmesi denilmektedir. Kusurlu veriler 
+yapılan analizleri olumsuz yönde etkilemektedir.
 
 
+2) Özellik seçimi (Feature Selection): Veri kümelerindeki tüm sütunlar bizim için 
+anlamlı ve gerekli olmayabilir. Gereksiz sütunların atılıp gereklilerin alınması 
+faaliyetine "özellik seçimi" denilmektedir. Örneğin bir veri tablosundaki kişinin 
+"adı soyadı" sütunu veri analizi açısından genellikle (ama her zaman değil) bir 
+fayda sağlamamaktadır. Bu durumda bu sütunların atılması gerekir. Bazen veriler 
+tamamen geçersiz bir durum halinde de karşımıza gelebilmektedir. Örneğin oransal 
+bir ölçeğe sahip sütunda yanlışlıkla kategorik bir veri bulunabilir.
+
+
+3) Verilerin Dönüştürülmesi (Data Transformation): Kategorik veriler, tarih ve 
+zaman verileri gibi veriler, resimler gibi veriler doğrudan işleme sokulamazlar. 
+Bunların sayısal biçime dönüştürülmesi gerekir. Bazen veri kümesindeki sütunlarda 
+önemli skala farklılıkları olabilmektedir. Bu skala farklılıkları algoritmaları 
+olumsuz etkileyebilmektedir. İşte sütunların skalalarını birbirine benzer hale 
+getirme sürecine "özellik ölçeklemesi (feature scaling)" denilmektedir.
+
+
+4) Özellik Mühendisliği (Feature Engineering): Özellik mühendisliği veri tablosundaki 
+sütunlardan olmayan başka sütunların oluşturulması sürecine denilmektedir. Yani 
+özellik mühendisliği var olan bilgilerden hareketle önemli başka bilgilerin elde
+edilmesidir. Örneğinin kişinin boy ve kilosu biliniyorsa biz vücut kitle endeksini 
+tabloya ekleyebiliriz.
+
+
+5) Boyutsal Özellik İndirgemesi (Dimentionality Feature Reduction): Veri kümesinde 
+çok fazla sütun olmasının pek çeşitli dezavantajı olabilmektedir. Örneğin bu tür 
+durumlarda işlem yükü artabilir. Gereksiz sütunlar kestirimi sürecini olumsuz
+biçimde etkileyebilir. Fazla sayıda sütun kursumuzun ilerleyen zamanalarında sıkça 
+karşılaşacağımız "overfitting" denilen yanlış öğrenmelere yol açabilir. O zaman 
+sütunların sayısının azaltılması gerekebilir. İşte n tane sütunun k < n olmak üzere
+k tane sütun haline getirilmesi sürecine boyutsal özellik indirgemesi denilmektedir. 
+Bu konu kursumuzda ileride ayrı bir bölümde ele alınacaktır.
+
+
+6) Verilerin Çoğaltılması (Data Augmentation): Elimizdeki veriler (veri kümesindeki 
+satırlar) ilgili makine öğrenmesi yöntemini uygulayabilmek için sayı bakımından 
+ya da nitelik bakımından yetersiz olabilir.  Eldeki verilerle (satırları kastediyoruz)
+yeni verilerin oluşturulması (yeni satırların oluşturulması) sürecine "verilerin 
+çoğaltılması (data augmentation)" denilmektedir. Örneğin bir resimden döndürülerek 
+pek çok resim elde edilebilir. Benzer biçimde örneğin bir resmin çeşitli kısımlarından
+yeni resimler oluşturulabilir. Özellik mühendisliğinin "sütun eklemeye yönelik", 
+verilerin çoğaltılmasının ise "satır eklemeye yönelik" bir süreç olduğuna dikkat ediniz.
+
+------------------------------------------------------------------------------------  
+"""
 
 
 
