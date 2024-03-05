@@ -1906,7 +1906,7 @@ standart sapmaya ilişkin olabilir. Yani bizim dağılım değerlerini ortalamas
 standart sapması 1 olacak biçimde ölçeklendirmemiz gerekmemektedir. 
 
 Ayrıca anakütleden çekilen örnekler küçükse (tipik olarak <= 50) Shapiro-Wilk testi 
-Kolmogorov-Simirnov testine göre daha iyi bir sonunun elde edilmesine yol açmaktadır. 
+Kolmogorov-Simirnov testine göre daha iyi bir sonucun elde edilmesine yol açmaktadır. 
 Yani örneğiniz küçükse Shapiro-Wilk testini tercih edebilirsiniz. 
 
 Aşağıdaki örnekte ortalaması 100, standart sapması 15 olan normal dağılmış ve düzgün 
@@ -1916,12 +1916,12 @@ Buradan elde edine pvalue değerlerine dikkat ediniz.
 
 from scipy.stats import norm, uniform, shapiro
 
-sample_norm = norm.rvs(100, 15, size=1000)
+sample_norm = norm.rvs(100, 15, size=100)
 
 result = shapiro(sample_norm)
 print(result.pvalue)                   
 
-sample_uniform = uniform.rvs(100, 100, size=1000) 
+sample_uniform = uniform.rvs(100, 100, size=100) 
 
 result = shapiro(sample_uniform)
 print(result.pvalue)
@@ -2198,9 +2198,83 @@ büyüklüğü >= 30 durumunda t dağılı ile normal dağılım birbirine çok 
 için aslında bu örnekte t dağılımı yerine normal dağılım da kullanabilirdi.
 
 ------------------------------------------------------------------------------------  
+Tıpkı sscipy.stats modülündeki norm nesnesinde olduğu gibi t nesnesinin de ilişkin 
+olduğu snıfın interval isimli bir metodu bulunmaktadır. Bu metot zaten doğrudan 
+t dağılımını kullanarak güven aralıklarını hesaplamaktadır. interval metodunun 
+parametrik yapısı şöyledir:
+
+interval(confidence, df, loc=0, scale=1)
+
+Buradaki confidence paarametresi yine "güven düzeyini (confidence level)" belirtmektedir. 
+df parametresi serbestlik derecesini belirtir. loc ve scale parametreleri de sırasıyla 
+ortalama ve standart sapma değerlerini belirtmektedir. Burada loc parametresine 
+biz örneğimizin ortalamasını, scale parametresine de örneklem dağılımının standart 
+sapmasını girmeliyiz. Tabii örneklem dağılımının standart sapması yine örnekten 
+hareketle elde edilecektir. Metot yine güven aralığının alt ve üst değerlerini bir 
+demet biçiminde geri döndürmektedir.
+
+
+import numpy as np
+from scipy.stats import t
+
+sample = np.array([101.93386212, 106.66664836, 127.72179427,  67.18904948, 87.1273706 ,  76.37932669,  
+                   87.99167058,  95.16206704, 101.78211828,  80.71674993, 126.3793041 , 105.07860807, 
+                   98.4475209 , 124.47749601,  82.79645255,  82.65166373, 92.17531189, 117.31491413, 
+                   105.75232982,  94.46720598, 100.3795159 ,  94.34234528,  86.78805744,  97.79039692, 
+                   81.77519378, 117.61282039, 109.08162784, 119.30896688, 98.3008706 ,  96.21075454, 
+                   100.52072909, 127.48794967, 100.96706301, 104.24326515, 101.49111644])
+
+sample_mean = np.mean(sample)
+sample_std = np.std(sample, ddof=1)
+sampling_mean_std = sample_std / np.sqrt(len(sample))
+
+lower_bound = t.ppf(0.025, len(sample) - 1, sample_mean, sampling_mean_std)
+upper_bound = t.ppf(0.975, len(sample) - 1, sample_mean, sampling_mean_std)
+
+print(f'[{lower_bound}, {upper_bound}]')
+print("---------------------------------")
+
+lower_bound, upper_bound = t.interval(0.95, len(sample) - 1, sample_mean, sampling_mean_std)
+print(f'[{lower_bound}, {upper_bound}]')
 
 ------------------------------------------------------------------------------------  
+------------------------------------------------------------------------------------  
+
+Merkezi limit teoremine göre eğer ana kütle normal dağılmamışsa ancak n >= 30 koşulunu 
+sağlayan örneklem dağılımlarının normal dağıldığı kabul edilmektedir. Yani 
+örneklerimizdeki gibi anakütle ortalamasının tahmin edilmesi ve güven aralıklarının 
+oluşturulması için şu iki koşuldan en az biri sağlanmalıdır:
+
+1) Anakütle normal dağılmıştır ve örneklem dağılımı için n < 30 durumu söz konusudur.
+2) Anakütle normal dağılmamıştır ve örneklem dağılımı için n >= 30 durumu söz konusudur.
+
+                                
+Pekiyi örneğimiz küçükse (tipik oalrak < 30) ve ana kütle normal dağılmamışsa güven 
+aralıklarını oluşturamaz mıyız? İşte bu tür durumlarda güven aralıklarının oluşturulması 
+ve bazı hipotez testleri için "parametrik olmayan (nonparametric) yöntemler kullanılmaktadır. 
+Ancak genel olarak parametrik olmayan yöntemler parametrik yöntemlere göre daha 
+daha az güvenilir sonuçlar vermektedir. 
+------------------------------------------------------------------------------------  
 """
+
+
+#  --------------------- Verilerin Kullanıma Hazır Hale Getirilmesi ---------------------
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
