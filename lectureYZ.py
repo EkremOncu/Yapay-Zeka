@@ -48,7 +48,7 @@ a = np.array([1, 2, 3, 4, 5], dtype= 'float64' )
 a = np.array([1, 2, 3, 4, 5], dtype= np.float64 )
 #  array([1., 2., 3., 4., 5.])
 
- NumPy dizilerinde kullanabileceğimiz dtype türlerinin önemli olanları şunlardır: 
+ NumPy dizilerinde kullanabileceğimiz dtype türlerinin önemli olanları şunlardır:  
 
 bool_ /bool8        : bool türü
 byte / int8         : bir byte'lık işaretli tamsayı türü
@@ -2318,6 +2318,140 @@ pek çok resim elde edilebilir. Benzer biçimde örneğin bir resmin çeşitli k
 yeni resimler oluşturulabilir. Özellik mühendisliğinin "sütun eklemeye yönelik", 
 verilerin çoğaltılmasının ise "satır eklemeye yönelik" bir süreç olduğuna dikkat ediniz.
 
+------------------------------------------------------------------------------------  
+------------------------------------------------------------------------------------  
+CSV dosyalarında iki virgül arasında hiçbir değer yoksa bu eksik veri anlamına 
+geliyor olabilir. Böyle CSV dosyalarını Pandas'ın read_csv fonksiyonuyla okursak 
+NaN (Not a Number) denilen özel numpy.float64 değerini elde ederiz. Örneğin "person.csv" 
+isimli dosya şu içeriği sahip olsun:
+
+Adı Soyadı,Kilo,Boy,Yaş,Cinsiyet
+Sacit Bulut,78,172,34,Erkek
+Ayşe Er,67,168,45,Kadın
+Ahmet San,,182,32,Erkek
+Macit Şen,98,156,65,Erkek
+Talat Demir,85,,49,Erkek
+
+Bu  dosyayı şöyle okuyalım:
+
+import pandas as pd
+
+df = pd.read_csv('person.csv')
+
+Şöyle bir çıktı elde ederiz:
+
+        Adı Soyadı  Kilo    Boy  Yaş Cinsiyet
+    0  Sacit Bulut  78.0  172.0   34    Erkek
+    1      Ayşe Er  67.0  168.0   45    Kadın
+    2    Ahmet San   NaN  182.0   32    Erkek
+    3    Macit Şen  98.0  156.0   65    Erkek
+    4  Talat Demir  85.0    NaN   49    Erkek
+
+Bir CSV dosyasında özel bazı sözcükler de eksik veri anlamına gelebilmektedir. 
+Ancak hangi özel sözcüklerin eksik veri anlamına geldiği CSV okuyucuları arasında 
+farklılıklar gösterebilmektedir. Örneğin Pandas'ın read_csv fonksiyonu şu özel 
+sözcükleri "eksik veri" gibi ele almaktadır: NaN, '', '#N/A', '#N/A' 'N/A', '#NA', 
+'-1.#IND', '-1.#QNAN', '-NaN', '-nan', '1.#IND', '1.#QNAN', '<NA>', 'N/A', 'NA', 
+'NULL', 'NaN', 'None', 'n/a', 'nan', ‘null’. CSV dosyalarında en çok karşımıza çıkan 
+eksik veri gösterimlri şunlardır: '', NaN, nan, NA, null. 
+
+read_csv fonksiyonu ayrıca na_values isimli parametresi yoluyla programcınn istediği 
+yazıları da eksik veri olarak ele alabilmektedir. Bu parametreye yazılardan oluşan 
+dolaşılabilir bir nesne girilmeldir. Örneğin:
+
+df = pd.read_csv('person.csv', na_values=['NE'])
+
+Burada read_csv yukarıdakilere ek olarak 'NE' yazısını da eksik olarak ele alacaktır. 
+
+read_csv fonksiyonunun keep_default_na parametresi False olarak girilirse 
+(bu parametrenin default değeri True biçimdedir) bu durumda yukarıda belirttiğimiz eksik 
+veri kabul edilen yazılar artık eksik veri olarak kabul edilmeyecek onlara normal 
+yazı muamalesi yapılacaktır. 
+
+read_csv fonksiyonu bir süredir yazısal olan sütunların dtype özelliğini "object" 
+olarak tutmaktadır. Yani bu tür sütunların her elemanı farklı türlerden olabilir. 
+Bu tür sütunlarda NaN gibi eksik veriler söz konusu olduğunda read_csv fonksiyonu 
+yine onu np.float64 NaN değeri olarak ele almaktadır.
+
+Eksik veri işlemleri NumPy kütüphanesi ile loadtxt fonksiyonu kullanılarak da yapılabilir. 
+Ancak loadtxt fonksiyonunun eksik verileri ele almak için kullanılması çok zahmetlidir. 
+Bu nedenle biz kursumuzda CSV dosyalarını genellikle Pandas'ın read_csv fonksiyonu 
+ile okuyacağız. 
+
+------------------------------------------------------------------------------------  
+Eksik verilerle çalışırken ilk yapılması gereken şey "eksikliğin analiz edilmesidir". 
+Yani kaç tane eksik veri vardır? Kaç satırda ve hangi sütunlarda eksik veriler bulunmaktadır? 
+Eksik veriler toplam verilerin yüzde kaçını oluşturmaktadır? Gibi sorulara yanıtlar 
+aranmalıdır.
+
+Eksik verilerin ele alınmasında iki temel strateji vardır:
+
+1) Eksik verilerin bulunduğu satırı (nadiren de sütunu) tamamen atmak
+2) Eksik verilerin yerine başka değerler yerleştirmek (imputation). 
+                                                                   
+------------------------------------------------------------------------------------  
+Eksik verilerin bulunduğu satırın atılması yönteminde şunlara dikkat edilmelidir:
+
+a) Eksik verili satırlar atıldığında elde kalan veri kümesi çok küçülecek midir?
+b) Eksik verili satırlar atıldığında elde kalan veri kümesi yanlı (biased) hale gelecek midir?
+
+Eğer bu soruların yanıtı "hayır" ise eksik verilerin bulunduğu satırlar tamamen atılabilir. 
+
+Eksik veriler yerine bir verinin doldurulması işlemine İngilizce "imputation" denilmektedir. 
+Eğer eksik verilerin bulunduğu satır (nadiren de sütun) atılamıyorsa "imputation" 
+uygulanmalıdır.
+
+------------------------------------------------------------------------------------  
+------------------------------------------------------------------------------------  
+ DataFrame nesnesi df olmak üzere, eksik veri analizinde şu kalıpları kullanabilirsiniz:
+
+1) Sütunlardaki eksik verilerin miktarları şöyle bulunabilir:
+
+df.isna().sum() ya da pd.isna(df).sum()
+
+Pandas'taki isna fonksiyonu aynı zamanda DataFrame ve Series sınıflarında bir metot 
+biçiminde de bulunmaktadır. isna bize bool türden bir DataFrame ya da Series nesnesi 
+vermektedir. bool üzerinde sum işlemi yapıldığında False değerler 0 olarak, True
+değerler 1 olarak işleme girer. Dolayısıyla yularıdaki işlemlerde biz sütunlardaki 
+eksik veri sayılarını elde etmiş oluruz. isna fonksiyonunun diğer bir ismi isnull 
+biçimindedir.
+
+------------------------------------------------------------------------------------  
+2) Eksik verilerin toplam sayısı şöyle bulunabilir:
+
+df.isna().sum().sum() ya da pd.isna(df).sum().sum() 
+
+isna fonksiyonu (ya da metodu) sütunsal temelde eksik verilerin sayılarını verdiğine 
+göre onların toplamı da toplam eksik verileri verecektir.
+
+------------------------------------------------------------------------------------  
+3) Eksik verilerin bulunduğu satır sayısı şöyle elde edilebilir:
+
+pd.isna(df).any(axis=1).sum() ya da df.isna().any(axis=1).sum()
+
+any fonksiyonu ya da metodu bir eksen parametresi alarak satırsal ya da sütunsal 
+işlem yapabilmektedir. any "en az bir True değer varsa True değerini veren hiç 
+True değer yoksa False değerini veren" bir fonksiyondur. 
+
+Yukarıdaki ifadede biz önce isna fonksiyonu ile eksik verileri matrissel bir biçimde 
+DataFrame olarak elde ettik. Sonra da onun satırlarına any işlemi uyguladık. 
+Dolayısıyla "en az bir eksik veri olan satırların" sayısını elde etmiş olduk.
+
+------------------------------------------------------------------------------------  
+4) Eksik verilerin bulunduğu satır indeksleri şöyle elde edilebilir:
+
+df.index[pd.isna(df).any(axis=1)] ya da df.loc[df.isna().any(axis=1)].index
+
+------------------------------------------------------------------------------------  
+5) Eksik verilerin bulunduğu sütun isimleri şöyle elde edilebilir:
+
+missing_columns = [name for name in df.columns if df[name].isna().any()]
+
+Burada liste içlemi kullandık. Önce sütun isimlerini elde edip o sütun bilgilerini 
+doğrudan indesklemeyle eld ettik. Sonra o sütunda en az bir eksik veri varsa o 
+sütunun ismini listeye ekledik.
+
+------------------------------------------------------------------------------------  
 ------------------------------------------------------------------------------------  
 """
 
