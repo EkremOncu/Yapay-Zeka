@@ -2448,7 +2448,7 @@ df.index[pd.isna(df).any(axis=1)] ya da df.loc[df.isna().any(axis=1)].index
 missing_columns = [name for name in df.columns if df[name].isna().any()]
 
 Burada liste içlemi kullandık. Önce sütun isimlerini elde edip o sütun bilgilerini 
-doğrudan indesklemeyle eld ettik. Sonra o sütunda en az bir eksik veri varsa o 
+doğrudan indesklemeyle elde ettik. Sonra o sütunda en az bir eksik veri varsa o 
 sütunun ismini listeye ekledik.
 
 ------------------------------------------------------------------------------------  
