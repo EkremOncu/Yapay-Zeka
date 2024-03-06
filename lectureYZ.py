@@ -2511,6 +2511,91 @@ Eksik veri bulunan satırların sayısı: 7384
 Eksik veri bulunan satırların oranı: 0.543740795287187
 
 ------------------------------------------------------------------------------------  
+
+------------------------------------------------------------------------------------  
+Eksik verileri DataFrame nesnesinden silmek için DataFrame sınıfının dropna metodu 
+kullanılabilir. Bu metotta default axis = 0'dır. Yani default durumda satırlar 
+atılmaktadır. Ancak axis=1 parametresiyle sütunları da atabiliriz. Metot default 
+durumda bize eksik verilerin atıldığı yeni bir DataFrame nesnesi vermektedir. Ancak 
+metodun inplace parametresi True yapılırsa  nesne üzerinde atım yapılmaktadır. 
+
+
+import pandas as pd
+
+df = pd.read_csv('melb_data.csv')
+
+print(f'Veri kümesinin boyutu: {df.shape}')
+print("---------")
+
+df_deleted_rows = df.dropna(axis=0)
+print(f'Satır atma sonucundaki yeni boyut: {df_deleted_rows.shape}')
+
+df_deleted_cols = df.dropna(axis=1)
+print(f'Sütun atma sonucundaki yeni boyut: {df_deleted_cols.shape}')
+
+-----------------------------------------------------------------------------------  
+Eksik verilerin yerine başka değerlerin yerleştirilmesi işlemine "imputation" denilmektedir.
+Kullanılan tipik imputation stratejiler şunlardır:
+
+- Sütun sayısal ise Eksik verileri sütun ortalaması ile doldurma
+
+- Sütun kategorik ya da sırasal ise eksik verileri mode değeri ile doldurma
+
+- Eksik verilerin  sütunlarda uç değeler varsa medyan değeri ile doldurulması 
+
+- Eksik verilerin yerine belli aralıkta ya da dağılımda rastgele değer yerleştirme yöntemi
+
+- Eksik verilerin zaman serileri tarzında sütunlarda önceki ya da sonraki sütun değerleriyle doldurulması
+
+- Eksik değerlerin regresyonla tahmin edilmesi yoluyla doldurulması
+
+- Eksik değerlerin KNN (K-Nearest Neighbours) Yöntemi ile doldurulması
+
+En çok uygulanan yöntem basitliği nedeniyle sütun ortalaması, sütun modu ya da 
+sütun medyanı ile doldurma yöntemidir. 
+
+-----------------------------------------------------------------------------------  
+Bu veri kümesinde eksik veriler şu sütunlarda bulunmaktaydı: "Car", "BuildingArea", ,
+"YearBuilt", "CouncilArea". Inputation işlemi için bu vsütunların incelenmesi gerekir. 
+"Car" sütunu ev için ayrılan otopark alanının kaç arabayı içerdiğini belirtmektedir. 
+Bu sütunda ayrık küçük tamsayı değerler vardır. Burada imputation için sütun ortalaması 
+alınabilir. Ancak bunların yuvarlanması daha uygun olabilir. Bu işlem şöyle yapılabilir:
+
+impute_val = df['Car'].mean().round()
+df['Car'] = df['Car'].fillna(impute_val)    # eşdeğeri df['Car'].fillna(impute_val, inplace=True)
+
+
+Pandas'taki DataFrame ve Series sınıflarının mode metotları sonucu Series nesnesi 
+biçiminde vermektedir. (Aynı miktarda yinelenen birden fazla değer olabileceği 
+için bu değerlerin hepsinin verilmesi tercih edilmiştir.) Dolayısıyla biz bu Series 
+nesnesinin ilk elemanını alarak değeri elde ettik.
+
+impute_val = df['CouncilArea'].mode()
+df['CouncilArea'] = df['CouncilArea'].fillna(impute_val[0])
+
+-----------------------------------------------------------------------------------  
+import pandas as pd
+
+df = pd.read_csv('melb_data.csv')
+
+print(df.isna().sum())
+print("-----------------------------")
+
+impute_val = round( df['Car'].mean())
+df['Car'] = df['Car'].fillna(impute_val)    # eşdeğeri df['Car'].fillna(impute_val, inplace=True)
+
+impute_val = round(df['BuildingArea'].mean())
+df['BuildingArea'] = df['BuildingArea'].fillna(impute_val)    # eşdeğeri df['Car'].fillna(impute_val, inplace=True)
+
+impute_val = round(df['YearBuilt'].median())
+df['YearBuilt'] = df['YearBuilt'].fillna(impute_val)    # eşdeğeri df['YearBuilt'].fillna(impute_val, inplace=True)
+
+impute_val = df['CouncilArea'].mode()
+df['CouncilArea'] = df['CouncilArea'].fillna(impute_val[0])
+
+print(f'kontrol için: {df.isna().sum()}')
+
+-----------------------------------------------------------------------------------  
 """
 
 
