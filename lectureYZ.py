@@ -2453,6 +2453,64 @@ sütunun ismini listeye ekledik.
 
 ------------------------------------------------------------------------------------  
 ------------------------------------------------------------------------------------  
+import pandas as pd
+
+df = pd.read_csv('melb_data.csv')
+
+missing_columns = [colname for colname in df.columns if df[colname].isna().any()]
+print(f'Eksik verilen bulunduğu sütunlar: {missing_columns}', end='\n\n')
+
+missing_column_dist = df.isna().sum()
+print('Eksik verilerin sütunlara göre dağılımı:')
+print(missing_column_dist, end='\n\n')
+
+missing_total = df.isna().sum().sum()
+print(f'Eksik verilen toplam sayısı: {missing_total}')
+
+missing_ratio = missing_total / df.size
+print(f'Eksik verilen oranı: {missing_ratio}')
+
+missing_rows = df.isna().any(axis=1).sum()
+print(f'Eksik veri bulunan satırların sayısı: {missing_rows}')
+
+missing_rows_ratio = missing_rows / len(df)
+print(f'Eksik veri bulunan satırların oranı: {missing_rows_ratio}')
+
+
+---------- Elde Edilen Çıktı ----------
+
+Eksik verilen bulunduğu sütunlar: ['Car', 'BuildingArea', 'YearBuilt', 'CouncilArea']
+
+Eksik verilerin sütunlara göre dağılımı:
+Suburb              0
+Address             0
+Rooms               0
+Type                0
+Price               0
+Method              0
+SellerG             0
+Date                0
+Distance            0
+Postcode            0
+Bedroom2            0
+Bathroom            0
+Car                62
+Landsize            0
+BuildingArea     6450
+YearBuilt        5375
+CouncilArea      1369
+Lattitude           0
+Longtitude          0
+Regionname          0
+Propertycount       0
+dtype: int64
+
+Eksik verilen toplam sayısı: 13256
+Eksik verilen oranı: 0.04648292306613367
+Eksik veri bulunan satırların sayısı: 7384
+Eksik veri bulunan satırların oranı: 0.543740795287187
+
+------------------------------------------------------------------------------------  
 """
 
 
