@@ -2599,8 +2599,82 @@ print(f'kontrol için: {df.isna().sum()}')
 """
 
 
+# scikit-learn 
 
+"""
+-----------------------------------------------------------------------------------  
+NumPy ve Pandas genel amaçlı kütüphanelerdir. SciPy ise matematik ve lineer cebir 
+konularına odaklanmış genel bir kütüphanedir. Oysa scikit-learn makine öğrenmesi 
+amacıyla tasarlanmış ve bu amaçla kullanılan bir kütüphanedir. Kütüphanenin yüklenmesi 
+şöyle yapılabilir:
 
+Ancak scikit-learn kütüphanesi yapay sinir ağları ve derin öğrenme ağlarına yönelik 
+tasarlanmamıştır. Ancak kütüphane verilerin kullanıma hazır hale getirilmesine 
+ilişkin öğeleri de içermektedir. scikit-learn içerisindeki sınıflar matematiksel 
+ve istatistiksel ağırlıklı öğrenme yöntemlerini uygulamaktadır. scikit-learn 
+kütüphanesinin import ismi sklearn biçimindedir.
+
+-----------------------------------------------------------------------------------  
+-----------------------------------------------------------------------------------  
+scikit-learn kütüphanesi genel olarak "nesne yönelimli" biçimde oluşturulmuştur. 
+Yani kütüphane daha çok fonksiyonlar yoluyla değil sınıflar yoluyla kullanılmaktadır. 
+Kütüphanenin belli bir kullanım biçimi vardır. Öğrenme kolay olsun diye bu biçim 
+değişik sınıflarda uygulanmıştır. Kütüphanenin tipik kullanım biçimi şöyledir:
+
+1) Önce ilgili sınıf türünden nesne yaratılır. Örneğin sınıf SimpleImputer isimli sınıf olsun:
+
+from sklearn.impute import SimpleImputer
+
+si = SimpleImputer(...)    
+
+-----------------------------------------------------------------------------------  
+2) Nesne yaratıldıktan sonra onun bir veri kümesi ile eğitilmesi gerekir. Buradaki 
+eğitme kavramı genel amaçlı bir kavramdır. Bu işlem sınıfların fit metotlarıyla yapılmaktadır. 
+fit işlemi sonrasında metot birtakım değerler elde edip onu nesnenin içerisinde saklar. 
+Yani fit metotları söz konusu veri kümesini ele alarak oradan gerekli faydalı 
+bilgileri elde etmektedir. Örneğin:
+
+si.fit(dataset)
+
+fit işlemi genel olarak transform için kullanılacak bilgilerin elde edilmesi işlemini 
+yapmaktadır. DOlayısıyla fit işleminden sonra artık nesnenin özniteliklerini kullanabiliriz. 
+    
+-----------------------------------------------------------------------------------  
+3) fit işleminden sonra fit işlemiyle elde edilen bilgilerin bir veri kümesine  
+uygulanması gerekir. Bu işlem de transform metotlarıyla yapılmaktadır. Bir veri 
+kümesi üzerinde fit işlemi uygulayıp birden fazla veri kümesini transform edebiliriz. 
+
+result1 = si.transform(data1)
+result2 = si.transform(data2)
+...
+
+fit ve transform metotları bizden bilgiyi NumPy dizisi olarak, Pandas, Series ya da 
+DataFrame nesnesi olarak ya da Python listesi olarak alabilmektedir. fit metotları 
+nesnenin kendisine geri dönmekte ve transform metotları da transform edilmiş
+NumPy dizilerine geri dönmektedir.
+
+-----------------------------------------------------------------------------------  
+4) Bazen fit edilecek veri kümesi ile transform edilecek veri kümesi aynı olur. Bu 
+durumda önce fit, sonra transform metotlarını çağırmak yerine bu iki işlem sınıfların 
+fit_transform metotlarıyla tek hamlede de yapılabilir. Örneğin:
+
+result = si.fit_transform(dataset)
+
+-----------------------------------------------------------------------------------  
+5) Ayrıca sınıfların fit işlemi sonucunda oluşan bilgileri almak için kullanılan 
+birtakım örnek öznitelikleri ve metotları da olabilmektedir.
+
+-----------------------------------------------------------------------------------  
+6) Sınıfların bazen inverse_transform metotları da bulunmaktadır. inverse_transform 
+metotları transform işleminin tersini yapmaktadır. Yani transform edilmiş bilgileri 
+alıp onları transform edilmemiş hale getirmektedir. 
+
+Genel olarak scikit-learn kütüphanesi hem NumPy hem de Pandas nesnelerini desteklemektedir. 
+fit, transform ve fit_transform metotları genel olarak iki boyutlu bir veri kümesini 
+kabul etmektedir. Bunun amacı genelleştirmeyi sağlamaktadır. Bu nedenle örneğin 
+biz bu metotlara Pandas'ın Series nesnelerini değil DataFrame nesnelerini verebiliriz. 
+-----------------------------------------------------------------------------------  
+"""
 
 
 
