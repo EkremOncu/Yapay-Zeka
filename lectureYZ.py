@@ -2556,7 +2556,7 @@ sütun medyanı ile doldurma yöntemidir.
 
 -----------------------------------------------------------------------------------  
 Bu veri kümesinde eksik veriler şu sütunlarda bulunmaktaydı: "Car", "BuildingArea", ,
-"YearBuilt", "CouncilArea". Inputation işlemi için bu vsütunların incelenmesi gerekir. 
+"YearBuilt", "CouncilArea". Inputation işlemi için bu sütunların incelenmesi gerekir. 
 "Car" sütunu ev için ayrılan otopark alanının kaç arabayı içerdiğini belirtmektedir. 
 Bu sütunda ayrık küçük tamsayı değerler vardır. Burada imputation için sütun ortalaması 
 alınabilir. Ancak bunların yuvarlanması daha uygun olabilir. Bu işlem şöyle yapılabilir:
@@ -2675,8 +2675,56 @@ kabul etmektedir. Bunun amacı genelleştirmeyi sağlamaktadır. Bu nedenle örn
 biz bu metotlara Pandas'ın Series nesnelerini değil DataFrame nesnelerini verebiliriz. 
 -----------------------------------------------------------------------------------  
 """
+"""
+-----------------------------------------------------------------------------------  
+# SimpleImputer 
 
+Şimdi eksik verilerin doldurulması işleminde kolaylık sağlayan scikit-learn kütüphanesindeki 
+SimpleImputer sınıfını görelim. Sınıfın kullanılması yukarıda ele alınan kalıba 
+uygundur. Önce nesne yaratılır. Sonra fit işlemi yapılır. Asıl dönüştürme işlemini 
+transform yapmaktadır. SimpluImputer sınıfı türünden nesne yaratılırken __init__ 
+metodunda birtakım parametreler belirtilebilmektedir. Bunların çoğu zaten default 
+değer almış durumdadır. Örneğin strategy parametresi default olarak 'mean' durumdadır. 
+Bu impute işleminin sütunun hangi bilgisine göre yapılacağını belirtir. 'mean' 
+dışında şu stratejiler bulunmaktadır:
 
+'median'
+'most_frequent'
+'constant'
+
+'constant' stratejisi belli bir değerle doldurma işlemini yapar. Eğer bu strateji 
+seçilirse doldurulacak değerin fill_value parametresiyle belirtilmesi gerekir. 
+Diğer parametreler için sınıfın dokümantasyonuna bakabilirsiniz
+
+-----------------------------------------------------------------------------------  
+SimpleImputer sınıfının fit, transform ve fit_transform metotları iki boyutlu bir 
+dizi almaktadır. Yani bu metotlara bir NumPy dizisi geçirecekseniz onun iki boyutlu 
+olması gerekir. Pandas'ın Series nesnelerinin tek boyutlu bir dizi belirttiğini 
+anımsayınız. Bu durumda biz bu metotlara Series nesnesi geçemeyiz. Ancak DataFrame 
+nesneleri iki boyutlu dizi belirttiği için DataFrame nesnelerini geçebiliriz. Eğer 
+elimizde tek boyutlu bir dizi varsa onu bir sütundan n satırdan oluşan iki boyutlu 
+bir diziye dönüştürmeliyiz. Bunun için NumPy ndarray sınıfının reshape metodunu 
+kullanabilirsiniz.
+
+----------------------------------------------------------------------------------- 
+SimpleImputer nesnesi yaratılırken doldurma stratejisi nesnenin yaratımı sırasında 
+verilmektedir. Yani nesne başta belirtilen stratejiyi uygulamaktadır. Ancak veri 
+kümelerinin değişik sütunları değişik stratejilerle doldurulmak istenebilir. Bunun 
+için birden fazla SimpleImputer nesnesi yaratılabilir. Örneğin:
+
+si1 = SimpleImputer(strategy='mean')
+si2 = SimpleImputer(strategy='median')
+...
+
+Ancak bunun yerine SimpleImputer sınıfının set_params metodu da kullanılabilir. 
+Bu metot önceden belirlenmiş parametreleri değiştirmekte kullanılmaktadır. Örneğin:
+
+si = SimpleImputer(strategy='mean')
+...
+si.set_params(strategy='median')
+...
+-----------------------------------------------------------------------------------  
+"""        
 
 
 
