@@ -2775,6 +2775,155 @@ si.set_params(strategy='most_frequent')
 df[['CouncilArea']] = si.fit_transform(df[['CouncilArea']])
 
 -----------------------------------------------------------------------------------  
+scikit-learn kütüphanesinde sklearn.impute modülünde aşağıdaki imputer sınıfları 
+bulunmaktadır:
+
+SimpleImputer
+IterativeImputer
+MissingIndicator
+KNNImputer
+
+Buradaki KNNImputer sınıfı "en yakın komşuluk" yöntemini kullanmaktadır. Bu konu 
+ileride ele alınacaktır. IterativeImputer sınıfı ise regresyon yaparak doldurulacak 
+değerleri oluşturmaktadır. Örneğin biz bu sınıfa fit işleminde 5 sütunlu bir dizi 
+vermiş olalım. Bu sınıf bu sütunların birini çıktı olarak dördünü girdi olarak ele 
+alıp girdilerden çıktıyı tahmin edecek doğrusal bir model oluşturmaktadır. Yani bu 
+sınıfta doldurulacak değerler yalnızca doldurmanın yapılacağı sütunlar dikkate 
+alınarak değil diğer sütunlar da dikkate alınarak belirlenmektedir. 
+
+Örneğin MHS veri kümesinde evin metrakaresi bilinmediğinde bu eksik veriyi ortalama 
+metrakareyle doldurmak yerine "bölgeyi", "binanın yaşını" da dikkate alarak doldurmak 
+isteyebiliriz. Ancak yukarıda da belirttiğimiz gibi genellikle bu tür karmaşık 
+imputation işlemleri çok fazla kullanılmamaktadır. 
+
+-----------------------------------------------------------------------------------  
 """
+
+"""
+-----------------------------------------------------------------------------------  
+Verilerin kullanıma hazır hale getirilmesi sürecinin en önemli işlemlerinden biri 
+de "kategorik (nominal)" ve "sıralı (ordinal)" sütunların sayısal biçime dönüştürülmesidir. 
+Çünkü makine öğrenmesi algoritmaları veriler üzerinde "toplama", "çarpma" gibi 
+işlemler yaparlar. Dolayısıyla kategorik veriler böylesi işlemlere sokulamazlar. 
+Bunun için önce onların sayısal biçime dönüştürülmeleri gerekir. 
+
+Genellikle bu dönüştürme "eksik verilerin ele alınması" işleminden daha sonra 
+yapılmaktadır. Ancak bazen önce kategorik dönüştürmeyi yapıp sonra imputation 
+işlemi de yapılabilir.
+
+-----------------------------------------------------------------------------------  
+
+Kategorik verilerin sayısal biçime dönüştürülmesi genellikle her kategori (sınıf) 
+için 0'dan başlayarak artan bir tamsayı karşı düşürerek yapılmaktadır. Örneğin bir 
+sütunda kişilerin renk tercihleri olsun. Ve sütun içeriği aşağıdaki gibi olsun:
+
+Kırmızı
+Mavi
+Kırmızı
+Yeşil
+Mavi
+Yeşil
+...
+
+Biz şimdi burada bu kategorik alanı Kırmızı = 0, Mavi = 1, Yeşil = 2 biçiminde 
+sayısal hale dönüştürebiliriz. Bu durumda bu sütun şu hale gelecektir:
+
+0
+1
+0
+2
+1
+2
+....
+
+Örneğin biz bu işlemi yapan bir fonksiyon yazabiliriz. Fonksiyonun birinci parametresi 
+bir DataFrame olabilir. İkinci parametresi ise hangi sütun sayısallaştıtılacağına 
+ilişkin sütun isimlerini belirten dolaşılabilir bir nesne olabilir. Fonksiyonu 
+şöyle yazabiliriz:
+
+def category_encoder(df, colnames):
+for colname in colnames:
+    labels = df[colname].unique()
+    for index, label in enumerate(labels):
+        df.loc[df[colname] == label, colname] = index
+
+Burada biz önce sütun isimlerini tek tek elde etmek için dış bir döngü kullandık. 
+Sonra ilgili sütundaki "tek olan (unique)" etiketleri (labels) elde ettik. Sonra 
+bu etiketleri iç bir döngüde dolaşarak sütunda ilgili etiketin bulunduğu satırlara
+onları belirten sayıları yerleştirdik. 
+
+----------------------------------------------------------------------------------- 
+
+Test işlemi için aşağıdaki gibi "test.csv" isimli bir CSV dosyasını kullanabiliriz:
+    
+Adı Soyadı,Kilo,Boy,Yaş,Cinsiyet,Renk Tercihi
+ Sacit Bulut,78,172,34,Erkek,Kırmızı
+ Ayşe Er,67,168,45,Kadın,Yeşil
+ Ahmet San,85,182,32,Erkek,Kırmızı
+ Macit Şen,98,192,65,Erkek,Mavi
+ Talat Demir,85,181,49,Erkek,Yeşil
+ Sibel Ünlü,72,172,34,Kadın,Mavi
+ Ali Serçe,75,165,21,Erkek,Yeşil
+
+Test kodu da şöyle olabilir:
+
+    
+import pandas as pd
+
+df = pd.read_csv('C:/Users/Lenovo/Desktop/GitHub/YapayZeka/Src/1- DataPreparation/test.csv')
+print(df)
+print('-----------------------------------------------------------------------')
+
+def label_encode(df, colnames):
+    for colname in colnames:
+        labels = df[colname].unique()
+        for index, label in enumerate(labels):
+            df.loc[df[colname] == label, colname] = index
+            
+            
+label_encode(df, ['Renk Tercihi', 'Cinsiyet'])
+print(df)
+
+Şöyle bir çıktı elde edilmiştir:
+
+        Adı Soyadı  Kilo  Boy  Yaş Cinsiyet Renk Tercihi
+0  Sacit Bulut    78  172   34        0            0
+1      Ayşe Er    67  168   45        1            1
+2    Ahmet San    85  182   32        0            0
+3    Macit Şen    98  192   65        0            2
+4  Talat Demir    85  181   49        0            1
+5   Sibel Ünlü    72  172   34        1            2    
+
+----------------------------------------------------------------------------------- 
+Aşağıda da MHS veri kümesi üzerinde aynı işlem yapılmıştır.
+
+import pandas as pd
+import numpy as np
+
+df = pd.read_csv('C:/Users/Lenovo/Desktop/GitHub/YapayZeka/Src/1- DataPreparation/melb_data.csv')
+
+from sklearn.impute import SimpleImputer
+
+si = SimpleImputer(strategy='mean')
+df[['Car', 'BuildingArea']] = np.round(si.fit_transform(df[['Car', 'BuildingArea']]))
+
+si.set_params(strategy='median')
+df[['YearBuilt']] = np.round(si.fit_transform(df[['YearBuilt']]))
+
+si.set_params(strategy='most_frequent')
+df[['CouncilArea']] = si.fit_transform(df[['CouncilArea']])
+
+def category_encoder(df, colnames):
+    for colname in colnames:
+        labels = df[colname].unique()
+        for index, label in enumerate(labels):
+            df.loc[df[colname] == label, colname] = index
+    
+category_encoder(df, ['Suburb', 'SellerG', 'Method', 'CouncilArea', 'Regionname'])
+print(df)
+
+----------------------------------------------------------------------------------- 
+"""
+
 
 
