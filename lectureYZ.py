@@ -6,8 +6,6 @@ Bu notlar Kaan ASLAN'ın notlarından yararlanılarak oluşturulmuştur.
 ---------------------------------------------------------------------------
 """
 
-
-
 #  ----------------------------- NumPy  -----------------------------
 """
 ------------------------------------------------------------------------------------
@@ -115,7 +113,6 @@ print(b)
 ------------------------------------------------------------------------------------
 """
 
-
 # ---------- random ------------
 """
 ------------------------------------------------------------------------------------
@@ -149,8 +146,6 @@ a = np.random.randint(10, 20, (5, 5), dtype='int8')
 ------------------------------------------------------------------------------------
 """
 
-
-
 # ---------- arange ------------
 """
 ------------------------------------------------------------------------------------
@@ -182,7 +177,6 @@ tamsayı değerler almasının nedeni de budur.
 ------------------------------------------------------------------------------------
 """
 
-
 # ---------- linspace ------------
 """
 ------------------------------------------------------------------------------------
@@ -202,7 +196,6 @@ a = np.linspace(0, 10, 10)
         5.55555556,  6.66666667,  7.77777778,  8.88888889, 10.        ])
 ------------------------------------------------------------------------------------
 """
-
 
 # ---------- shape ------------
 """
@@ -272,7 +265,6 @@ c = a.ravel()
 ------------------------------------------------------------------------------------
 """
 
-
 # ---------- slicing (dilimleme)------------
 """
 ------------------------------------------------------------------------------------
@@ -341,8 +333,6 @@ print()
 print(np.matmul(a,b)) 
 ------------------------------------------------------------------------------------
 """
-
-
 
 #  ----------------------------- Pandas  -----------------------------
 """
@@ -1354,7 +1344,6 @@ uniform.rvs(100, 200, 10)
 ------------------------------------------------------------------------------------
 """
 
-
 # t Dağılımı
 
 """   
@@ -1484,8 +1473,7 @@ result = t.cdf(x, 5)
 print(result)               # [0.31914944 0.5        0.81839127 0.86669189]
 
 ------------------------------------------------------------------------------------
-"""  
-
+"""
 
 # Kesikli (discrete) dağılım
 """  
@@ -1642,7 +1630,6 @@ Bu fonksiyonlarda birinci parametre "olumlu gerçekleşme sayısını", ikinci p
 belirtmektedir. 
 ------------------------------------------------------------------------------------
 """
-
 
 #   Merkezi limit teoremi (central limit theorem)
 
@@ -1809,7 +1796,6 @@ olması için örnek büyüklüğünün >= 30 olması gerekir. Tabii n < 30 duru
 ------------------------------------------------------------------------------------
 """
 
-
 # Normalliğin Test Edilmesi
 
 """
@@ -1928,7 +1914,6 @@ print(result.pvalue)
 
 ------------------------------------------------------------------------------------  
 """
-
 
 # Örnekten Hareketle Anakütle Parametrelerinin Tahmin Edilmesi
 
@@ -2256,7 +2241,6 @@ Ancak genel olarak parametrik olmayan yöntemler parametrik yöntemlere göre da
 daha az güvenilir sonuçlar vermektedir. 
 ------------------------------------------------------------------------------------  
 """
-
 
 #  --------------------- Verilerin Kullanıma Hazır Hale Getirilmesi ---------------------
 
@@ -2598,8 +2582,7 @@ print(f'kontrol için: {df.isna().sum()}')
 -----------------------------------------------------------------------------------  
 """
 
-
-# scikit-learn 
+# scikit-learn
 
 """
 -----------------------------------------------------------------------------------  
@@ -2675,6 +2658,7 @@ kabul etmektedir. Bunun amacı genelleştirmeyi sağlamaktadır. Bu nedenle örn
 biz bu metotlara Pandas'ın Series nesnelerini değil DataFrame nesnelerini verebiliriz. 
 -----------------------------------------------------------------------------------  
 """
+
 """
 -----------------------------------------------------------------------------------  
 # SimpleImputer 
@@ -2723,16 +2707,74 @@ si = SimpleImputer(strategy='mean')
 ...
 si.set_params(strategy='median')
 ...
+
+-----------------------------------------------------------------------------------      
+SimpleImputer sınıfında yukarıda belirttiğimiz gibi fit metodu asıl doldurma işlemini 
+yapmaz. Doldurma işlemi için gereken bilgileri elde eder. Yani örneğin:
+
+a = np.array([1, 1, None, 4, None]).reshape(-1, 1)
+
+si = SimpleImputer(strategy='mean')
+si.fit(a)
+
+Burada fit metodu aslında yalnızca bu a dizisindeki sütunların ortalamalarını elde 
+etmektedir. (Örneğimizde tek br sütun var). Biz fit yaptığımız bilgiyi transform 
+etmek zorunda değiliz. Örneğin:
+
+b = np.array([1, 1, None, 4, None]).reshape(-1, 1)
+result = si.transform(b)
+
+Biz şimdi burada a'dan elde ettiğimiz ortalama 3 değeri ile bu b dizisini doldurmuş 
+oluruz. Tabii genellikle bu tür durumlarda fit yapılan dizi ile transform yapılan 
+dizi aynı dizi olur.
+
 -----------------------------------------------------------------------------------  
-"""        
+-----------------------------------------------------------------------------------  
+scikit-learn kütüphanesindeki pek çok sınıf aynı anda birden fazla sütun üzerinde 
+işlem yapabilmektedir. Bu nedenle bu sınıfların fit ve transform metotları bizden 
+iki boyutlu dizi istemektedir. tranform metotları da bize iki iki boyutlu dizi 
+geri döndürmektedir.
 
+Örneğin SimpleImputer sınıfına biz fit işlemind eiki bıyutlu bir dizi veriririz. 
+Bu drumda fit metodu her sütunu diğerinden ayrı bir biçimde ele alır ve o sütunlara 
+ilişkin bilgileri oluşturur. Örneğin biz fit metoduna aşağıdaki gibi iki boyutlu 
+bir dizi vermiş olalım:
 
+1       4
+None    7
+5       None
+3       8
+9       2
 
+Stratejinin "mean" olduğunu varsayalım. Bu durumda fit metodu her iki sütunun da 
+ortalamasını alıp nesnenin içerisinde saklayacaktır. Biz artık transform metoduna 
+iki boyutlu iki sütundan oluşan bir dizi verebiliriz. Bu transform metodu bizim 
+verdiğimiz dizinin ilk sütunununu fit ettiğimiz dizinin ilk sütunundan elde ettiği 
+bilgiyle, ikinci sütununu fit ettiğimiz dizinin ikinci sütunundan elde ettiği bilgiyle 
+dolduracakır. 
 
+İşte sckit-learn sınıflarının fit ve transform metotlarına biz iki boyutlu diziler 
+veririz. O da bize iki boyutlu diziler geri döndürür. Eğer elimizde tek boyutlu 
+bir dizi varsa biz onu reshape metoduyla iki boyutlu hale getirerek fit ve transform 
+metotlarına vermeliyiz.
 
+-----------------------------------------------------------------------------------  
+import pandas as pd
+import numpy as np
+from sklearn.impute import SimpleImputer
 
+df = pd.read_csv('C:/Users/Lenovo/Desktop/GitHub/YapayZeka/Src/1- DataPreparation/melb_data.csv')
 
+si = SimpleImputer(strategy='mean')
+df[['Car','BuildingArea']] = np.round(si.fit_transform(df[['Car','BuildingArea']]))
 
+si.set_params(strategy='median')
+df[['YearBuilt']] = si.fit_transform(df[['YearBuilt']])
 
+si.set_params(strategy='most_frequent')
+df[['CouncilArea']] = si.fit_transform(df[['CouncilArea']])
+
+-----------------------------------------------------------------------------------  
+"""
 
 
