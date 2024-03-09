@@ -2884,6 +2884,14 @@ def label_encode(df, colnames):
 label_encode(df, ['Renk Tercihi', 'Cinsiyet'])
 print(df)
 
+
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+df.loc[df[colname] == label, colname]: Bu kısım, colname sütunundaki değerleri 
+label ile eşit olan satırları seçer. df.loc[] metodunun ilk bölümü 
+(df[colname] == label) hangi satırların seçileceğini belirlerken, ikinci bölüm 
+(colname) hangi sütunun değerlerinin değiştirileceğini belirtir.
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
 Şöyle bir çıktı elde edilmiştir:
 
         Adı Soyadı  Kilo  Boy  Yaş Cinsiyet Renk Tercihi
@@ -2923,6 +2931,123 @@ category_encoder(df, ['Suburb', 'SellerG', 'Method', 'CouncilArea', 'Regionname'
 print(df)
 
 ----------------------------------------------------------------------------------- 
+
+Aslında yukarıdaki işlem scikit-learn kütüphanesindeki preprocessing modülünde 
+bulunan LabelEncoder sınıfıyla yapılabilmektedir. LabelEncoder sınıfının genel 
+çalışma biçimi scikit-learn kütüphanesinin diğer sınıflarındaki gibidir. Ancak bu 
+sınıfın fit ve transform metotları TEK boyutlu bir numpy dizisi ya da Series nesnesi 
+almaktadır. (Halbuki yukarıda da belirttiğimiz gibi genel olarak fit ve transform 
+metotlarının çoğu iki boyutlu dizileri ya da DataFrame nesnelerini alabilmektedir.)
+
+fit metodu yukarıda bizim yaptığımız gibi unique elemanları tespit edip bunu nesne 
+içerisinde saklamaktadır. Asıl dönüştürme işlemi transform metoduyla yapılmaktadır. 
+Tabii eğer fit ve transform metotlarında aynı veriler kullanılacaksa bu işlemler 
+tek hamlede fit_transform metoduyla da yapılabilir. Örneğin yukarıdaki "test.csv" 
+veri kümesindeki "Cinsiyet" ve "Renk Tercihi" sütunlarını kategorik olmaktan çıkartıp 
+sayısal biçime şöyel dönüştürebiliriz:
+    
+-----------------------------------------------------------------------------------
+import pandas as pd
+from sklearn.preprocessing import LabelEncoder
+
+
+df = pd.read_csv('C:/Users/Lenovo/Desktop/GitHub/YapayZeka/Src/1- DataPreparation/test.csv')
+
+le = LabelEncoder()
+
+transformed_data = le.fit_transform(df['Renk Tercihi'])
+df['Renk Tercihi'] = transformed_data
+
+transformed_data = le.fit_transform(df['Cinsiyet'])
+df['Cinsiyet'] = transformed_data
+print(df)
+
+-----------------------------------------------------------------------------------
+Aşağıda MHS veri kümesindeki gerekli sütunlar LabelEncoder sınıfı ile sayısal 
+biçime dönüştürülmüştür.
+
+
+import pandas as pd
+import numpy as np
+
+df = pd.read_csv('C:/Users/Lenovo/Desktop/GitHub/YapayZeka/Src/1- DataPreparation/melb_data.csv')
+print(df, end='\n\n')
+
+from sklearn.impute import SimpleImputer
+
+si = SimpleImputer(strategy='mean')
+df[['Car', 'BuildingArea']] = np.round(si.fit_transform(df[['Car', 'BuildingArea']]))
+
+si.set_params(strategy='median')
+df[['YearBuilt']] = np.round(si.fit_transform(df[['YearBuilt']]))
+
+si.set_params(strategy='most_frequent')
+df[['CouncilArea']] = si.fit_transform(df[['CouncilArea']])
+    
+
+from sklearn.preprocessing import LabelEncoder
+
+le = LabelEncoder()
+for colname in ['Suburb', 'SellerG', 'Method', 'CouncilArea', 'Regionname']:
+    df[colname] = le.fit_transform(df[colname])
+
+print(df)
+
+-----------------------------------------------------------------------------------
+LabelEncoder sınıfının inverse_transform metodu ters işlemi yapmaktadır. Yani bir 
+kez fit işlemi yapıldıktan sonra nesne zaten hangi etiketlerin hangi sayısal değerlere 
+karşı geldiğini kendi içerisinde tutmaktadır. Böylece biz sayısal değer verdiğimizde 
+onun yazısal karşılığını inverse_transform ile elde edebiliriz
+
+
+import pandas as pd
+from sklearn.preprocessing import LabelEncoder
+
+df = pd.read_csv('C:/Users/Lenovo/Desktop/GitHub/YapayZeka/Src/1- DataPreparation/test.csv')
+print(df, end='\n\n')
+
+le = LabelEncoder()
+
+transformed_data = le.fit_transform(df['Renk Tercihi'])
+df['Renk Tercihi'] = transformed_data
+
+label_names = le.inverse_transform(transformed_data)
+print(label_names, end='\n\n')
+
+
+transformed_data = le.fit_transform(df['Cinsiyet'])
+df['Cinsiyet'] = transformed_data
+
+label_names = le.inverse_transform(transformed_data)
+print(label_names)
+
+-----------------------------------------------------------------------------------
+Aslında kategorik verilerin 0'dan itibaren birer tamsayı ile numaralandırılması 
+iyi bir teknik değildir. Kategorik verilen "one hot encoding" denilen biçimde 
+sayısallaştırılması doğru tekniktir. Biz "one hot encoding" dönüştürmesini izleyen 
+paragraflarda ele alacağız.
+
+Sıralı (ordinal) verilerin sayısal biçime dönüştürülmesi tipik olarak düşük sıranın 
+düşük numarayla ifade edilmesi biçiminde olabilir. Örneğin "Eğitim Durumu", "ilkokul", 
+"ortaokul", "lise", "üniversite" biçiminde dört kategoride sıralı bir bilgi olabilir. 
+Biz de bu bilgilere sırasıyla birer numara vermek isteyebiliriz. Örneğin:
+
+İlkokul     --> 0
+Ortaokul    --> 1
+Lise        --> 2
+Üniversite  --> 3
+
+scikit-learn içerisindeki LabelEncoder sınıfı bu amaçla kullanılamamaktadır. Çünkü 
+LabelEncoder etiketlere rastgele numara vermektedir. scikit-learn içerisinde bu 
+işlemi pratik bir biçimde yapan hazır bir sınıf bulunmamaktadır.
+
+OrdinalEncoder sınıfı encode edilecek sütunları eğer onlar yazısal biçimdeyse 
+"lexicographic" sıraya göre numaralandırmaktadır. (Yani sözlükte ilk gördüğü 
+kategoriye düşük numara vermektedir.) Kategorilere bizim istediğimiz numaraları 
+vermemektedir. Ayrıca bu sınıfn fit ve transform metotları iki boyutlu nesneleri 
+kabul etmektedir.
+
+-----------------------------------------------------------------------------------
 """
 
 
