@@ -3022,6 +3022,7 @@ label_names = le.inverse_transform(transformed_data)
 print(label_names)
 
 -----------------------------------------------------------------------------------
+-----------------------------------------------------------------------------------
 Aslında kategorik verilerin 0'dan itibaren birer tamsayı ile numaralandırılması 
 iyi bir teknik değildir. Kategorik verilen "one hot encoding" denilen biçimde 
 sayısallaştırılması doğru tekniktir. Biz "one hot encoding" dönüştürmesini izleyen 
@@ -3039,16 +3040,82 @@ Lise        --> 2
 
 scikit-learn içerisindeki LabelEncoder sınıfı bu amaçla kullanılamamaktadır. Çünkü 
 LabelEncoder etiketlere rastgele numara vermektedir. scikit-learn içerisinde bu 
-işlemi pratik bir biçimde yapan hazır bir sınıf bulunmamaktadır.
+işlemi pratik bir biçimde yapan hazır bir sınıf bulunmamaktadır. Gerçi scikit-learn 
+içerisinde OrdinalEncoder isimli bir sınıf vardır ama o sınıf bu tür amaçları 
+gerçekleştirmek için tasarlanmamıştır. 
+
+-----------------------------------------------------------------------------------
+OrdinalEncoder sınıfının kullanımı benzerdir. Önce fit sonra transform yapılır. 
+Eğer fit ve transform metodunda aynı veri kümesi kullanılacaksa fit_transform metodu 
+ile bu iki işlem bir arada yapılabilir. OrdinalEncoder sınıfının categories_ örnek 
+özniteliği oluşturulan kategorileri NumPy dizisi olarak vermektedir. Sınıfın 
+n_features_in_ örnek özniteliği ise fit işlemine sokulan sütunların sayısını vermektedir.
+
 
 OrdinalEncoder sınıfı encode edilecek sütunları eğer onlar yazısal biçimdeyse 
 "lexicographic" sıraya göre numaralandırmaktadır. (Yani sözlükte ilk gördüğü 
-kategoriye düşük numara vermektedir.) Kategorilere bizim istediğimiz numaraları 
-vermemektedir. Ayrıca bu sınıfn fit ve transform metotları iki boyutlu nesneleri 
-kabul etmektedir.
+kategoriye düşük numara vermektedir. Tabii bu işlem UNICODE tabloya göre yapılmaktadır.) 
+Kategorilere bizim istediğimiz numaraları vermemektedir. Ayrıca bu sınıfın fit ve 
+transform metotları iki boyutlu nesneleri kabul etmektedir. Bu bağlamda OrdinalEncoder 
+sınıfının LabelEncoder sınıfındne en önemli farklılığı OrdinalEncoder sınıfının 
+birden fazla sütunu (özelliği) kabul etmesidir. Halbuki LabelEncoder sınıfı tek bir 
+sütunu (özelliği) dönüştürmektedir.
+
+-----------------------------------------------------------------------------------
+Örneğin "test.csv" veri kümesi için:
+    
+Burada "Cinsiyet" ve "RenkTercihi" kategorik (nominal) ölçekte sütunlardır. "EğitimDurumu" 
+sütunu kategorik ya da sıralı olarak ele alınabilir. Eğer biz İlkokul = 0, Ortaokul = 1, 
+Lise = 2, Üniversite = 3 biçiminde sıralı ölçeğe ilişkin bir kodlama yapmak istersek 
+bunu LabelEncoder ya da OrdinalEncoder ile sağlayamayız. Örneğin:
+
+import pandas as pd
+from sklearn.preprocessing import OrdinalEncoder 
+
+df = pd.read_csv('C:/Users/Lenovo/Desktop/GitHub/YapayZeka/Src/1- DataPreparation/test.csv')
+print(df, end='\n\n')
+
+oe = OrdinalEncoder()
+transformed_data = oe.fit_transform(df[['Cinsiyet', 'Renk Tercihi', 'Eğitim Durumu']])
+df[['Cinsiyet', 'Renk Tercihi', 'Eğitim Durumu']] = transformed_data 
+
+ Buradan şöyle bir DataFrame elde edilecektir:
+
+        AdıSoyadı  Kilo  Boy  Yaş  Cinsiyet  RenkTercihi  EğitimDurumu
+0  Sacit Bulut    78  172   34       0.0           0.0            3.0
+1      Ayşe Er    67  168   45       1.0           2.0            1.0
+2    Ahmet San    85  182   32       0.0           0.0            3.0
+3    Macit Şen    98  192   65       0.0           1.0            0.0
+4  Talat Demir    85  181   49       0.0           2.0            2.0
+5   Sibel Ünlü    72  172   34       1.0           1.0            1.0
+6    Ali Serçe    75  165   21       0.0           2.0            3.0
+                                
+Bunu OridinalEncoder sınıfı le kodlamaya çalışırsak muhtemelen tam istediğimiz 
+gibi bir kodlama yapamayız.   
+
+-----------------------------------------------------------------------------------
+Bu durumda eğer kategorilere istediğiniz gibi değer vermek istiyorsanız bunu manuel 
+bir biçimde yapabilirsiniz. Örneğin veri kümesi read_csv fonksiyonuyla okunurken 
+converters parametresi yoluyla hemen dönüştürme yapılabilir. read_csv ve load_txt 
+fonksiyonlarında converters parametresi bir sözlük nesnesi almaktadır. Bu sözlük 
+nesnesi hangi sütun değerleri okunurken hangi dönüştürmenin yapılacağını belirtmektedir. 
+Buradaki sözlüğün her elemanının anahtarı bir sütun indeksinden ya da sütun indeksinden 
+değeri ise o sütunun dönüştürülmesinde kullanılacak fonksiyondan oluşmaktadır. Tabii 
+bu fonksiyon lambda ifadesi olarak da girilebilir. Örneğin:
+
+import pandas as pd
+df = pd.read_csv('C:/Users/Lenovo/Desktop/GitHub/YapayZeka/Src/1- DataPreparation/test.csv', converters={'EğitimDurumu': lambda s: {'İlkokul': 0, 'Ortaokul': 1, 'Lise': 2, 'Üniversite': 3}[s]})
+
+Elde edilecek DataFrame nesnesi şöyle olacaktır:
+
+        AdıSoyadı  Kilo  Boy  Yaş Cinsiyet RenkTercihi  EğitimDurumu
+0  Sacit Bulut    78  172   34    Erkek      Kırmızı              0
+1      Ayşe Er    67  168   45    Kadın        Yeşil              1
+2    Ahmet San    85  182   32    Erkek      Kırmızı              0
+3    Macit Şen    98  192   65    Erkek         Mavi              2
+4  Talat Demir    85  181   49    Erkek        Yeşil              3
+5   Sibel Ünlü    72  172   34    Kadın         Mavi              1
+6    Ali Serçe    75  165   21    Erkek        Yeşil              0
 
 -----------------------------------------------------------------------------------
 """
-
-
-
