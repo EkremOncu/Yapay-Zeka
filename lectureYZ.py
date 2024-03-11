@@ -3213,11 +3213,97 @@ df[ohe.categories_[0]] = transformed_data
 print(df)
 
 -----------------------------------------------------------------------------------
+DataFrame nesnesine yukarıdaki gibi birden fazla sütun eklerken dikkat etmek gerekir. 
+Çünkü tesadüfen bu kategori isimlerine ilişkin sütunlardan biri zaten varsa o sütun 
+yok edilip yerine bu kategori sütunu oluşturulacaktır. Bunu engellemek için oluşturacağınız 
+kategori sütunlarını önek vererek isimlendirebilirsiniz. Önek verirken orijinal 
+sütun ismini kullanırsanız bu durumda çakışma olmayacağı garanti edilebilir. Yani 
+örneğin RenkTercihi sütunu için "Kırmızı", "Mavi" "Yeşil" isimleri yerine 
+"RenkTercihi_Kırmızı", "RenkTercihi_Mavi" ve "RenkTercihi_Yeşil" isimlerini 
+kullanabilirsiniz. Bu biçimde isim elde etmek "liste içlemiyle" oldukça kolaydır. 
+Örneğin:
+
+category_names = ['RenkTercihi_' + category for category in ohe.categories_[0]]
+
+
+import pandas as pd
+from sklearn.preprocessing import OneHotEncoder
+
+df = pd.read_csv('C:/Users/Lenovo/Desktop/GitHub/YapayZeka/Src/1- DataPreparation/test.csv')
+
+ohe = OneHotEncoder(sparse=False, dtype='uint8')
+
+transformed_data = ohe.fit_transform(df[['Renk Tercihi']])
+
+df.drop(['Renk Tercihi'], axis=1, inplace=True)
+
+category_names = ['RenkTercihi_' + category for category in ohe.categories_[0]]
+
+df[category_names] = transformed_data
+
+print(df)
+    
+-----------------------------------------------------------------------------------
+Burada "RenkTercihi"nin yanı sıra "Eğitim Durumu" de kategorik bir sütundur. Bunun her 
+ikisini birden tek hamlede "one hot encoding" işlemine sokabiliriz:
+
+ohe = OneHotEncoder(sparse=False, dtype='uint8')
+transformed_data = ohe.fit_transform(df[['Renk Tercihi', 'Eğitim Durumu']])
+
+df.drop(['Renk Tercihi', 'Eğitim Durumu'], axis=1, inplace=True)
+
+categories1 = ['RenkTercihi_' + category for category in ohe.categories_[0]]
+categories2 = ['Eğitim Durumu_' + category for category in ohe.categories_[1]]
+
+df[categories1 + categories2] = transformed_data
+
+----------------------------------------------------------------------------------
+----------------------------------------------------------------------------------
+One hot encoding yapmanın diğer bir yolu Pandas kütüphanesindeki get_dummies fonksiyonunu 
+kullanmaktadır. get_dummies fonksiyonu bizden bir DataFrame, Series ya da dolaşılabilir 
+herhangi bir nesneyi alır. Eğer biz get_dummies fonksiyonuna bütün bir DataFrame
+geçirirsek fonksiyon oldukça akıllı davranmaktadır. Bu durumda fonksiyon DataFrame 
+nesnesi içerisindeki yazısal sütunları tespit eder. Yalnızca yazısal sütunları 
+"one hot encoding" işlemine sokar ve bize yazısal sütunları dönüştürülmüş yeni bir 
+DataFrame nesnesi verir. Pandas ile çalışırken bu fonksiyon çok kolaylık sağlamaktadır.
+
+Biz aslında get_dummies fonksiyonu yoluyla yapmış olduğumuz işlemleri tek hamlede 
+yapabiliriz:
+
+    
+import pandas as pd
+df = pd.read_csv('C:/Users/Lenovo/Desktop/GitHub/YapayZeka/Src/1- DataPreparation/test.csv')    
+
+df = pd.read_csv('test.csv')
+transformed_df = pd.get_dummies(df, dtype='uint8')
+
+
+Burada biz tek hamlede istediğimiz dönüştürmeyi yapabildik. Bu dönüştürmede yine 
+sütun isimleri orijinal sütun isimleri ve kategori simleriyle örneklendirilmiştir. 
+Eğer isterse programcı "prefix" parametresi ile bu öneki değiştirebilir, "prefix_sep"
+parametresiyle de '_' karakteri yerine başka birleştirme karakterlerini kullanabilir. 
+
+get_dummies fonksiyonu default durumda sparse olmayan bool türden bir DataFrame 
+nesnesi vermektedir. Ancak get_dummies fonksiyonunda "dtype" parametresi belirtilerek 
+"uint8" gibi bir türden çıktı oluşturulması sağlanabilmektedir. 
+
+----------------------------------------------------------------------------------
+Biz bir DataFrame nesnesinin tüm yazısal sütunlarını değil bazı yazısal sütunlarını 
+da "one hot encoding" işlemine sokmak isteyebiliriz. Bu durumda fonksiyon DataFrame 
+nesnesinin diğer sütunlarına hiç dokunmamaktadır. Örneğin:
+
+transformed_df = pd.get_dummies(df, columns=['Renk Tercihi'], dtype='uint8')
+
+
+Biz burada yalnızca DataFrame nesnesinin "Renk Tercihi" sütununu "one hot encoding" 
+yapmış olduk. get_dummies fonksiyonun zaten "one hot encoding" yapılan sütunu 
+sildiğine dikkat ediniz. Bu bizim genellikle istediğimiz bir şeydir. Yukarıdaki 
+örnekte "test.csv" dosyasında "AdıSoyadı" sütunu yazısal bir sütundur. Dolayısıyla 
+default durumda bu sütun da "one hot encoding" işlemine sokulacaktır. Bunu engellemek 
+için "columns" parametresinden faydalanabiliriz ya da baştan o sütunu atabiliriz. 
+Örneğin:
+
+transformed_df = pd.get_dummies(df.iloc[:, 1:], dtype='uint8')
+
+----------------------------------------------------------------------------------
 """
-
-
-
-
-
-
-
