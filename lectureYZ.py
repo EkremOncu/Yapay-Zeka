@@ -2935,7 +2935,7 @@ print(df)
 Aslında yukarıdaki işlem scikit-learn kütüphanesindeki preprocessing modülünde 
 bulunan LabelEncoder sınıfıyla yapılabilmektedir. LabelEncoder sınıfının genel 
 çalışma biçimi scikit-learn kütüphanesinin diğer sınıflarındaki gibidir. Ancak bu 
-sınıfın fit ve transform metotları TEK boyutlu bir numpy dizisi ya da Series nesnesi 
+sınıfın fit ve transform metotları "TEK" boyutlu bir numpy dizisi ya da Series nesnesi 
 almaktadır. (Halbuki yukarıda da belirttiğimiz gibi genel olarak fit ve transform 
 metotlarının çoğu iki boyutlu dizileri ya da DataFrame nesnelerini alabilmektedir.)
 
@@ -3118,4 +3118,106 @@ Elde edilecek DataFrame nesnesi şöyle olacaktır:
 6    Ali Serçe    75  165   21    Erkek        Yeşil              0
 
 -----------------------------------------------------------------------------------
+
+-----------------------------------------------------------------------------------
+# one hot encoding
+
+Kategorik verilerin 0'dan itibaren LabelEncoder ya da OridnalEncoder sınıfı ile 
+sayısallaştırılması iyi bir fikir değildir. Çünkü bu durumda sanki veri "sıralı (ordinal)" 
+bir biçime sokulmuş gibi olur. Pek çok algoritma bu durumdan olumsuz yönde etkilenmektedir.
+
+kategorik olguların birden fazla sütunla ifade edilmesi yoluna gidilmektedir. Kategorik 
+verilerin birden fazla sütunla ifade edilmesinde en yaygın kullanılan yöntem "one hot encoding" 
+denilen yöntemdir. Bu yöntemde sütundaki kategorilerin sayısı hesaplanır. Veri 
+tablosuna bu sayıda sütun eklenir. "One hot" terimi "bir grup bitten hepsinin sıfır 
+yalnızca bir tanesinin 1 olma durumunu" anlatmaktadır. İşte bu biçimde n tane kategori 
+n tane sütunla ifade edilir. Her kategori yalnızca tek bir sütunda 1 diğer sütunlarda 
+0 olacak biçimde kodlanır.
+
+-----------------------------------------------------------------------------------
+
+    RenkTercihi
+    -----------
+    Kırmızı
+    Kırmızı
+    Mavi
+    Kırmızı
+    Yeşil
+    Mavi
+    Yeşil
+    ...
+
+Burada 3 renk olduğunu düşünelim. Bunun "one hot encoding" dönüştürmesi şöyle olacaktır:
+
+Kırmızı     Mavi        Yeşil
+1           0           0
+1           0           0
+0           1           0
+1           0           0
+0           0           1
+0           1           0
+0           0           1
+...
+
+Eğer sütundaki kategori sayısı 2 tane ise böyle sütunlar üzerinde "one hot encoding" 
+uygulamanın bir faydası yoktur. Bu tür ikili sütunlar 0 ve 1 biçiminde kodlanabilir. 
+(Yani bu işlem LabelEncoder sınıfyla yapılabilir).
+
+-----------------------------------------------------------------------------------
+"One hot encoding" yapmanın çok çeşitli yöntemleri vardır. Örneğin scitkit-learn 
+içerisindeki preprocessing modülünde bulunan OneHotEncoder sınıfı bu işlem için 
+kullanılabilir. Sınıfın genel kullanımı diğer sckit-learn sınıflarında olduğu gibidir. 
+Yani önce fit işlemi sonra transform işlemi yapılır. fit işleminden sonra sütunlardaki 
+"tek olan (unique)" elemanlar sınıfın categories_ örnek özniteliğine NumPy dizilerinden 
+oluşan bir liste biçiminde kaydedilmektedir.
+
+"One hot encoding" yapılırken DataFrame içerisine eski sütunu silip yeni sütunlar 
+eklenmelidir. DataFrame sütununa bir isim vererek atama yapılırsa nesne o sütunu 
+zaten otomatik eklemektedir. "One hot encoding" ile oluşturulan sütunların isimleri 
+önemli değildir. Ancak OneHotEncoder nesnesi önce sütunu np.unique fonksiyonuna 
+sokmakta ondan sonra o sırada encoding işlemi yapmaktadır. NumPy'ın unique fonksiyonu 
+aynı zamanda sıraya dizme işlemini de zaten yapmaktadır. Dolayısıyla OneHotEncoder 
+aslında kategorik değerleri alfabetik sıraya göre sütunsal olarak dönüştürmektedir.
+
+OneHotEncoder sınıfının fit ve transform metotları çok boyutlu dizileri kabul 
+etmektedir. Bu durumda biz bu metotlara Pandas'ın Series nesnesini değil DataFrame 
+nesnesini vermeliyiz.
+
+OneHotEncoder nesnesini yaratırken "sparse_output" parametresini False biçimde vermeyi 
+unutmayınız. (Bu parametrenin eski ismi yalnızca "sparse" biçimindeydi). Çünkü bu 
+sınıf default olarak transform edilmiş nesneyi "seyrek matris (sparse matrix)" 
+olarak vermektedir. Elemanlarının büyük çoğunluğu 0 olan matrislere "seyrek matris 
+(sparse matrix)" denilmektedir. Bu tür matrisler "fazla yer kaplamasın diye" 
+sıkıştırılmış bir biçimde ifade edilebilmektedir. 
+
+Yine OneHotEncoder nesnesi yaratılırken parametre olarak dtype türünü belirtebiliriz. 
+Default dtype türü np.float64 alınmaktadır. Matris seyrek formda elde edilmeyecekse 
+bu dtype türünü "uint8" gibi en küçük türde tutabilirsiniz. max_categories parametresi 
+kategori sayısını belli bir değerde tutmak için kullanılmaktadır. Bu durumda diğer 
+tüm kategoriler başka bir kategori oluşturmaktadır
+
+-----------------------------------------------------------------------------------
+import pandas as pd
+from sklearn.preprocessing import OneHotEncoder
+
+df = pd.read_csv('C:/Users/Lenovo/Desktop/GitHub/YapayZeka/Src/1- DataPreparation/test.csv')
+
+ohe = OneHotEncoder(sparse=False, dtype='uint8')
+transformed_data = ohe.fit_transform(df[['Renk Tercihi']])
+
+df.drop(['Renk Tercihi'], axis=1, inplace=True)
+
+df[ohe.categories_[0]] = transformed_data
+
+# ohe.categories_  -----> [ array(['Kırmızı', 'Mavi', 'Yeşil'], dtype=object) ]
+print(df)
+
+-----------------------------------------------------------------------------------
 """
+
+
+
+
+
+
+
