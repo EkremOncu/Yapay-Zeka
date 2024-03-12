@@ -2856,7 +2856,7 @@ onları belirten sayıları yerleştirdik.
 
 Test işlemi için aşağıdaki gibi "test.csv" isimli bir CSV dosyasını kullanabiliriz:
     
-Adı Soyadı,Kilo,Boy,Yaş,Cinsiyet,Renk Tercihi
+AdıSoyadı,Kilo,Boy,Yaş,Cinsiyet,RenkTercihi
  Sacit Bulut,78,172,34,Erkek,Kırmızı
  Ayşe Er,67,168,45,Kadın,Yeşil
  Ahmet San,85,182,32,Erkek,Kırmızı
@@ -2881,7 +2881,7 @@ def label_encode(df, colnames):
             df.loc[df[colname] == label, colname] = index
             
             
-label_encode(df, ['Renk Tercihi', 'Cinsiyet'])
+label_encode(df, ['Renk ercihi', 'Cinsiyet'])
 print(df)
 
 
@@ -2894,7 +2894,7 @@ label ile eşit olan satırları seçer. df.loc[] metodunun ilk bölümü
 
 Şöyle bir çıktı elde edilmiştir:
 
-        Adı Soyadı  Kilo  Boy  Yaş Cinsiyet Renk Tercihi
+        AdıSoyadı  Kilo  Boy  Yaş Cinsiyet RenkTercihi
 0  Sacit Bulut    78  172   34        0            0
 1      Ayşe Er    67  168   45        1            1
 2    Ahmet San    85  182   32        0            0
@@ -2943,7 +2943,7 @@ fit metodu yukarıda bizim yaptığımız gibi unique elemanları tespit edip bu
 içerisinde saklamaktadır. Asıl dönüştürme işlemi transform metoduyla yapılmaktadır. 
 Tabii eğer fit ve transform metotlarında aynı veriler kullanılacaksa bu işlemler 
 tek hamlede fit_transform metoduyla da yapılabilir. Örneğin yukarıdaki "test.csv" 
-veri kümesindeki "Cinsiyet" ve "Renk Tercihi" sütunlarını kategorik olmaktan çıkartıp 
+veri kümesindeki "Cinsiyet" ve "RenkTercihi" sütunlarını kategorik olmaktan çıkartıp 
 sayısal biçime şöyel dönüştürebiliriz:
     
 -----------------------------------------------------------------------------------
@@ -2955,8 +2955,8 @@ df = pd.read_csv('C:/Users/Lenovo/Desktop/GitHub/YapayZeka/Src/1- DataPreparatio
 
 le = LabelEncoder()
 
-transformed_data = le.fit_transform(df['Renk Tercihi'])
-df['Renk Tercihi'] = transformed_data
+transformed_data = le.fit_transform(df['RenkTercihi'])
+df['RenkTercihi'] = transformed_data
 
 transformed_data = le.fit_transform(df['Cinsiyet'])
 df['Cinsiyet'] = transformed_data
@@ -3008,8 +3008,8 @@ print(df, end='\n\n')
 
 le = LabelEncoder()
 
-transformed_data = le.fit_transform(df['Renk Tercihi'])
-df['Renk Tercihi'] = transformed_data
+transformed_data = le.fit_transform(df['RenkTercihi'])
+df['RenkTercihi'] = transformed_data
 
 label_names = le.inverse_transform(transformed_data)
 print(label_names, end='\n\n')
@@ -3076,8 +3076,8 @@ df = pd.read_csv('C:/Users/Lenovo/Desktop/GitHub/YapayZeka/Src/1- DataPreparatio
 print(df, end='\n\n')
 
 oe = OrdinalEncoder()
-transformed_data = oe.fit_transform(df[['Cinsiyet', 'Renk Tercihi', 'Eğitim Durumu']])
-df[['Cinsiyet', 'Renk Tercihi', 'Eğitim Durumu']] = transformed_data 
+transformed_data = oe.fit_transform(df[['Cinsiyet', 'RenkTercihi', 'Eğitim Durumu']])
+df[['Cinsiyet', 'RenkTercihi', 'Eğitim Durumu']] = transformed_data 
 
  Buradan şöyle bir DataFrame elde edilecektir:
 
@@ -3203,9 +3203,9 @@ from sklearn.preprocessing import OneHotEncoder
 df = pd.read_csv('C:/Users/Lenovo/Desktop/GitHub/YapayZeka/Src/1- DataPreparation/test.csv')
 
 ohe = OneHotEncoder(sparse=False, dtype='uint8')
-transformed_data = ohe.fit_transform(df[['Renk Tercihi']])
+transformed_data = ohe.fit_transform(df[['RenkTercihi']])
 
-df.drop(['Renk Tercihi'], axis=1, inplace=True)
+df.drop(['RenkTercihi'], axis=1, inplace=True)
 
 df[ohe.categories_[0]] = transformed_data
 
@@ -3233,9 +3233,9 @@ df = pd.read_csv('C:/Users/Lenovo/Desktop/GitHub/YapayZeka/Src/1- DataPreparatio
 
 ohe = OneHotEncoder(sparse=False, dtype='uint8')
 
-transformed_data = ohe.fit_transform(df[['Renk Tercihi']])
+transformed_data = ohe.fit_transform(df[['RenkTercihi']])
 
-df.drop(['Renk Tercihi'], axis=1, inplace=True)
+df.drop(['RenkTercihi'], axis=1, inplace=True)
 
 category_names = ['RenkTercihi_' + category for category in ohe.categories_[0]]
 
@@ -3248,9 +3248,9 @@ Burada "RenkTercihi"nin yanı sıra "Eğitim Durumu" de kategorik bir sütundur.
 ikisini birden tek hamlede "one hot encoding" işlemine sokabiliriz:
 
 ohe = OneHotEncoder(sparse=False, dtype='uint8')
-transformed_data = ohe.fit_transform(df[['Renk Tercihi', 'Eğitim Durumu']])
+transformed_data = ohe.fit_transform(df[['RenkTercihi', 'Eğitim Durumu']])
 
-df.drop(['Renk Tercihi', 'Eğitim Durumu'], axis=1, inplace=True)
+df.drop(['RenkTercihi', 'Eğitim Durumu'], axis=1, inplace=True)
 
 categories1 = ['RenkTercihi_' + category for category in ohe.categories_[0]]
 categories2 = ['Eğitim Durumu_' + category for category in ohe.categories_[1]]
@@ -3274,7 +3274,6 @@ yapabiliriz:
 import pandas as pd
 df = pd.read_csv('C:/Users/Lenovo/Desktop/GitHub/YapayZeka/Src/1- DataPreparation/test.csv')    
 
-df = pd.read_csv('test.csv')
 transformed_df = pd.get_dummies(df, dtype='uint8')
 
 
@@ -3282,6 +3281,8 @@ Burada biz tek hamlede istediğimiz dönüştürmeyi yapabildik. Bu dönüştür
 sütun isimleri orijinal sütun isimleri ve kategori simleriyle örneklendirilmiştir. 
 Eğer isterse programcı "prefix" parametresi ile bu öneki değiştirebilir, "prefix_sep"
 parametresiyle de '_' karakteri yerine başka birleştirme karakterlerini kullanabilir. 
+
+transformed_df = pd.get_dummies(df, columns=['RenkTercihi', 'AdıSoyadı'], dtype='uint8', prefix=['R', 'AD'], prefix_sep='-')
 
 get_dummies fonksiyonu default durumda sparse olmayan bool türden bir DataFrame 
 nesnesi vermektedir. Ancak get_dummies fonksiyonunda "dtype" parametresi belirtilerek 
@@ -3292,10 +3293,10 @@ Biz bir DataFrame nesnesinin tüm yazısal sütunlarını değil bazı yazısal 
 da "one hot encoding" işlemine sokmak isteyebiliriz. Bu durumda fonksiyon DataFrame 
 nesnesinin diğer sütunlarına hiç dokunmamaktadır. Örneğin:
 
-transformed_df = pd.get_dummies(df, columns=['Renk Tercihi'], dtype='uint8')
+transformed_df = pd.get_dummies(df, columns=['RenkTercihi'], dtype='uint8')
 
 
-Biz burada yalnızca DataFrame nesnesinin "Renk Tercihi" sütununu "one hot encoding" 
+Biz burada yalnızca DataFrame nesnesinin "RenkTercihi" sütununu "one hot encoding" 
 yapmış olduk. get_dummies fonksiyonun zaten "one hot encoding" yapılan sütunu 
 sildiğine dikkat ediniz. Bu bizim genellikle istediğimiz bir şeydir. Yukarıdaki 
 örnekte "test.csv" dosyasında "AdıSoyadı" sütunu yazısal bir sütundur. Dolayısıyla 
@@ -3306,4 +3307,86 @@ için "columns" parametresinden faydalanabiliriz ya da baştan o sütunu atabili
 transformed_df = pd.get_dummies(df.iloc[:, 1:], dtype='uint8')
 
 ----------------------------------------------------------------------------------
+
+----------------------------------------------------------------------------------
+Diğer bir "one hot encoding" uygulama yöntemi de "tensorflow.keras" kütüphanesindeki 
+"to_categorical" fonksiyonudur. Bazen zaten Keras ile çalışıyorsak bu fonksiyonu 
+tercih edebilmekteyiz. to_categorical fonksiyonunu kullanmadan önce kategorik sütunun 
+sayısal biçime dönüştürülmüş olması gerekmektedir. Yani biz önce sütun üzerinde 
+eğer sütun yazısal ise LabelEncoder işlemini uygulamalıız. to_categorical fonksiyonu 
+aynı anda birden fazla sütunu "one hot encoding" yapamamaktadır. Bu nedenle diğer 
+seçeneklere göre kullanımı daha zor bir fonksiyondur. to_categorical fonksiyonu 
+Keras kütüphanesindeki utils isimli modülde bulunmaktadır.
+----------------------------------------------------------------------------------
+
+import pandas as pd
+
+df = pd.read_csv('C:/Users/Lenovo/Desktop/GitHub/YapayZeka/Src/1- DataPreparation/test.csv') 
+
+from tensorflow.keras.utils import to_categorical
+
+from sklearn.preprocessing import LabelEncoder
+
+le = LabelEncoder()
+
+transformed_color = le.fit_transform(df['RenkTercihi'])
+transformed_occupation = le.fit_transform(df['Meslek'])
+
+ohe_color = to_categorical(transformed_color)
+ohe_occupation = to_categorical(transformed_occupation)
+
+color_categories = ['RenkTercihi_' + color for color in df['RenkTercihi'].unique()]
+occupation_categories = ['Meslek_' + occupation for occupation in df['Meslek'].unique()]
+
+df.drop(['RenkTercihi', 'Meslek'], axis=1, inplace=True)
+
+df[color_categories] = ohe_color
+df[occupation_categories] = ohe_occupation
+
+print(df)
+
+----------------------------------------------------------------------------------
+"One hot encoding" yapmanın diğer bir yolu da manuel yoldur.
+ 
+ 
+import pandas as pd
+
+df = pd.read_csv('C:/Users/Lenovo/Desktop/GitHub/YapayZeka/Src/1- DataPreparation/test.csv')
+
+print(df, end='\n\n')
+
+import numpy as np
+
+color_cats = np.unique(df['RenkTercihi'].to_numpy())
+occupation_cats = np.unique(df['Meslek'].to_numpy())
+
+from sklearn.preprocessing import LabelEncoder
+
+le = LabelEncoder()
+df['RenkTercihi'] = le.fit_transform(df['RenkTercihi'])
+df['Meslek'] = le.fit_transform(df['Meslek'])
+
+print(df, end='\n\n')
+
+color_um = np.eye(len(color_cats))
+occupation_um = np.eye(len(occupation_cats))
+
+ohe_color = color_um[df['RenkTercihi'].to_numpy()]
+ohe_occupation = occupation_um[df['Meslek'].to_numpy()]
+
+df.drop(['RenkTercihi', 'Meslek'], axis=1, inplace=True)
+df[color_cats] = ohe_color
+df[occupation_cats] = ohe_occupation
+
+print(df, end='\n\n')
+
+----------------------------------------------------------------------------------
+
+
+
+
+----------------------------------------------------------------------------------
 """
+
+
+
