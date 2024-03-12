@@ -2242,6 +2242,8 @@ daha az güvenilir sonuçlar vermektedir.
 ------------------------------------------------------------------------------------  
 """
 
+
+
 #  --------------------- Verilerin Kullanıma Hazır Hale Getirilmesi ---------------------
 
 """
@@ -3382,11 +3384,157 @@ print(df, end='\n\n')
 
 ----------------------------------------------------------------------------------
 
-
-
-
 ----------------------------------------------------------------------------------
+# dummy variable encoding
+
+"One hot encoding" işleminin bir versiyonuna da "dummy variable encoding" denilmektedir. 
+Şöyle ki: "One hot encoding" işleminden tane kategori için n tane sütun oluşturuluyordu. 
+Halbuki "dummy variable encoding" işleminde n tane kategori için n - 1 tane sütun 
+oluşturulmaktadır. Çünkü bu yöntemde bir kategori tüm sütunlardaki sayının 0 olması 
+ile ifade edilmektedir. Örneğin Kırmızı, Yeşil, Mavi kategorilerinin bulunduğu 
+bir sütun şöyle "dummy variable encoding" biçiminde dönüştürülebilir:
+
+Mavi Yeşil
+0       0       (Kırmızı)
+1       0       (Mavi)
+0       1       (Yeşil)
+
+Görüldüğü gibi kategorilerden biri (burada "Kırmızı") tüm elemanı 0 olan satırla 
+temsil edilmiştir. Böylece sütun sayısı bir eksiltilmiştir.
+
+---------------------------------------------------------------------------------
+"Dummy variable encoding" işlemi için farklı sınıflar ya da fonksiyonlar kullanılmamaktadır. 
+Bu işlem "one hot encoding" yapan sınıflar ve fonksiyonlarda özel bir parametreyle 
+gerçekleştirilmektedir. Örneğin scikit-learn kütüphanesindeki OneHotEncoder 
+sınıfının drop parametresi 'first' olarak geçilirse bu durumda transform işlemi 
+"dummy variable encoding" biçiminde yapılmaktadır.
+
+---------------------------------------------------------------------------------
+import pandas as pd
+from sklearn.preprocessing import OneHotEncoder
+
+df = pd.read_csv('C:/Users/Lenovo/Desktop/GitHub/YapayZeka/Src/1- DataPreparation/test.csv')
+
+ohe = OneHotEncoder(sparse=False, drop='first')
+transformed_data = ohe.fit_transform(df[['RenkTercihi']]) 
+
+print(df['RenkTercihi'])
+print()
+print(ohe.categories_)
+print()
+print(transformed_data)
+
+Görüldüğü gibi burada "Kırmızı" kategorisi [0, 0] biçiminde kodlanmıştır. 
+
+---------------------------------------------------------------------------------
+Pandas'ın get_dummies fonksiyonunda drop_first parametresi True geçilirse 
+"dummy variable encoding" uygulanmaktadır. Örneğin:
+
+    
+transformed_df = pd.get_dummies(df, columns=['RenkTercihi', 'Meslek'], dtype='uint8', drop_first=True)
+print(transformed_df)
+
+---------------------------------------------------------------------------------
+
+---------------------------------------------------------------------------------
+# Binary encoding 
+
+Binary encoding yönteminde her kategori "ikilik sistemde bir sayıymış" gibi ifade 
+edilmektedir. Örneğin sütunda 256 tane kategori olsun. Bu kategoriler 0'dan 255'e 
+kadar numaralandırılabilir. 0 ile 255 arasındaki sayılar 2'lik sistemde 8 bit ile
+ifade edilebilir. Örneğin bir kategorinin sayısal değeri (LabelEncoder yapıldığını 
+düşünelim) 14 olsun. Biz bu kategoriyi aşağıdaki gibi 8 bit'lik 2'lik sistemde 
+bir sayı biçiminde kodlayabiliriz:
+
+0 0 0 0 1 1 1 0 
+
+Tabii kategori sayısı tam 2'nin kuvveti kadar olmak zorunda değildir. Bu durumda 
+kategori sayısı N olmak üzere gerkeli olan bit sayısı (yani sütun sayısı) 
+ceil(log2(N)) hesabı ile elde edilebilir. 
+
+!! ceil fonksiyonu float sayıyı üste yuvarlar
+
+scikit-learn kütüphanesinin contribute girişimlerinden birinde bu işlemi yapan bir 
+BinaryEncoder isminde bir sınıf bulunmaktadır. Bu sınıf category_encoders isimli 
+bir paket içerisindedir ve bu paket ayrıca yüklenmelidir. Yükleme şöyle yapılabilir:
+
+pip install category_encoders
+
+---------------------------------------------------------------------------------
+BinaryEncoder sınıfının transform fonksiyonu default durumda Pandas DataFrame nesnesi 
+vermektedir. Ancak nesne yaratılırken return_df parametresi False geçilirse bu 
+durumda transform fonksiyonları NumPy dizisi geri döndürmektedir.
+
+from category_encoders.binary import BinaryEncoder
+
+df = pd.read_csv('C:/Users/Lenovo/Desktop/GitHub/YapayZeka/Src/1- DataPreparation/test.csv')
+
+be = BinaryEncoder()
+transformed_data = be.fit_transform(df['Meslek'])
+print(transformed_data) 
+
+Burada "Meslek" sütunu "binary encoding" biçiminde kodlanmıştır. BinaryEncode kodlamada değerleri 1'den başlatılmaktadır. 
+Yukarıdaki işlemden aşağıdaki gibi bir çıktı elde edilmiştir:
+
+   Meslek_0  Meslek_1
+0         0         1
+1         0         1
+2         1         0
+3         1         1
+4         1         0
+5         1         1
+6         0         1
+
+---------------------------------------------------------------------------------
+import pandas as pd
+  
+df = pd.read_csv('C:/Users/Lenovo/Desktop/GitHub/YapayZeka/Src/1- DataPreparation/test.csv')
+
+from category_encoders.binary import BinaryEncoder
+
+be = BinaryEncoder()
+transformed_data = be.fit_transform(df[['RenkTercihi', 'Meslek']])
+print(transformed_data)
+
+df.drop(['RenkTercihi', 'Meslek'], axis=1, inplace=True)
+df[transformed_data.columns] = transformed_data    # pd.concat((df, transformed_data), axis=1)
+print(df)
+
+---------------------------------------------------------------------------------
+Tıpkı get_dummies fonksiyonunda olduğu gibi aslında bir DataFrame bütünsel olarak 
+da verilebilir. Yine default durumda tüm yazısal sütunlar "binary encoding" 
+dönüştürmesine sokulmaktadır. Ancak biz BinaryEncoding sınıfının __init__ metodunda
+cols parametresi ile hangi sütunların dönüştürüleceğini belirleyebiliriz.
+
+
+import pandas as pd
+
+df = pd.read_csv('C:/Users/Lenovo/Desktop/GitHub/YapayZeka/Src/1- DataPreparation/test.csv')
+
+from category_encoders.binary import BinaryEncoder
+
+be = BinaryEncoder(cols=['RenkTercihi', 'Meslek'])
+transformed_df = be.fit_transform(df)
+print(transformed_df)
+
+---------------------------------------------------------------------------------
 """
+
+
+
+#  -------------------  Yapay Sinir Ağları (Artificial Neural Neetworks)  -------------------
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
