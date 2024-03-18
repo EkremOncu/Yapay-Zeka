@@ -3524,10 +3524,67 @@ print(transformed_df)
 
 #  -------------------  Yapay Sinir Ağları (Artificial Neural Neetworks)  -------------------
 
+"""
+---------------------------------------------------------------------------------
+Yapay zeka ve makine öğrenmesi alanının en önemli yöntemlerinin başında "yapay 
+sinir ağları (artificial neural networks)" ve "derin öğrenme (deep learning)" denilen 
+yöntemler gelmektedir. Biz de bu bölümde belli bir derinlikte bu konuları ele alacağız. 
+
+Yapay sinir ağları yapay nöronların birbirlerine bağlanmasıyla oluşturulmaktadır. 
+Bir nöronun gridileri vardır ve yalnızca bir tane de çıktısı vardır. Nöronun girdileri 
+veri kümesindeki satırları temsil eder. Yani veri kümesindeki satırlar nöronun 
+girdileri olarak kullanılmaktadır. Nöronun girdilerini xi temsil edersek her girdi 
+"ağırlık (weight) değeri" denilen bir değerler çarpılır ve bu çarpımların toplamları 
+elde edilir. Ağırlık değerlerini wi ile gösteribiliriz. Bu durumda xi'lerle wi'ler 
+karşılıklı olarak çarpılıp toplanmaktadır.
+
+total = x1w1 + x2w2 + x3w3 + x4w4 + x5w5
+
+İki vektörün karşılıklı elemanlarının çarpımlarının toplamına İngilizce "dot product" 
+denilmektedir. (Dot product işlemi np.dot fonksiyonuyla yapılabilmektedir.) Elde 
+edilen dot product "bias" denilen bir değerle toplanır. Biz bias dieğerini b ile 
+temsil edeceğiz. Örneğin:
+
+total = x1w1 + x2w2 + x3w3 + x4w4 + x5w5 + b
+
+Bu toplam da "aktivasyon fonsiyonu (activation function)" ya da "transfer fonksiyonu 
+(transfer function)" denilen bir fonksiyona sokulmaktadır. Böylece o nöronun çıktısı 
+elde edilmektedir. Örneğin:
+
+out = activation(x1w1 + x2w2 + x3w3 + x4w4 + x5w5 + b)
+
+Biz bu işlemi vektörel olarak şöyle de gösterebiliriz:
+
+out = activation(XW + b)
+
+---------------------------------------------------------------------------------
+Bir nöronun çıktısı başka nöronlar girdi yapılabilir. Böylece tüm ağın nihai çıktıları 
+oluşur. Örneğin ağımızın bir katmanında k tane nöron olsun. Tüm girdilerin 
+(yani Xi'lerin) bu nöronların hepsine bağlandığını varsayalım. Her nöronun ağırlık 
+değerleri ve bias değeri diğerlerinden farklıdır.
+
+out = activation(XW + b)
+
+X = [x1, x2, x3, ..., xn]
+
+W matrisi aşağıdaki görünümdedir:
+
+w11  w21 w31 ... wk1
+w12  w22 w31 ... wk2
+w13  w23 w33 ... wk3
+...  ... ... ... ...
+w1n  w2n w3n ... wkn
 
 
+Buradaki X matrisi ile W matrisi matrisi, matris çarpımına sokulduğunda 1XK boyutunda 
+bir matris elde edilecektir. Gösterimimizdeki b matrisi şöyle temsil edilebilir:
 
+b = [b1, b2, b2, ...., bk]
 
+Böylece XW + b işleminden 1XK boyutunda bir matris elde edilecektir. 
+
+---------------------------------------------------------------------------------
+"""
 
 
 
