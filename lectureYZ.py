@@ -3584,6 +3584,65 @@ b = [b1, b2, b2, ...., bk]
 Böylece XW + b işleminden 1XK boyutunda bir matris elde edilecektir. 
 
 ---------------------------------------------------------------------------------
+Bir sinir ağının amacı bir "kestirimde" bulunmaktır. Yani biz ağa girdi olarak Xi 
+değerlerini veririz. Ağdan hedeflediğimiz çıktıyı elde etmeye çalışırız. Ancak 
+bunu yapabilmemiz için nöronlardaki w değerlerinin ve b değerlerinin biliniyor 
+olması gerekir. Önce biz ağımızı mevcut verilerle eğitip bu w ve b değerlerinin 
+uygun biçimde oluşturulmasını sağlarız. Ondan sonra kestirim yaparız. Tabi ağ ne 
+kadar iyi eğitilirse ağın yapacağı kestirim de o kadar isabetli olacaktır. 
+
+---------------------------------------------------------------------------------
+İstatistikte girdi değerlerinden hareketle çıktı değerinin belirlenmesine (tahmin 
+edilmesine) yönelik süreçlere "regresyon (regression)" denilmektedir. Regresyon 
+işlemleri çok çeşitli biçimlerde sınıflandırılabilmektedir. Çıktıya göre regresyon 
+işlemleri istatistikte tipik olarak iki grupla sınıflandırılmaktadır:
+
+1) (Lojistik Olmayan) Regresyon İşlemleri
+2) Lojistik Regresyon İşlemleri
+
+Aslında istatistikte "regresyon" denildiğinde çoğu kez default olarak zaten 
+"lojistik olmayan regresyon" işlemleri anlaşılmaktadır. Bu tür regresyonlarda 
+girdilerden hareketle kategorik değil sayısal bir çıktı elde edilmektedir.
+
+Girdiler bir resmin pixel'leri olabilir. Çıktı da bu resmin elma mı, armut mu, 
+kayısı mı olduğuna yönelik kategorik bir bilgi olabilir. Bu tür regresyonlara 
+istatistikte "lojistik regresyonlar" ya da "logit regresyonları" denilmektedir.
+
+Makine öğrenmesinde lojistik regresyon terimi yerine daha çok "sınıflandırma 
+(classification)" terimi kullanılmaktadır. Buradaki "lojistik" sözcüğü mantıktaki 
+"lojikten" gelmektedir. İngilizce "logistic" terimi "logic" ve "statistics" 
+terimlerinin birleştirilmesiyle uydurulmuştur.
+
+Lojistik olsun ya da olmasın aslında regresyon işlemlerinin hepsi girdiyi çıktıya 
+dönüştüren bir f foonksiyonunun elde edilmesi sürecidir. Örneğin:
+
+y = f(x1, x2, ..., xn)
+
+İşte makine öğrenmesinde bu f fonksiyonunun elde edilmesinin çeşitli yöntemleri 
+vardır. Yapay sinir ağlarında da aslında bu biçimde bir f fonksiyonu bulunmaya 
+çalışılmaktadır.
+
+---------------------------------------------------------------------------------
+Sınıflandırma sürecindeki çıktının olabileceği değerlere "sınıf (class)" denilmektedir.  
+Sınıflandırma (lojistik regresyon) problemlerinde eğer çıktı ancak iki değerden 
+biri olabiliyorsa bu tür sınıflandırma problemlerine de "iki sınıflı sınıflandırma 
+(binary classification)" problemleri denilmektedir. Örneğin bir film hakkında 
+yazılan yorum yazısının "olumlu" ya da "olumsuz" biçiminde iki değerden oluştuğunu 
+düşünelim. Bu sınıflandırma işlemi ikili sınıflandırmadır. Benzer biçimde bir 
+biyomedikal görüntüdeki kitlenin "iyi huylu (benign)" mu "kötü huylu (malign)" mu 
+olduğuna yönelik sınıflandırma da ikili sınıflandırmaya örnektir. 
+
+Eğer sınıflandırmada çıktı sınıflarının sayısı ikiden fazla ise böyle sınıflandırma 
+problemlerine "çok sınıflı (multiclass)" sınıflandırma problemleri denilmektedir. 
+Örneğin bir resmin hangi meyveye ilişkin olduğunun tespit edilmesi için kullanılan 
+sınıflandırma modeli "çok sınıflı" bir modeldir. 
+
+İstatistikte "lojistik regresyon" denildiğinde aslında default olarak "iki sınıflı 
+(binary)" lojistik regresyon anlaşılmaktadır. Çok sınıflı lojistik regresyonlara 
+istatistikte genellikle İngilizce "multiclass logistic regression" ya da 
+"multinomial logistic regression" denilmektedir.
+
+---------------------------------------------------------------------------------
 """
 
 
