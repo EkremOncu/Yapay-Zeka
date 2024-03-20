@@ -3531,7 +3531,7 @@ sinir ağları (artificial neural networks)" ve "derin öğrenme (deep learning)
 yöntemler gelmektedir. Biz de bu bölümde belli bir derinlikte bu konuları ele alacağız. 
 
 Yapay sinir ağları yapay nöronların birbirlerine bağlanmasıyla oluşturulmaktadır. 
-Bir nöronun gridileri vardır ve yalnızca bir tane de çıktısı vardır. Nöronun girdileri 
+Bir nöronun girdileri vardır ve yalnızca bir tane de çıktısı vardır. Nöronun girdileri 
 veri kümesindeki satırları temsil eder. Yani veri kümesindeki satırlar nöronun 
 girdileri olarak kullanılmaktadır. Nöronun girdilerini xi temsil edersek her girdi 
 "ağırlık (weight) değeri" denilen bir değerler çarpılır ve bu çarpımların toplamları 
@@ -3643,10 +3643,124 @@ istatistikte genellikle İngilizce "multiclass logistic regression" ya da
 "multinomial logistic regression" denilmektedir.
 
 ---------------------------------------------------------------------------------
+En basit yapay sinir ağı mimarisi tek bir nörondan oluşan mimaridir. Buna 
+"perceptron" denilmektedir. Aşağıda bir nöronun bir sınıfla temsil edilmesine ilişkin 
+bir örnek 
+
+import numpy as np
+
+class Neuron:
+    def __init__(self, w, b):
+        self.w= w
+        self.b = b
+        
+    def output(self, x):
+        return self.sigmoid(np.dot(x, self.w) + self.b)
+    
+    @staticmethod
+    def sigmoid(x):
+        return np.e ** x / (1 + np.e ** x)
+
+        
+w = np.array([1, 2, 3])
+b = 1.2
+
+n = Neuron(w, b)
+
+x = np.array([1, 3, 4])
+result = n.output(x)
+print(result)
+---------------------------------------------------------------------------------
 """
 
 
+#  Yapay Sinir Ağlarında Katmanlar (LAYER)
 
+"""
+---------------------------------------------------------------------------------
+Bir yapay sinir ağı modelinde "katmanlar (layers)" vardır. Katman aynı düzeydeki 
+nöron grubuna denilmektedir. Yapya sinir ağı katmanları tipik olarak üçe ayırmaktadır:
+
+1) Girdi Katmanı (Input Layer)
+2) Saklı Katmanlar (Hidden Layers)
+3) Çıktı Katmanı (Output Layer)
+
+Girdi katmanı veri kümesindeki satırları temsil eden yani ağa uygulanacak verileri 
+belirten katmandır. Aslında girdi katmanı gerçek anlamda nöronlardan oluşmaz. Ancak 
+anlatımları kolaylaştırmak için bu katmanın da nöronlardan oluştuğu varsayılmaktadır. 
+Başka bir deyişle girdi katmanının tek bir nöron girişi ve tek bir çıktısı vardır.
+Yani girdi katmanı bir şey yapmaz, girdiyi değiştirmeden çıktıya verir. Girdi 
+katmanındaki nöron sayısı veri kümesindeki sütunların (yani özelliklerin) sayısı 
+kadar olmalıdır. Örneğin 5 tane girdiye (özelliğe) sahip olan bir sinir ağının 
+girdi katmanı şöyle gösterilebilir:
+
+x1 ---> O --->
+x2 ---> O --->
+x3 ---> O --->
+x4 ---> O --->
+x5 ---> O --->
+
+Buradaki O sembolleri girdi katmanındaki nöronları temsil etmektedir. Girdi katmanındaki 
+nöronların 1 tane girdisinin 1 tane de çıktısınn olduğuna dikkat ediniz. Buradaki 
+nöronlar girdiyi değiştirmediğine göre bunların w değerleri 1, b değerleri 0, 
+aktivasyon fonksiyonu da f(x) = x biçiminde olmalıdır.
+
+
+Hidden Layer -> Girdiler saklı katman denilen katmanlardaki nöronlara bağlanırlar. 
+Modelde sıfır tane, bir tane ya da birden fazla saklı katman bulunabilir. Saklı 
+katmanların sayısı ve saklı katmanlardaki nöronların sayısı ve bağlantı biçimleri 
+problemin niteliğine göre değişebilmektedir. Yani saklı katmanlardaki nöronların 
+girdi katmanıyla aynı sayıda olması gerekmez. Her saklı katmandaki nöron sayıları 
+da aynı olmak zorunda değildir.
+
+
+Çıktı katmanı bizim sonucu alacağımız katmandır. Çıktı katmanındaki nöron sayısı 
+bizim kestirmeye çalıştığımız olgularla ilgilidir. Örneğin biz bir evin fiyatını 
+kestirmeye çalışıyorsak çıktı katmanında tek bir nöron bulunur. Yine örneğin biz 
+ikili sınıflandırma problemi üzerinde çalışıyorsak çıktı katmanı yine tek bir nörondan 
+oluşabilir. Ancak biz evin fiyatının yanı sıra evin sağlamlığını da kestirmek 
+istiyorsak bu durumda çıktı katmanında iki nöron olacaktır. Benzer biçimde çok 
+sınıflı sınıflandırma problemlerinde çıktı katmanında sınıf sayısı kadar nöron bulunur.
+
+---------------------------------------------------------------------------------
+Bir yapay sinir ağı modelinde katman sayısının artırılması daha iyi bir sonucun 
+elde edileceği anlamına gelmez. Benzer biçimde katmanlardaki nöron sayılarının 
+artırılması da daha iyi bir sonucun elde edileceği anlamına gelmemektedir. Katmanların 
+sayısından ziyade onların işlevleri daha önemli olmaktadır. Ağa gereksiz katman 
+eklemek, katmanlardaki nöronları artırmak tam ters bir biçimde ağın başarısının 
+düşmesine de yol açabilmektedir. Yani gerekmediği halde ağa saklı katman eklemek, 
+katmanlardaki nöron sayısını artırmak bir fayda sağlamamakta tersine kestirim 
+başarısını düşürebilmektedir. Ancak görüntü tanıma gibi özel ve zor problemlerde 
+saklı katman sayılarının artırılması gerekebilmektedir. 
+
+---------------------------------------------------------------------------------
+Pekiyi bir sinir ağı modelinde kaç tane saklı katman olmalıdır? Pratik olarak 
+şunları söyleyebiliriz:
+    
+- Sıfır tane saklı katmana sahip tek bir nörondan oluşan en basit modele "perceptron" 
+dendiğini belirtmiştir. Bu perceptron "doğrusal olarak ayrıştırılabilen (linearly 
+separable)" sınıflandırma problemlerini ve yalın doğrusal regresyon problemlerini 
+çözebilmektedir. 
+
+- Tek saklı katmanlı modeller aslında pek çok sınıflandırma problemini ve (doğrusal 
+olmayan) regresyon problemlerini belli bir yeterlilikte çözebilmektedir. Ancak 
+tek saklı katman yine de bu tarz bazı problemler için yetersiz kalabilmektedir. 
+
+- İki saklı katman pek çok karmaşık olmayan sınıflandırma problemi için ve regresyon 
+problemi için iyi bir modeldir. Bu nedenle karmaşık olmayan problemler için ilk 
+akla gelecek model iki saklı katmanlı modeldir. 
+
+- İkiden fazla saklı katmana sahip olan modeller karmaşık ve özel problemleri çözmek 
+için kullanılmaktadır. İki saklı katmandan fazla katmana sahip olan modellere genel 
+olarak "derin öğrenme ağları (deep learning networks)" denilmektedir. 
+
+Yukarıda da belirttiğimiz gibi "derin öğrenme (deep learning)" farklı bir yöntemi 
+belirtmemektedir. Derin öğrenme özel ve karmaşık problemleri çözebilmek için ikiden 
+fazla saklı katman içeren sinir ağı modellerini belirtmek için kullanılan bir 
+terimdir.    
+
+---------------------------------------------------------------------------------
+"""
 
 
 
