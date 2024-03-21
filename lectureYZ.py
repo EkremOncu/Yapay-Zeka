@@ -2933,6 +2933,7 @@ category_encoder(df, ['Suburb', 'SellerG', 'Method', 'CouncilArea', 'Regionname'
 print(df)
 
 ----------------------------------------------------------------------------------- 
+# LabelEncoder
 
 Aslında yukarıdaki işlem scikit-learn kütüphanesindeki preprocessing modülünde 
 bulunan LabelEncoder sınıfıyla yapılabilmektedir. LabelEncoder sınıfının genel 
@@ -2946,7 +2947,7 @@ içerisinde saklamaktadır. Asıl dönüştürme işlemi transform metoduyla yap
 Tabii eğer fit ve transform metotlarında aynı veriler kullanılacaksa bu işlemler 
 tek hamlede fit_transform metoduyla da yapılabilir. Örneğin yukarıdaki "test.csv" 
 veri kümesindeki "Cinsiyet" ve "RenkTercihi" sütunlarını kategorik olmaktan çıkartıp 
-sayısal biçime şöyel dönüştürebiliriz:
+sayısal biçime şöyle dönüştürebiliriz:
     
 -----------------------------------------------------------------------------------
 import pandas as pd
@@ -3261,6 +3262,8 @@ df[categories1 + categories2] = transformed_data
 
 ----------------------------------------------------------------------------------
 ----------------------------------------------------------------------------------
+# get_dummies
+
 One hot encoding yapmanın diğer bir yolu Pandas kütüphanesindeki get_dummies fonksiyonunu 
 kullanmaktadır. get_dummies fonksiyonu bizden bir DataFrame, Series ya da dolaşılabilir 
 herhangi bir nesneyi alır. Eğer biz get_dummies fonksiyonuna bütün bir DataFrame
@@ -3280,7 +3283,7 @@ transformed_df = pd.get_dummies(df, dtype='uint8')
 
 
 Burada biz tek hamlede istediğimiz dönüştürmeyi yapabildik. Bu dönüştürmede yine 
-sütun isimleri orijinal sütun isimleri ve kategori simleriyle örneklendirilmiştir. 
+sütun isimleri orijinal sütun isimleri ve kategori isimleriyle örneklendirilmiştir. 
 Eğer isterse programcı "prefix" parametresi ile bu öneki değiştirebilir, "prefix_sep"
 parametresiyle de '_' karakteri yerine başka birleştirme karakterlerini kullanabilir. 
 
@@ -3311,6 +3314,8 @@ transformed_df = pd.get_dummies(df.iloc[:, 1:], dtype='uint8')
 ----------------------------------------------------------------------------------
 
 ----------------------------------------------------------------------------------
+# to_categorical
+
 Diğer bir "one hot encoding" uygulama yöntemi de "tensorflow.keras" kütüphanesindeki 
 "to_categorical" fonksiyonudur. Bazen zaten Keras ile çalışıyorsak bu fonksiyonu 
 tercih edebilmekteyiz. to_categorical fonksiyonunu kullanmadan önce kategorik sütunun 
@@ -3760,11 +3765,67 @@ fazla saklı katman içeren sinir ağı modellerini belirtmek için kullanılan 
 terimdir.    
 
 ---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Bir veri kümesini CSV dosyasından okuduktan sonra onu Keras'ın kullanımına hazırlamak 
+için bazı işlemlerin yapılması gerekir. Yapılması gereken ilk işlem veri kümesinin 
+dataset_x ve dataset_y biçiminde iki parçaya ayrılmasıdır. Çünkü ağın eğitilmesi,
+sırasında girdilerle çıktıların ayrıştırılması gerekmektedir. Burada dataset_x 
+girdileri dataset_y ise kestirilecek çıktıları belirtmektedir. 
+
+Eğitim bittikten sonra genellikle ağın kestirimine hangi ölçüde güvenileceğini 
+belirleyebilmek için bir test işlemi yapılır. Ağın kestirim başarısı "test veri kümesi" 
+denilen bir veri kümesi ile yapılmaktadır. Test veri kümesinin eğitimde kullanılmayan 
+bir veri kümesi biçiminde olması gerekir.
+
+Eğitim ve test veri kümesini manuel olarak ayırabiliriz. Ancak ayırma işleminden 
+önce veri kümesini satırsal bakımdan karıştırmak uygun olur. Çünkü bazı veri kümeleri 
+CSV dosyasına karışık bir biçimde değil yanlı bir biçimde kodlanmış olabilmektedir. 
+Örneğin bazı veri kümeleri bazı alanlara göre sıraya dizilmiş bir biçimde bulunabilmektedir. 
+Biz onun baştaki belli kısmını eğitim, sondaki belli kısmını test veri kümesi 
+olarak kullanırsak eğitim ve test veri kümeleri yanlı hale gelebilmektedir.
+-----> np.random.shuffle(dataset)
+
+---------------------------------------------------------------------------------
+diabetes.csv bazı sütunlar eksik veri içermektedir. Bu eksik verile NaN biçiminde 
+değil 0 biçiminde kodlanmıştır. Biz bu eksik verileri ortaalama değerle doldurabiliriz. 
+Eksik veri içeren sütunlar şunlardır:
+
+Glucose
+BloodPressure
+SkinThickness
+Insulin
+BMI
+
+---------------------------------------------------------------------------------
+TRAINING_RATIO = 0.80
+
+import pandas as pd
+df = pd.read_csv('C:\\Users\\Lenovo\\Desktop\\GitHub\\YapayZeka\\Src\\2- KerasIntroduction\diabetes.csv')
+
+
+from sklearn.impute import SimpleImputer
+si = SimpleImputer(strategy='mean', missing_values=0 )
+
+df[['Glucose', 'BloodPressure', 'SkinThickness', 'Insulin', 'BMI']] = si.fit_transform(df[['Glucose', 'BloodPressure', 'SkinThickness', 'Insulin', 'BMI']])
+print((df==0).sum())
+print()
+
+dataset = df.to_numpy()
+
+import numpy as np
+
+np.random.shuffle(dataset)
+
+dataset_x = dataset[:, :-1] 
+dataset_y = dataset[:, -1] 
+
+training_len = int(np.round(len(dataset) * TRAINING_RATIO))
+
+training_dataset_x = dataset_x[ :training_len]
+test_dataset_x = dataset_x[training_len : ]
+
+training_dataset_y = dataset_y[ :training_len]
+test_dataset_y = dataset_y[training_len : ]
+
+---------------------------------------------------------------------------------
 """
-
-
-
-
-
-
-
