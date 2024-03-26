@@ -3787,7 +3787,7 @@ olarak kullanırsak eğitim ve test veri kümeleri yanlı hale gelebilmektedir.
 
 ---------------------------------------------------------------------------------
 diabetes.csv bazı sütunlar eksik veri içermektedir. Bu eksik verile NaN biçiminde 
-değil 0 biçiminde kodlanmıştır. Biz bu eksik verileri ortaalama değerle doldurabiliriz. 
+değil 0 biçiminde kodlanmıştır. Biz bu eksik verileri ortalama değerle doldurabiliriz. 
 Eksik veri içeren sütunlar şunlardır:
 
 Glucose
@@ -3826,6 +3826,49 @@ test_dataset_x = dataset_x[training_len : ]
 
 training_dataset_y = dataset_y[ :training_len]
 test_dataset_y = dataset_y[training_len : ]
+
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Veri kümesini eğitim ve test olarak ayırma işlemi için sklearn.model_selection 
+modülündeki train_test_split isimli fonksiyon sıkça kullanılmaktadır. Fonksiyon 
+NumPy dizilerini ya da Pandas DataFrame ve Series nesnelerini ayırabilmektedir. 
+
+Fonksiyon bizden dataset_x ve dataset_y değerlerini ayrı ayrı ister. test_size 
+ya da train_size parametreleri 0 ile 1 arasında test ya da eğitim verilerinin oranını 
+belirlemek için kullanılmaktadır. train_test_split fonksiyonu bize 4'lü bir liste 
+vermektedir. Listenin elemanları sırasıyla şunlardır: training_dataset_x, 
+test_dataset_x, training_dataset_y, test_dataset_y. Örneğin:
+
+    
+from sklearn.model_selection import train_test_split
+training_dataset_x, test_dataset_x, training_dataset_y, test_dataset_y = train_test_split(dataset_x, dataset_y, test_size=0.2)
+
+test_size = 0.2  ---> TRAINING_RATIO = 0.8 ---> training_size = 0.8
+
+Burada fonksiyona dataset_x ve dataset_y girdi olarak verilmiştir. Fonksiyon 
+bunları bölerek dörtlü bir listeye geri dönmüştür.
+
+---------------------------------------------------------------------------------
+
+---------------------------------------------------------------------------------
+Keras'ta bir sinir ağı oluşturmanın çeşitli adımları vardır. Burada sırasıyla bu 
+adımlardan ve adımlarla ilgili bazı olgulardan bahsedeceğiz.
+
+
+1) Öncelikle bir model nesnesi oluşturulmalıdır. tensorflow.keras modülü içerisinde 
+çeşitli model sınıfları bulunmaktadır. En çok kullanılan model sınıfı Sequential 
+isimli sınıftır. Tüm model sınıfları Model isimli sınıftan türetilmiştir. Sequential 
+modelde ağa her eklenen katman sona eklenir. Böylece ağ katmanların sırasıyla 
+eklenmesiyle oluşturulur. Sequential nesnesi yaratılırken name parametresiyle modele 
+bir isim de verilebilir. Örneğin:
+
+from tensorflow.keras import Sequential
+
+model = Sequential(name='Sample')
+
+Aslında Sequential nesnesi yaratılırken katmanlar belirlendiyse layers parametresiyle 
+bu katmanlar da verilebilmektedir. Ancak sınıfın tipik kullanımında katmanlar daha 
+sonra izleyen maddelerde ele alınacağı gibi sırasıyla eklenmektedir.
 
 ---------------------------------------------------------------------------------
 """
