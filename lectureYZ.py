@@ -3855,7 +3855,7 @@ Keras'ta bir sinir ağı oluşturmanın çeşitli adımları vardır. Burada sı
 adımlardan ve adımlarla ilgili bazı olgulardan bahsedeceğiz.
 
 
-1) Öncelikle bir model nesnesi oluşturulmalıdır. tensorflow.keras modülü içerisinde 
+1-) Öncelikle bir model nesnesi oluşturulmalıdır. tensorflow.keras modülü içerisinde 
 çeşitli model sınıfları bulunmaktadır. En çok kullanılan model sınıfı Sequential 
 isimli sınıftır. Tüm model sınıfları Model isimli sınıftan türetilmiştir. Sequential 
 modelde ağa her eklenen katman sona eklenir. Böylece ağ katmanların sırasıyla 
@@ -3871,4 +3871,96 @@ bu katmanlar da verilebilmektedir. Ancak sınıfın tipik kullanımında katmanl
 sonra izleyen maddelerde ele alınacağı gibi sırasıyla eklenmektedir.
 
 ---------------------------------------------------------------------------------
+
+2-) Model nesnesinin yaratılmasından sonra katman nesnelerinin oluşturulup model nesnesine 
+eklenmesi gerekir. Keras'ta farklı gereksinimler için farklı katman sınıfları 
+bulundurulmuştur. En çok kullanılan katman sınıfı tensorflow.keras.layers modülündeki 
+Dense sınıfıdır. Dense bir katman modele eklendiğinde önceki katmandaki tüm nöronların 
+çıktıları eklenen katmandaki nöronların hepsine girdi yapılmaktadır. 
+
+Bu durumda örneğin önceki katmanda k tane nöron varsa biz de modele n tane nörondan 
+oluşan bir Dense katman ekliyorsak bu durumda modele k * n + n tane yeni parametre 
+(yani tahmin edilmesi gereken parametre) eklemiş oluruz. Burada k * n tane ayarlanması 
+gereken w (ağırlık) değerleri ve n tane de ayarlanması gereken bias değerleri söz 
+konusudur. Bir nörondaki w (ağırlık) değerlerinin o nörona giren nöron sayısı kadar 
+olduğuna ve bias değerlerinin her nöron için bir tane olduğuna dikkat ediniz.
+
+Dense sınıfının __init__ metodunun ilk parametresi eklenecek katmandaki nöron sayısını 
+belirtir. İkinci parametre olan activation parametresi o katmandaki tüm nöronların 
+aktivasyon fonksiyonlarının ne olacağını belirtmektedir. Bu parametreye aktivasyon 
+fonksiyonları birer yazı biçiminde isimsel olarak girilebilir. Ya da tensorflow.keras.activations 
+modülündeki fonksiyonlar olarak girilebilir. Örneğin:
+
+from tensorflow.keras.layers import Dense
+layer = Dense(100, activation='relu')
+
+ya da örneğin:
+    
+from tensorflow.keras.activations import relu
+layer = Dense(100, activation=relu)
+
+
+Dense fonksiyonun use_bias parametresi default durumda True biçimdedir. Bu parametre 
+katmandaki nöronlarda "bias" değerinin kullanılıp kullanılmayacağını belirtmektedir. 
+
+Metodun kernel_initializer parametresi katmandaki nöronlarda kullanılan w parametrelerinin 
+ilkdeğerlerinin rastgele biçimde hangi algoritmayla oluşturulacağını belirtmektedir. 
+Bu parametrenin default değeri "glorot_unfiorm" biçimindedir. 
+
+Metodun bias_initializer parametresi ise katmandaki nöronların "bias" değerlerinin 
+başlangıçta nasıl alınacağını belirtmektedir. Bu parametrenin default değeri de 
+"zero" biçimdedir. Yani bias değerleri başlangıçta 0 durumundadır.
+
+
+Keras'ta Sequential modelde girdi katmanı programcı tarafından yaratılmaz. İlk 
+saklı katman yaratılırken girdi katmanındaki nöron sayısı input_dim parametresiyle 
+ya da input_shape parametresiyle belirtilmektedir. input_dim tek boyutlu girdiler için 
+c ise çok boyutlu girdiler için kullanılmaktadır. Örneğin:
+
+layer = Dense(100, activation='relu', input_dim=8) # tek boyutlu 8 tane nörondan oluşuyor demek
+
+input_shape= (10,10) # girdi katmanı 2 boyutlu 10'a 10'luk matris demek
+
+Tabii input_dim ya da input_shape parametrelerini yalnızca ilk saklı katmanda kullanabiliriz. 
+Genel olarak ağın girdi katmanında dataset_x'tekü sütun sayısı kadar nöron olacağına 
+göre ilk katmandaki input_dim parametresini aşağıdaki gibi de girebiliriz:
+
+layer = Dense(100, activation='relu', input_dim= training_dataset_x.shape[1])
+
+Aslında Keras'ta girdi katmanı için tensorflow.keras.layers modülünde Input isminde 
+bir katman da kullanılmaktadır. Tenseoflow'un yeni versiyonlarında girdi katmanının 
+Input katmanı ile oluşturulması istenmektedir. Aksi takdirde bu yeni versiyonlar uyarı 
+vermektedir. Girdi katmanını Input isimli katman sınıfıyla oluştururken bu Input 
+sınıfının __init__ metodunun birinci parametresi bir demet biçiminde (yani sahpe olarak) 
+girilmelidir. Örneğin:
+
+input = Input((8, ))
+
+Burada 8 nöronşuk bir girdi katmanı oluşturulmuştur. Yukarıda da belirttiğimiz gibi 
+eskiden ilk saklı katmanda girdi katmanı belirtiliyordu. Ancak Tensorflow kütüphanesinin 
+yeni verisyonlarında ilk saklı katmanda girdi katmanının belirtilmesi artık uyarıya 
+(warning) yol açmaktadır.
+
+Her katmana istersek name parametresi ile bir isim de verebiliriz. Bu isimler model 
+özeti alınırken ya da katmanlara erişilirken kullanılabilmektedir. Örneğin:
+
+layer = Dense(100, activation='relu',  name='Hidden-1')
+
+Oluşturulan katman nesnesinin model nesnesine eklenmesi için Sequential sınıfının 
+add metodu kullanılmaktadır. Örneğin:
+
+input = Input((8, ))
+model.add(input)
+layer = Dense(100, activation='relu',  name='Hidden-1')
+model.add(layer)
+
+Programcılar genellikle katman nesnesinin yaratılması ve eklenmesini tek satırda 
+aşağıdaki gibi yaparlar:
+
+model.add(Dense(100, activation='relu', input_dim=9, name='Hidden-1'))
+---------------------------------------------------------------------------------
 """
+
+
+
+
