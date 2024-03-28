@@ -3882,8 +3882,10 @@ Bu durumda örneğin önceki katmanda k tane nöron varsa biz de modele n tane n
 oluşan bir Dense katman ekliyorsak bu durumda modele k * n + n tane yeni parametre 
 (yani tahmin edilmesi gereken parametre) eklemiş oluruz. Burada k * n tane ayarlanması 
 gereken w (ağırlık) değerleri ve n tane de ayarlanması gereken bias değerleri söz 
-konusudur. Bir nörondaki w (ağırlık) değerlerinin o nörona giren nöron sayısı kadar 
-olduğuna ve bias değerlerinin her nöron için bir tane olduğuna dikkat ediniz.
+konusudur. 
+
+!!! Bir nörondaki w (ağırlık) değerlerinin o nörona giren nöron sayısı kadar 
+olduğuna ve bias değerlerinin her nöron için bir tane olduğuna dikkat ediniz. !!!
 
 Dense sınıfının __init__ metodunun ilk parametresi eklenecek katmandaki nöron sayısını 
 belirtir. İkinci parametre olan activation parametresi o katmandaki tüm nöronların 
@@ -3915,7 +3917,7 @@ başlangıçta nasıl alınacağını belirtmektedir. Bu parametrenin default de
 Keras'ta Sequential modelde girdi katmanı programcı tarafından yaratılmaz. İlk 
 saklı katman yaratılırken girdi katmanındaki nöron sayısı input_dim parametresiyle 
 ya da input_shape parametresiyle belirtilmektedir. input_dim tek boyutlu girdiler için 
-c ise çok boyutlu girdiler için kullanılmaktadır. Örneğin:
+input_shape ise çok boyutlu girdiler için kullanılmaktadır. Örneğin:
 
 layer = Dense(100, activation='relu', input_dim=8) # tek boyutlu 8 tane nörondan oluşuyor demek
 
@@ -3931,12 +3933,12 @@ Aslında Keras'ta girdi katmanı için tensorflow.keras.layers modülünde Input
 bir katman da kullanılmaktadır. Tenseoflow'un yeni versiyonlarında girdi katmanının 
 Input katmanı ile oluşturulması istenmektedir. Aksi takdirde bu yeni versiyonlar uyarı 
 vermektedir. Girdi katmanını Input isimli katman sınıfıyla oluştururken bu Input 
-sınıfının __init__ metodunun birinci parametresi bir demet biçiminde (yani sahpe olarak) 
+sınıfının __init__ metodunun birinci parametresi bir demet biçiminde (yani shape olarak) 
 girilmelidir. Örneğin:
 
 input = Input((8, ))
 
-Burada 8 nöronşuk bir girdi katmanı oluşturulmuştur. Yukarıda da belirttiğimiz gibi 
+Burada 8 nöronluk bir girdi katmanı oluşturulmuştur. Yukarıda da belirttiğimiz gibi 
 eskiden ilk saklı katmanda girdi katmanı belirtiliyordu. Ancak Tensorflow kütüphanesinin 
 yeni verisyonlarında ilk saklı katmanda girdi katmanının belirtilmesi artık uyarıya 
 (warning) yol açmaktadır.
@@ -3958,9 +3960,87 @@ Programcılar genellikle katman nesnesinin yaratılması ve eklenmesini tek sat�
 aşağıdaki gibi yaparlar:
 
 model.add(Dense(100, activation='relu', input_dim=9, name='Hidden-1'))
+
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+3) Modele katmanlar eklendikten sonra bir özet bilgi yazdırılabilir. Bu işlem 
+Sequential sınıfının summary isimli metoduyla yapılmaktadır. 
+
+Yukarıda da belirttiğimiz gibi bir katmandaki "eğitilebilir (trainable)" parametrelerin 
+sayısı aşağıda olan örnekteki gibi hesaplanmaktadır. Aşağıdaki modeli inceleyiniz:
+  
+    
+model = Sequential(name='Diabetes')
+
+model.add(Input((training_dataset_x.shape[1],)))
+model.add(Dense(16, activation='relu', name='Hidden-1'))
+model.add(Dense(16, activation='relu', name='Hidden-2'))
+model.add(Dense(1, activation='sigmoid', name='Output'))
+model.summary()
+
+B modelde bir girdi katmanı, iki saklı katman (biz bunlara ara katman da diyeceğiz) 
+bir de çıktı katmanı vardır. summary metodundan elde edilen çıktı şöyledir.
+
+    Model: "Diabetes"
+    ┌─────────────────────────────────┬────────────────────────┬───────────────┐
+    │ Layer (type)                    │ Output Shape           │       Param # │
+    ├─────────────────────────────────┼────────────────────────┼───────────────┤
+    │ Hidden-1 (Dense)                │ (None, 16)             │           144 │
+    ├─────────────────────────────────┼────────────────────────┼───────────────┤
+    │ Hidden-2 (Dense)                │ (None, 16)             │           272 │
+    ├─────────────────────────────────┼────────────────────────┼───────────────┤
+    │ Output (Dense)                  │ (None, 1)              │            17 │
+    └─────────────────────────────────┴────────────────────────┴───────────────┘
+    Total params: 433 (1.69 KB)
+    Trainable params: 433 (1.69 KB)
+    Non-trainable params: 0 (0.00 B)
+    Trainable params: 433 (1.69 KB)
+    Non-trainable params: 0 (0.00 B)
+
+Burada ağımızdaki girdi katmanında 8 nöron olduğuna göre ve ilk saklı katmanda da 
+16 nöron olduğuna göre ilk saklı katmana (8 * 16) nöron girmektedir. Öte yandan 
+her nöronun bir tane bias değeri de olduğuna göre ilk katmandaki tahmin ayarlanması 
+gereken parametrelerin (trainable parameters) sayısı (8 * 16 + 16 = 144) tanedir. 
+İkinci saklı katmana 16 nöron dense biçimde bağlanmıştır. O halde ikinci saklı 
+katmandaki ayarlanması gereken parametreler toplamda (16 * 16 + 16 = 272) tanedir. 
+Modelimizin çıktı katmanında 1 nöron vardır. Önceki katmanın 16 çıkışı olduğuna 
+göre bu çıktı katmanında (16 * 1 + 1 = 17) tane ayarlanması gereken parametre vardır. 
+
+Ağın saklı katmanlarında en çok kullanılan aktivasyon fonksiyonu "relu" isimli fonksiyondur. 
+İkili sınıflandırma problemlerinde çıktı katmanı tek nörondan oluşur ve bu katmandaki 
+aktivasyon fonksiyonu "sigmoid" fonksiyonu olur. Sigmoid fonksiyonu 0 ile 1 arasında 
+bir değer vermektedir. Biz aktivasyon fonksiyonlarını izleyen paragraflarda ele alacağız.
+
+Aşağıdaki örnekte "dibates" veri kümesi üzerinde ikili sınıflandırma problemi için 
+bir sinir ağı oluşturulmuştur. 
+
+---------------------------------------------------------------------------------
+from sklearn.impute import SimpleImputer
+
+si = SimpleImputer(strategy='mean', missing_values=0)
+
+df[['Glucose', 'BloodPressure', 'SkinThickness', 'Insulin', 'BMI']] = si.fit_transform(df[['Glucose', 'BloodPressure',
+        'SkinThickness', 'Insulin', 'BMI']])
+
+dataset = df.to_numpy()
+
+dataset_x = dataset[:, :-1]
+dataset_y = dataset[:, -1]
+
+from sklearn.model_selection import train_test_split
+
+training_dataset_x, test_dataset_x, training_dataset_y, test_dataset_y = train_test_split(dataset_x, dataset_y, test_size=0.2)
+
+from tensorflow.keras import Sequential
+from tensorflow.keras.layers import Input, Dense
+
+model = Sequential(name='Diabetes')
+
+model.add(Input((training_dataset_x.shape[1],)))
+model.add(Dense(16, activation='relu', name='Hidden-1'))
+model.add(Dense(16, activation='relu', name='Hidden-2'))
+model.add(Dense(1, activation='sigmoid', name='Output'))
+model.summary()
+
 ---------------------------------------------------------------------------------
 """
-
-
-
-
