@@ -3978,7 +3978,7 @@ model.add(Dense(16, activation='relu', name='Hidden-2'))
 model.add(Dense(1, activation='sigmoid', name='Output'))
 model.summary()
 
-B modelde bir girdi katmanı, iki saklı katman (biz bunlara ara katman da diyeceğiz) 
+Bu modelde bir girdi katmanı, iki saklı katman (biz bunlara ara katman da diyeceğiz) 
 bir de çıktı katmanı vardır. summary metodundan elde edilen çıktı şöyledir.
 
     Model: "Diabetes"
@@ -3994,8 +3994,7 @@ bir de çıktı katmanı vardır. summary metodundan elde edilen çıktı şöyl
     Total params: 433 (1.69 KB)
     Trainable params: 433 (1.69 KB)
     Non-trainable params: 0 (0.00 B)
-    Trainable params: 433 (1.69 KB)
-    Non-trainable params: 0 (0.00 B)
+    
 
 Burada ağımızdaki girdi katmanında 8 nöron olduğuna göre ve ilk saklı katmanda da 
 16 nöron olduğuna göre ilk saklı katmana (8 * 16) nöron girmektedir. Öte yandan 
@@ -4058,7 +4057,6 @@ fonksiyonun minimize edilmesi istenir. İşte minimize edilecek bu fonksiyona da
 fonksiyonun değerini minimize edecek biçimde işlem yapan algoritmadır. Yani optimizasyon 
 algoritması loss fonksiyonunu minimize etmek için yapılan işlemleri temsil etmektedir. 
     
-
 Loss fonksiyonları ağın ürettiği değerlerle gerçek değerler arasındaki farklılığı 
 temsil eden fonksiyonlardır. Loss fonksiyonları genel olarak iki girdi alıp bir 
 çıktı vermektedir. Loss fonksiyonunun girdileri gerçek değerler ile ağın ürettiği 
@@ -4071,6 +4069,14 @@ Loss fonksiyonları çıktının biçimine yani problemin türüne bağlı olara
 problemleri için "categorical cross-entropy", lojistik olmayan regresyon problemleri 
 için "mean squared error" isimli loss fonksiyonları tercih edilmektedir. 
 
+
+ikili sınıflandırma problemleri --->   binary cross-entropy
+
+çoklu sınıflandırma problemleri --->   categorical cross-entropy
+
+lojistik olmayan regresyon problemleri --->  mean squared error
+
+---------------------------------------------------------------------------------
 Optimizasyon algoritmaları aslında genel yapı olarak birbirlerine benzemektedir. 
 Pek çok problemde bu algoritmaların çoğu benzer performans göstermektedir. En çok 
 kullanılan optimizasyon algoritmaları "rmsprop", "adam" ve "sgd" algoritmalarıdır. 
@@ -4089,5 +4095,72 @@ from tensorflow.keras.optimizers import RMSprop
 rmsprop = RMSprop()
 
 model.compile(optimizer=rmsprop, ...)
+
+Tabii optimizer parametresinin bir sınıf nesnesi olarak girilmesi daha detaylı 
+belirlemelerin yapılmasına olanak sağlamaktadır. Optimizasyon işlemlerinde bazı 
+parametrik değerler vardır. Bunlara makine öğrenmesinde "üst düzey parametreler 
+(hyper parameters)" denilmektedir. İşte optimizasyon algoritması bir sınıf nesnesi 
+biçiminde verilirse bu sınıfın __init__ metodunda biz bu üst düzey parametreleri 
+istediğimiz gibi belirleyebiliriz. Eğer optimizasyon algoritması yazısal biçimde 
+verilirse bu üst düzey parametreler default değerlerle kullanılmaktadır. optimzer 
+parametresinin default değeri "rmsprop" biçimindedir. Yani biz bu parametre için 
+değer girmezsek default optimazyon algoritması "rmsprop" olarak alınacaktır. 
+
+---------------------------------------------------------------------------------
+loss fonksiyonu compile metoduna yine isimsel olarak ya da tensorflow.keras.losses 
+modülündeki sınıflar türünden sınıf nesleri biçiminde ya da doğrudan fonksiyon 
+olarak girilebilmektedir. loss fonksiyonları kısa ya da uzun isim olarak yazısal 
+biçimde kullanılabilmektedir. Tipik loss fonksiyon isimleri şunlardır:
+
+'mean_squared_error' ya da 'mse'
+'mean_absolute_error' ya da 'mae'
+'mean_absolute_percentage_error' ya da 'mape'
+'mean_squared_logarithmic_error' ya da 'msle'
+'categorical_crossentropy'
+'binary_crossentropy'
+
+Bu durumda compile metodu örnek bir biçimde şöyle çağrılabilir:
+
+model.compile(optimizer='rmsprop', loss='binary_crossentropy')
+
+---------------------------------------------------------------------------------
+compile metodunun üçüncü önemli parametresi "metrics" isimli parametredir. metrics 
+parametresi bir liste ya da demet olarak girilir. metrics parametresi daha sonra 
+açıklanacak olan "sınama (validation)" işlemi için kullanılacak fonksiyonları 
+belirtmektedir. Sınamada her zaman zaten bizim loss fonksiyonu olarak belirttiğimiz 
+fonksiyon kullanılmaktadır. metrics parametresinde ilave fonksiyonlar da girilebilmektedir. 
+
+Örneğin ikili sınıflandırma problemleri için tipik olarak "binary_accuracy" denilen 
+metrik fonksiyon, çoklu sınıflandırma için "categorical_accuracy" denilen metrik 
+fonksiyon ve lojistik olmayan regresyon problemleri için de "mean_absolute_error" 
+isimli metrik fonksiyon sıklıkla kullanılmaktadır. 
+
+ikili sınıflandırma problemleri --->   binary_accuracy
+
+çoklu sınıflandırma problemleri --->   categorical_accuracy
+
+lojistik olmayan regresyon problemleri --->   mean_absolute_error
+
+
+Örneğin ikili sınıflandırma problemi için biz eğitim sırasında "loss" değerinin 
+yanı sıra "binary_accuracy" değerini de elde etmek isteyelim. Bu durumda compile 
+metodunu şöyle çağırmalıyız:
+    
+model.compile(optimizer='rmsprop', loss='binary_crossentropy', metrics=['binary_accuracy'])    
+
+---------------------------------------------------------------------------------
+
+---------------------------------------------------------------------------------
+5) Model derlenip çeşitli belirlemeler yapıldıktan sonra artık gerçekten eğitim 
+aşamasına geçilir. Eğitim süreci Sequential sınıfının fit metoduyle yapılmaktadır. 
+fit metodunun en önemli parametresi ilk iki parametre olan x ve y veri kümeleridir. 
+Biz burada training_dataset_x ve training_dataset_y verilerini fit metodunun ilk 
+iki parametresine geçirmeliyiz.
+
+---------------------------------------------------------------------------------
+
+
+
+
 ---------------------------------------------------------------------------------
 """
