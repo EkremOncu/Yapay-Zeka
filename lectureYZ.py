@@ -4157,10 +4157,45 @@ fit metodunun en önemli parametresi ilk iki parametre olan x ve y veri kümeler
 Biz burada training_dataset_x ve training_dataset_y verilerini fit metodunun ilk 
 iki parametresine geçirmeliyiz.
 
+fit metodunun önemli bir parametresi batch_size isimli parametredir. Eğitim işlemi 
+aslında satır satır değil batch batch yapılmaktadır. batch bir grup satıra denilmektedir. 
+Yani ağa bir grup satır girdi olarak verilir. Ağdan bir grup çıktı elde edilir. Bu 
+bir grup çıktı ile bu çıktıların gerçek değerleri loss fonksiyonuna sokulur ve 
+optimizasyon algoritması çalıştırılarak w ve bias değerleri güncellenir. Yani 
+optimizasyon algoritması her batch işlemden sonra devreye sokulmaktadır. Batch 
+büyüklüğü fit metodunda batch_size parametresiyle belirtilmektedir. Bu değer girilmezse 
+batch_size 32 olarak alınmaktadır. 32 değeri pek çok uygulama için uygun bir değerdir. 
+Optimizasyon işleminin satır satır yapılması yerine batch batch yapılmasının iki 
+önemli nedeni vardır: Birincisi işlem miktarının azaltılması, dolayısıyla eğitim 
+süresinin kısaltılmasıdır. İkincisi ise "overfitting" denilen olumsuz durum için 
+bir önlem oluşturmasıdır.
+
 ---------------------------------------------------------------------------------
+fit metodunun diğer önemli parametresi de "epochs" isimli parametredir. Eğitim 
+veri kümesinin eğitim sırasında yeniden eğitimde kullanılmasına "epoch" işlemi 
+denilmektedir.
 
+Örneğin elimizde 1000 satırlık bir eğitim veri kümesi olsun. batch_size parametresinin 
+de 20 olduğunu varsayalım. Bu durumda bu eğitim veri kümesi 1000 / 20 = 50 batch 
+işleminde bitecektir. Yani model parametreleri 50 kere ayarlanacaktır. Pek çok 
+durumda eğitim veri kümesinin bir kez işleme sokulması model parametrelerinin
+iyi bir biçimde konumlandırılması için yetersiz kalmaktadır. İşte eğitim veri kümesinin 
+birden fazla kez yani fit metodundaki epochs sayısı kadar yeniden eğitimde kullanılması 
+yoluna gidilmektedir. Pekiyi epochs değeri ne olmalıdır?
 
+Aslında bunu uygulamacı belirler. Az sayıda epoch model parametrelerini yeterince 
+iyi konumlandıramayabilir. Çok fazla sayıda epoch "overfitting" denilen olumsuz 
+duruma zemin hazırlayabilir. Ayrıca çok fazla epoch eğitim zamanını da uzatmaktadır. 
+Uygulamacı epoch'lar sırasında modelin davranışına bakabilir ve uygun epoch sayısında 
+işlemi kesebilir. Eğitim sırasında Keras bizim belirlediğimiz fonksiyonları çağırabilmektedir. 
+Buna Keras'ın "callback" mekanizması denilmektedir. Uygulamacı bu yolla model belli 
+bir duruma geldiğinde eğitim işlemini kesebilir. Ya da uygulamacı eğer eğitim çok 
+uzamayacaksa yüksek bir epoch ile eğitimini yapabilir. İşlemler bitince epoch'lardaki 
+performansa bakabilir. Olması gerekn epoch değerini kestirebilir. Sonra modeli 
+yeniden bu sayıda epoch ile eğitir. 
 
-
+fit metodunun shuffle parametresi her epoch'tan sonra eğitim veri kümesinin karıştırılıp 
+karıştırılmayacağını belirtmektedir. Bu parametre default olarak True biçimdedir. 
+Yani eğitim sırasında her epoch'ta eğitim veri kümesi karıştırılmaktadır. 
 ---------------------------------------------------------------------------------
 """
