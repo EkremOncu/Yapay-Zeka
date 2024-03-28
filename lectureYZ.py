@@ -4043,4 +4043,51 @@ model.add(Dense(1, activation='sigmoid', name='Output'))
 model.summary()
 
 ---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+4) Model oluşturulduktan sonra modelin derlenmesi (compile edilmesi) gerekir. Buradaki 
+"derleme" makine diline dönüştürme anlamında bir terim değildir. Eğitim için bazı 
+belirlemelerin yapılması anlamına gelmektedir. Bu işlem Sequential sınıfının 
+compile isimli metoduyla yapılmaktadır. Modelin compile metoduyla derlenmesi sırasında 
+en önemli iki parametre "loss fonksiyonu" ve "optimizasyon algoritması"dır.
+
+Eğitim sırasında ağın ürettiği değerlerin gerçek değerlere yaklaştırılması için w 
+ve bias değerlerinin nasıl güncelleneceğine ilişkin algoritmalara "optimizasyon 
+algoritmaları" denilmektedir. Matematiksel optimizasyon işlemlerinde belli bir 
+fonksiyonun minimize edilmesi istenir. İşte minimize edilecek bu fonksiyona da 
+"loss fonksiyonu" denilmektedir. Başka bir deyişle optimizasyon algoritması loss 
+fonksiyonun değerini minimize edecek biçimde işlem yapan algoritmadır. Yani optimizasyon 
+algoritması loss fonksiyonunu minimize etmek için yapılan işlemleri temsil etmektedir. 
+    
+
+Loss fonksiyonları ağın ürettiği değerlerle gerçek değerler arasındaki farklılığı 
+temsil eden fonksiyonlardır. Loss fonksiyonları genel olarak iki girdi alıp bir 
+çıktı vermektedir. Loss fonksiyonunun girdileri gerçek değerler ile ağın ürettiği 
+değerlerdir. Çıktı değeri ise aradaki farklığı belirten bir değerdir. Eğitim sırasında 
+gitgide loss fonksiyonun değerinin düşmesini bekleriz. Tabii loss değerinin düşmesi 
+aslında ağın gerçek değerlere daha yakın değerler üretmesi anlamına gelmektedir.
+
+Loss fonksiyonları çıktının biçimine yani problemin türüne bağlı olarak seçilmektedir. 
+Örneğin ikili sınıflandırma problemleri için "binary cross-entropy", çoklu sınıflandırma 
+problemleri için "categorical cross-entropy", lojistik olmayan regresyon problemleri 
+için "mean squared error" isimli loss fonksiyonları tercih edilmektedir. 
+
+Optimizasyon algoritmaları aslında genel yapı olarak birbirlerine benzemektedir. 
+Pek çok problemde bu algoritmaların çoğu benzer performans göstermektedir. En çok 
+kullanılan optimizasyon algoritmaları "rmsprop", "adam" ve "sgd" algoritmalarıdır. 
+Bu algoritmalar "gradient descent" denilen genel optimizasyon yöntemini farklı 
+biçimlerde uygulamaktadır.
+
+compile metodunda optimizasyon algoritması bir yazı olarak ya da tensorflow.keras.optimizers 
+modülündeki sınıflar türünden bir sınıf nesnesi olarak girilebilmektedir. Örneğin:
+
+model.compile(optimizer='rmsprop', ...)
+
+Örneğin:
+
+from tensorflow.keras.optimizers import RMSprop
+
+rmsprop = RMSprop()
+
+model.compile(optimizer=rmsprop, ...)
+---------------------------------------------------------------------------------
 """
