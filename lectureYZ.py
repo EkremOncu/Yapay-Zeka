@@ -4197,5 +4197,97 @@ yeniden bu sayıda epoch ile eğitir.
 fit metodunun shuffle parametresi her epoch'tan sonra eğitim veri kümesinin karıştırılıp 
 karıştırılmayacağını belirtmektedir. Bu parametre default olarak True biçimdedir. 
 Yani eğitim sırasında her epoch'ta eğitim veri kümesi karıştırılmaktadır. 
+
 ---------------------------------------------------------------------------------
+Modelin fit metodu ile eğitilmesi sırasında "sınama (validation)" denilen önemli 
+bir kavram daha devreye girmektedir. Sınama işlemi test işlemine benzemektedir. 
+Ancak test işlemi tüm model eğitildikten sonra yapılırken sınama işlemi her epoch'tan 
+sonra modelin eğitim sürecinde yapılmaktadır. Başka bir deyişle sınama işlemi model 
+eğitilirken yapılan test işlemidir.
+
+Epoch'lar sırasında modelin performansı hakkında bilgi edinebilmek için sınama 
+işlemi yapılmaktadır. Sınamanın yapılması için fit metodunun validation_split parametresinin 
+0 ile 1 arasında oransal bir değer olarak girilmesi gerekir. Bu oransal değer eğitim 
+veri kümesinin yüzde kaçının sınama için kullanılacağını belirtmektedir. Örneğin 
+validation_split=0.2 eğitim veri kümesinin %20'sinin sınama için kullanılacağını 
+belirtmektedir.
+
+fit metodu işin başında eğitim veri kümesini eğitimde kullanılacak kısım ile sınamada 
+kullanılacak kısım biçiminde ikiye ayırmaktadır. Sonra her epoch'ta yalnızca eğitimde 
+kullanılacak kümeyi karıştırmaktadır. Sınama işlemi aynı kümeyle her epoch sonrasında 
+karıştırılmadan yapılmaktadır. fit metodunda ayrıca bir de validation_data isimli 
+bir parametre vardır. Bu parametre sınama verilerini girmek için kullanılmaktadır. 
+Bazen programcı sınama verilerinin eğitim veri kümesinden çekilip alınmasını istemez. 
+Onu ayrıca fit metoduna vermek isteyebilir. Tabii validation_data parametresi girildiyse 
+artık validation_split parametresinin bir anlamı yoktur. Bu parametre girilse bile 
+artık fonksiyon tarafından dikkate alınmaz. Örneğin:
+
+model.fit(training_dataset_x, training_dataset_y, batch_size=32, epochs=100, validation_split=0.2)
+
+
+validation_split parametresinin default değerinin 0 olduğuna dikkat ediniz. 
+validation_split değerinin 0 olması epoch'lar sonrasında sınama işleminin 
+yapılmayacağı anlamına gelmektedir. 
+
+---------------------------------------------------------------------------------
+Pekiyi modelin fit metodunda her epoch'tan sonra sınama işleminde hangi ölçümler 
+ekrana yazdırılacaktır? İşte compile metodunda belirtilen ve ismine metrik fonksiyonlar 
+denilen fonksiyonlar her epoch işlemi sonucunda ekrana yazdırılmaktadır. Her epoch 
+sonucunda fit metodu şu değerleri yazdırmaktadır:
+
+- Epoch sonrasında elde edilen loss değerlerinin ortalaması
+
+- Epoch sonrasında eğitim veri kümesinin kendisi için elde edilen metrik değerlerin 
+ortalaması
+
+- Epoch sonrasında sınama için kullanılan sınama verilerinden elde edilen loss 
+değerlerinin ortalaması
+
+- Epoch sonrasında sınama için kullanılan sınama verilerinden elde edilen metrik 
+değerlerin ortalaması
+
+
+Bir epoch işleminin batch batch yapıldığını anımsayınız. Bu durumda epoch sonrasında 
+fit tarafından ekrana yazdırılan değerler bu batch işlemlerden elde edilen ortalama 
+değerlerdir. Yani örneğin her batch işleminden bir loss değeri elde edilir. Sonra 
+bu loss değerlerinin ortalaması hesap edilerek yazdırılır. 
+
+Eğitim veri kümesindeki değerler ile sınama veri kümesinden elde edilen değerler 
+birbirine karışmasın diye fit metodu sınama verilerinden elde edilen değerlerin 
+başına "val_" öneki getirmektedir. 
+
+---------------------------------------------------------------------------------
+Örneğin biz ikili sınıflandırma problemi üzerinde çalışıyor olalım ve metrik fonksion 
+olarak "binary_accuracy" kullanmış olalım. fit metodu her epoch sonrasında şu 
+değerleri ekrana yazdıracaktır:
+
+
+loss (eğitim veri kümesinden elde edilen ortalama loss değeri)
+binary_accuracy (eğitim veri kümesinden elde edilen ortalama metrik değer)
+val_loss (sınama veri kümesinden elde edilen ortalama loss değeri)
+val_binary_accuracy (sınama veri kümesinden elde edilen ortalama metrik değer)
+
+Tabii compile metodunda birden fazla metirk değer de belirtilmiş olabilir. Bu durumda 
+fit tüm bu metrik değerlerin ortalamasını ekrana yazdıracaktır. fit tarafından 
+ekrana yazdırılan örnek bir çıktı şöyle olabilir:
+
+....
+Epoch 91/100
+16/16 [==============================] - 0s 3ms/step - loss: 0.5536 - binary_accuracy: 0.7230 - val_loss: 0.5520 - 
+val_binary_accuracy: 0.7480
+Epoch 92/100
+16/16 [==============================] - 0s 3ms/step - loss: 0.5392 - binary_accuracy: 0.7251 - val_loss: 0.5588 - 
+val_binary_accuracy: 0.7805
+Epoch 93/100
+16/16 [==============================] - 0s 3ms/step - loss: 0.5539 - binary_accuracy: 0.7088 - val_loss: 0.5666 - 
+val_binary_accuracy: 0.8049
+...
+
+Burada loss değeri epoch sonrasında eğitim verilerinden elde edilen ortalama loss 
+değerini, val_loss değeri epoch sonrasında sınama verilerinden elde edilen ortalama 
+loss değerini, binary_accuracy epoch sonrasında eğitim verilerinden elde edilen
+ortalama isabet yüzdesini ve val_binary_accuracy ise epoch sonrasında sınama 
+verilerinden elde edilen ortalama isabet yüzdesini belirtmektedir.
+    
+---------------------------------------------------------------------------------    
 """
