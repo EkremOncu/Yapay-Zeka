@@ -4288,6 +4288,68 @@ değerini, val_loss değeri epoch sonrasında sınama verilerinden elde edilen o
 loss değerini, binary_accuracy epoch sonrasında eğitim verilerinden elde edilen
 ortalama isabet yüzdesini ve val_binary_accuracy ise epoch sonrasında sınama 
 verilerinden elde edilen ortalama isabet yüzdesini belirtmektedir.
+
+
+Eğitim sırasında eğitim veri kümesindeki başarının sınama veri kümesinde görülmemesi 
+eğitimin kötü bir yöne gittiğine işaret etmektedir. 
+
+Örneğin ikili sınıflandırma probleminde epoch sonucunda eğitim veri kümesindeki 
+binary_accuracy değerinin %99 olduğunu ancak val_binary_accuracy değerinin %65 
+olduğunu düşünelim. Bunun anlamı ne olabilir? Bu durum aslında epoch'lar sırasında 
+modelin bir şeyler öğrendiği ama bizim istediğimiz şeyleri öğrenemediği anlamına 
+gelmektedir. Çünkü eğitim veri kümesini epoch'larla sürekli bir biçimde gözden 
+geçiren model artık onu ezberlemiştir. Ancak o başarıyı eğitimden bağımsız bir veri 
+kümesinde gösterememektedir. İşte bu olguya "overfitting" denilmektedir. Yanlış 
+bir şeyin öğrenilmesi bir şeyin öğrenilememesi kadar kötü bir durumdur. Overfitting 
+oluşumunun çeşitli nedenleri vardır. Ancak overfitting epoch'lar dolayısıyla oluşuyorsa 
+epoch'ları uygun bir noktada kesmek gerekir.      
+
+---------------------------------------------------------------------------------  
+
+---------------------------------------------------------------------------------   
+6) fit işleminden sonra artık model eğitilmiştir. Onun test veri kümesiyle test 
+edilmesi gerekir. Bu işlem Sequential sınıfının evaluate isimli metodu ile yapılmaktadır.
+evaluate metodunun ilk iki parametresi test_dataset_x ve test_dataset_y değerlerini 
+almaktadır. Diğer bir parametresi yine batch_size parametresidir. Buradaki bacth_size 
+eğitim işlemi yapılırken fit metodunda kullanılan batch_size ile benzer anlamdadır 
+ancak işlevleri farklıdır. Model test edilirken test işlemi de birer birer değil batch 
+batch yapılabilir. Ancak bu batch'ler arasında herhangi bir şey yapılmamaktadır. 
+(Eğitim sırasındaki batch işlemleri sonrasında ağ parametrelerinin ayarlandığını 
+anımsayınız. Test işlemi sırasında böyle bir ayarlama yapılmamaktadır.) Buradaki 
+batch değeri işlemlerin hızlı yapılması üzerinde etkili olmaktadır. Yine batch_size 
+parametresi girilmezse default 32 alınmaktadır. 
+
+evaluate metodu bir liste geri döndürmektedir. Listenin ilk elemanı test veri kümesinden 
+elde edilen loss fonksiyonunun değeridir. Diğer elemanları da sırasıyla metrik 
+olarak verilen fonksiyonların değerleridir. Örneğin:
+
+eval_result = model.evaluate(test_dataset_x, test_dataset_y)
+
+Aslında eval_result listesinin elemanlarının hangi anlamlara geldiğini daha iyi 
+ifade edebilmek için Sequential sınıfında metrics_names isimli bir örnek özniteliği 
+(instance attribute) bulundurulmuştur. Bu metrics_names listesindeki isimler bire 
+bir evalute metodunun geri döndürdüğü liste elemanları ile örtüşmektedir. Bu durumda 
+evaluate metodunun geri döndürdüğü listeyi aşağıdaki gibi de yazdırabiliriz:
+
     
----------------------------------------------------------------------------------    
+for i in range(len(eval_result)):
+    print(f'{model.metrics_names[i]}: {eval_result[i]}')
+
+Aynı şeyi built-in zip fonksiyonuyla da şöyle yapabilirdik:
+
+for name, value in zip(model.metrics_names, eval_result):
+    print(f'{name}: {value}')
+    
+--------------------------------------------------------------------------------- 
+
+--------------------------------------------------------------------------------- 
+7) Artık model test de edilmiştir. Şimdi sıra "kestirim (prediction)" yapmaya gelmiştir. 
+Kestirim işlemi için Sequential sınıfının predict metodu kullanılır. Biz bu metoda 
+girdi katmanına uygulanacak sütun verilerini veriririz. predict metodu da bize 
+çıktı katmanındaki nöronların değerlerini verir. predict metoduna biz her zaman 
+İKİ BOYUTLU bir numpy dizisi vermeliyiz. Çünkü predict metodu tek hamlede birden 
+çok satır için kestirim yapabilmektedir. Biz predict metoduna bir satır verecek 
+olsak bile onu İKİ BOYUTLU  bir matris biçiminde vermeliyiz.
+
+--------------------------------------------------------------------------------- 
 """
