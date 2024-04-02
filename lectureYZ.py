@@ -4157,10 +4157,199 @@ fit metodunun en önemli parametresi ilk iki parametre olan x ve y veri kümeler
 Biz burada training_dataset_x ve training_dataset_y verilerini fit metodunun ilk 
 iki parametresine geçirmeliyiz.
 
+fit metodunun önemli bir parametresi batch_size isimli parametredir. Eğitim işlemi 
+aslında satır satır değil batch batch yapılmaktadır. batch bir grup satıra denilmektedir. 
+Yani ağa bir grup satır girdi olarak verilir. Ağdan bir grup çıktı elde edilir. Bu 
+bir grup çıktı ile bu çıktıların gerçek değerleri loss fonksiyonuna sokulur ve 
+optimizasyon algoritması çalıştırılarak w ve bias değerleri güncellenir. Yani 
+optimizasyon algoritması her batch işlemden sonra devreye sokulmaktadır. Batch 
+büyüklüğü fit metodunda batch_size parametresiyle belirtilmektedir. Bu değer girilmezse 
+batch_size 32 olarak alınmaktadır. 32 değeri pek çok uygulama için uygun bir değerdir. 
+Optimizasyon işleminin satır satır yapılması yerine batch batch yapılmasının iki 
+önemli nedeni vardır: Birincisi işlem miktarının azaltılması, dolayısıyla eğitim 
+süresinin kısaltılmasıdır. İkincisi ise "overfitting" denilen olumsuz durum için 
+bir önlem oluşturmasıdır.
+
 ---------------------------------------------------------------------------------
+fit metodunun diğer önemli parametresi de "epochs" isimli parametredir. Eğitim 
+veri kümesinin eğitim sırasında yeniden eğitimde kullanılmasına "epoch" işlemi 
+denilmektedir.
 
+Örneğin elimizde 1000 satırlık bir eğitim veri kümesi olsun. batch_size parametresinin 
+de 20 olduğunu varsayalım. Bu durumda bu eğitim veri kümesi 1000 / 20 = 50 batch 
+işleminde bitecektir. Yani model parametreleri 50 kere ayarlanacaktır. Pek çok 
+durumda eğitim veri kümesinin bir kez işleme sokulması model parametrelerinin
+iyi bir biçimde konumlandırılması için yetersiz kalmaktadır. İşte eğitim veri kümesinin 
+birden fazla kez yani fit metodundaki epochs sayısı kadar yeniden eğitimde kullanılması 
+yoluna gidilmektedir. Pekiyi epochs değeri ne olmalıdır?
 
+Aslında bunu uygulamacı belirler. Az sayıda epoch model parametrelerini yeterince 
+iyi konumlandıramayabilir. Çok fazla sayıda epoch "overfitting" denilen olumsuz 
+duruma zemin hazırlayabilir. Ayrıca çok fazla epoch eğitim zamanını da uzatmaktadır. 
+Uygulamacı epoch'lar sırasında modelin davranışına bakabilir ve uygun epoch sayısında 
+işlemi kesebilir. Eğitim sırasında Keras bizim belirlediğimiz fonksiyonları çağırabilmektedir. 
+Buna Keras'ın "callback" mekanizması denilmektedir. Uygulamacı bu yolla model belli 
+bir duruma geldiğinde eğitim işlemini kesebilir. Ya da uygulamacı eğer eğitim çok 
+uzamayacaksa yüksek bir epoch ile eğitimini yapabilir. İşlemler bitince epoch'lardaki 
+performansa bakabilir. Olması gerekn epoch değerini kestirebilir. Sonra modeli 
+yeniden bu sayıda epoch ile eğitir. 
 
+fit metodunun shuffle parametresi her epoch'tan sonra eğitim veri kümesinin karıştırılıp 
+karıştırılmayacağını belirtmektedir. Bu parametre default olarak True biçimdedir. 
+Yani eğitim sırasında her epoch'ta eğitim veri kümesi karıştırılmaktadır. 
 
 ---------------------------------------------------------------------------------
+Modelin fit metodu ile eğitilmesi sırasında "sınama (validation)" denilen önemli 
+bir kavram daha devreye girmektedir. Sınama işlemi test işlemine benzemektedir. 
+Ancak test işlemi tüm model eğitildikten sonra yapılırken sınama işlemi her epoch'tan 
+sonra modelin eğitim sürecinde yapılmaktadır. Başka bir deyişle sınama işlemi model 
+eğitilirken yapılan test işlemidir.
+
+Epoch'lar sırasında modelin performansı hakkında bilgi edinebilmek için sınama 
+işlemi yapılmaktadır. Sınamanın yapılması için fit metodunun validation_split parametresinin 
+0 ile 1 arasında oransal bir değer olarak girilmesi gerekir. Bu oransal değer eğitim 
+veri kümesinin yüzde kaçının sınama için kullanılacağını belirtmektedir. Örneğin 
+validation_split=0.2 eğitim veri kümesinin %20'sinin sınama için kullanılacağını 
+belirtmektedir.
+
+fit metodu işin başında eğitim veri kümesini eğitimde kullanılacak kısım ile sınamada 
+kullanılacak kısım biçiminde ikiye ayırmaktadır. Sonra her epoch'ta yalnızca eğitimde 
+kullanılacak kümeyi karıştırmaktadır. Sınama işlemi aynı kümeyle her epoch sonrasında 
+karıştırılmadan yapılmaktadır. fit metodunda ayrıca bir de validation_data isimli 
+bir parametre vardır. Bu parametre sınama verilerini girmek için kullanılmaktadır. 
+Bazen programcı sınama verilerinin eğitim veri kümesinden çekilip alınmasını istemez. 
+Onu ayrıca fit metoduna vermek isteyebilir. Tabii validation_data parametresi girildiyse 
+artık validation_split parametresinin bir anlamı yoktur. Bu parametre girilse bile 
+artık fonksiyon tarafından dikkate alınmaz. Örneğin:
+
+model.fit(training_dataset_x, training_dataset_y, batch_size=32, epochs=100, validation_split=0.2)
+
+
+validation_split parametresinin default değerinin 0 olduğuna dikkat ediniz. 
+validation_split değerinin 0 olması epoch'lar sonrasında sınama işleminin 
+yapılmayacağı anlamına gelmektedir. 
+
+---------------------------------------------------------------------------------
+Pekiyi modelin fit metodunda her epoch'tan sonra sınama işleminde hangi ölçümler 
+ekrana yazdırılacaktır? İşte compile metodunda belirtilen ve ismine metrik fonksiyonlar 
+denilen fonksiyonlar her epoch işlemi sonucunda ekrana yazdırılmaktadır. Her epoch 
+sonucunda fit metodu şu değerleri yazdırmaktadır:
+
+- Epoch sonrasında elde edilen loss değerlerinin ortalaması
+
+- Epoch sonrasında eğitim veri kümesinin kendisi için elde edilen metrik değerlerin 
+ortalaması
+
+- Epoch sonrasında sınama için kullanılan sınama verilerinden elde edilen loss 
+değerlerinin ortalaması
+
+- Epoch sonrasında sınama için kullanılan sınama verilerinden elde edilen metrik 
+değerlerin ortalaması
+
+
+Bir epoch işleminin batch batch yapıldığını anımsayınız. Bu durumda epoch sonrasında 
+fit tarafından ekrana yazdırılan değerler bu batch işlemlerden elde edilen ortalama 
+değerlerdir. Yani örneğin her batch işleminden bir loss değeri elde edilir. Sonra 
+bu loss değerlerinin ortalaması hesap edilerek yazdırılır. 
+
+Eğitim veri kümesindeki değerler ile sınama veri kümesinden elde edilen değerler 
+birbirine karışmasın diye fit metodu sınama verilerinden elde edilen değerlerin 
+başına "val_" öneki getirmektedir. 
+
+---------------------------------------------------------------------------------
+Örneğin biz ikili sınıflandırma problemi üzerinde çalışıyor olalım ve metrik fonksion 
+olarak "binary_accuracy" kullanmış olalım. fit metodu her epoch sonrasında şu 
+değerleri ekrana yazdıracaktır:
+
+
+loss (eğitim veri kümesinden elde edilen ortalama loss değeri)
+binary_accuracy (eğitim veri kümesinden elde edilen ortalama metrik değer)
+val_loss (sınama veri kümesinden elde edilen ortalama loss değeri)
+val_binary_accuracy (sınama veri kümesinden elde edilen ortalama metrik değer)
+
+Tabii compile metodunda birden fazla metirk değer de belirtilmiş olabilir. Bu durumda 
+fit tüm bu metrik değerlerin ortalamasını ekrana yazdıracaktır. fit tarafından 
+ekrana yazdırılan örnek bir çıktı şöyle olabilir:
+
+....
+Epoch 91/100
+16/16 [==============================] - 0s 3ms/step - loss: 0.5536 - binary_accuracy: 0.7230 - val_loss: 0.5520 - 
+val_binary_accuracy: 0.7480
+Epoch 92/100
+16/16 [==============================] - 0s 3ms/step - loss: 0.5392 - binary_accuracy: 0.7251 - val_loss: 0.5588 - 
+val_binary_accuracy: 0.7805
+Epoch 93/100
+16/16 [==============================] - 0s 3ms/step - loss: 0.5539 - binary_accuracy: 0.7088 - val_loss: 0.5666 - 
+val_binary_accuracy: 0.8049
+...
+
+Burada loss değeri epoch sonrasında eğitim verilerinden elde edilen ortalama loss 
+değerini, val_loss değeri epoch sonrasında sınama verilerinden elde edilen ortalama 
+loss değerini, binary_accuracy epoch sonrasında eğitim verilerinden elde edilen
+ortalama isabet yüzdesini ve val_binary_accuracy ise epoch sonrasında sınama 
+verilerinden elde edilen ortalama isabet yüzdesini belirtmektedir.
+
+
+Eğitim sırasında eğitim veri kümesindeki başarının sınama veri kümesinde görülmemesi 
+eğitimin kötü bir yöne gittiğine işaret etmektedir. 
+
+Örneğin ikili sınıflandırma probleminde epoch sonucunda eğitim veri kümesindeki 
+binary_accuracy değerinin %99 olduğunu ancak val_binary_accuracy değerinin %65 
+olduğunu düşünelim. Bunun anlamı ne olabilir? Bu durum aslında epoch'lar sırasında 
+modelin bir şeyler öğrendiği ama bizim istediğimiz şeyleri öğrenemediği anlamına 
+gelmektedir. Çünkü eğitim veri kümesini epoch'larla sürekli bir biçimde gözden 
+geçiren model artık onu ezberlemiştir. Ancak o başarıyı eğitimden bağımsız bir veri 
+kümesinde gösterememektedir. İşte bu olguya "overfitting" denilmektedir. Yanlış 
+bir şeyin öğrenilmesi bir şeyin öğrenilememesi kadar kötü bir durumdur. Overfitting 
+oluşumunun çeşitli nedenleri vardır. Ancak overfitting epoch'lar dolayısıyla oluşuyorsa 
+epoch'ları uygun bir noktada kesmek gerekir.      
+
+---------------------------------------------------------------------------------  
+
+---------------------------------------------------------------------------------   
+6) fit işleminden sonra artık model eğitilmiştir. Onun test veri kümesiyle test 
+edilmesi gerekir. Bu işlem Sequential sınıfının evaluate isimli metodu ile yapılmaktadır.
+evaluate metodunun ilk iki parametresi test_dataset_x ve test_dataset_y değerlerini 
+almaktadır. Diğer bir parametresi yine batch_size parametresidir. Buradaki bacth_size 
+eğitim işlemi yapılırken fit metodunda kullanılan batch_size ile benzer anlamdadır 
+ancak işlevleri farklıdır. Model test edilirken test işlemi de birer birer değil batch 
+batch yapılabilir. Ancak bu batch'ler arasında herhangi bir şey yapılmamaktadır. 
+(Eğitim sırasındaki batch işlemleri sonrasında ağ parametrelerinin ayarlandığını 
+anımsayınız. Test işlemi sırasında böyle bir ayarlama yapılmamaktadır.) Buradaki 
+batch değeri işlemlerin hızlı yapılması üzerinde etkili olmaktadır. Yine batch_size 
+parametresi girilmezse default 32 alınmaktadır. 
+
+evaluate metodu bir liste geri döndürmektedir. Listenin ilk elemanı test veri kümesinden 
+elde edilen loss fonksiyonunun değeridir. Diğer elemanları da sırasıyla metrik 
+olarak verilen fonksiyonların değerleridir. Örneğin:
+
+eval_result = model.evaluate(test_dataset_x, test_dataset_y)
+
+Aslında eval_result listesinin elemanlarının hangi anlamlara geldiğini daha iyi 
+ifade edebilmek için Sequential sınıfında metrics_names isimli bir örnek özniteliği 
+(instance attribute) bulundurulmuştur. Bu metrics_names listesindeki isimler bire 
+bir evalute metodunun geri döndürdüğü liste elemanları ile örtüşmektedir. Bu durumda 
+evaluate metodunun geri döndürdüğü listeyi aşağıdaki gibi de yazdırabiliriz:
+
+    
+for i in range(len(eval_result)):
+    print(f'{model.metrics_names[i]}: {eval_result[i]}')
+
+Aynı şeyi built-in zip fonksiyonuyla da şöyle yapabilirdik:
+
+for name, value in zip(model.metrics_names, eval_result):
+    print(f'{name}: {value}')
+    
+--------------------------------------------------------------------------------- 
+
+--------------------------------------------------------------------------------- 
+7) Artık model test de edilmiştir. Şimdi sıra "kestirim (prediction)" yapmaya gelmiştir. 
+Kestirim işlemi için Sequential sınıfının predict metodu kullanılır. Biz bu metoda 
+girdi katmanına uygulanacak sütun verilerini veriririz. predict metodu da bize 
+çıktı katmanındaki nöronların değerlerini verir. predict metoduna biz her zaman 
+İKİ BOYUTLU bir numpy dizisi vermeliyiz. Çünkü predict metodu tek hamlede birden 
+çok satır için kestirim yapabilmektedir. Biz predict metoduna bir satır verecek 
+olsak bile onu İKİ BOYUTLU  bir matris biçiminde vermeliyiz.
+
+--------------------------------------------------------------------------------- 
 """
