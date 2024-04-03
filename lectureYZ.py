@@ -14,14 +14,14 @@ oluşturulmuştur. Bunların en çok kullanılanı "NumPy" isimli kütüphanedir
 C'de yazılmış bir kütüphanedir.
 
 !!! NumPy dizileri  MUTABLE 'dir. (değiştirilebilir)
-------------------------------------------------------------------------------------
 
+------------------------------------------------------------------------------------
 import numpy  as np
 
 a = np.array([  [1, 2, 3], [4, 5, 6], [7, 8, 9] ])
 print(a, type(a))
-------------------------------------------------------------------------------------
 
+------------------------------------------------------------------------------------
 Anımsanacağı gibi Python'daki list, tuple, gibi veri yapıları aslında değerlerin i
 kendisini tutmamaktadır. Değerlerin tutulduğu nesnelerin adreslerini tutmaktadır. 
 Bu biçimdeki çalışma yoğun sayısal işlemlerde oldukça hantal hale gelmektedir. Bu 
@@ -36,8 +36,8 @@ Burada a değişkenin gösteridği NumPy dizisi tamamen C'deki gibi bir dizidir.
 NumPy dizisinin elemanları adresleri değil doğrudan değerlerin kendisini tutmaktadır. 
 Bu nedenle NumPy dizileri (yani ndarray nesneleri) birkaç istisna durum dışında 
 homojendir.
-------------------------------------------------------------------------------------
 
+------------------------------------------------------------------------------------
 array fonksiyonuyla NumPy dizisi (ndarray nesnesi) yaratılırken yaratılacak NumPy 
 dizisinin C'deki dtype türü array fonksiyonun dtype parametresi ile açıkça 
 belirlenebilir.
@@ -55,7 +55,7 @@ short / int16       : iki byte'lık işaretli tamsayı türü
 ushort / uint16     : iki byte'lık işaretsiz tamsayı türü
 int32               : dört byte'lık işaretli tamsayı türü
 uint32              : dört byte'lık işaretsiz tamsayı türü
-int64               : sekiz byte2lık işaretli tamsayı türü
+int64               : sekiz byte'lık işaretli tamsayı türü
 uint64              : sekiz byte'lık işaretsiz tamsayı türü
 float32 / single    : dört byte'lık gerçek sayı türü
 
@@ -68,8 +68,8 @@ işaretsiz tamsayı -> Örneğin : (0, 255)
 -> işaretli tamsayı = bitlerden biri işarete ayrılmış demek
 
 !!! Bir NumPy dizisinin dtype'ı demek -> Onun C dilindeki gerçek(orjinal) türü demek
-------------------------------------------------------------------------------------
 
+------------------------------------------------------------------------------------
 String sınıfı C'deki string sınıfı gibi davranır, iterable değil.
 
 import numpy  as np
@@ -78,8 +78,8 @@ print(a)
 
 a = np.array(list('ankara'))
 print(a)
-------------------------------------------------------------------------------------
 
+------------------------------------------------------------------------------------
 İçi sıfırlarla dolu numpy dizilerinin oluşturulması gerekebilmektedir. Bunun için 
 zeros fonksiyonu kullanılmaktadır. zeros fonksiyonun yine birinci parametresi 
 oluşturulacak Numpy dizisinin boyutlarını (shape) belirtir.
@@ -91,15 +91,16 @@ print()
 
 a = np.zeros( (10,10) , dtype='int8') # iki boyutlu dizi
 print(a)
-------------------------------------------------------------------------------------
 
-ones isimli fonksiyon içi 1'lerle dolu bir NumPy dizisi oluşturmaktadır. Yine fonksiyonun birinci parametresi oluşturulacak dizinin boyutlarını 
-belirtir. dtype parametresi ise dtype türünü belirtir.  Örneğin:
+------------------------------------------------------------------------------------
+ones isimli fonksiyon içi 1'lerle dolu bir NumPy dizisi oluşturmaktadır. Yine 
+fonksiyonun birinci parametresi oluşturulacak dizinin boyutlarını belirtir. dtype 
+parametresi ise dtype türünü belirtir.  Örneğin:
 
 a = np.ones(10, dtype='int32')
 # array([1, 1, 1, 1, 1, 1, 1, 1, 1, 1])
-------------------------------------------------------------------------------------
 
+------------------------------------------------------------------------------------
 full isimli fonksiyon NumPy dizisini bizim istediğimiz değerle doldurarak yaratır. 
 (Yani zeros ve ones fonksiyonlarının genel biçimidir.) Bu fonksiyonun yine birinci 
 parametresi NumPy dizisinin boyutlarını, ikinci parametresi doldurulacak değerleri 
@@ -116,10 +117,12 @@ print(b)
 # ---------- random ------------
 """
 ------------------------------------------------------------------------------------
+Rastgele değerlerden NumPy dizisi oluşturabilmek için numpy.random modülünde çeşitli 
+fonksiyonlar bulundurulmuştur. Örneğin numpy.random.random fonksiyonu belli bir 
+boyutta 0 ile 1 arasında rastgele gerçek sayı değerleri oluşturmaktadır. Bu fonksiyon 
+dtype parametresine sahip değildir. Her zaman float64 olarak numpy dizisini 
+yaratmaktadır. Fonksiyonun boyut belirten bir parametresi vardır
 
-Rastgele değerlerden NumPy dizisi oluşturabilmek için numpy.random modülünde çeşitli fonksiyonlar bulundurulmuştur. Örneğin 
-numpy.random.random fonksiyonu belli bir boyutta 0 ile 1 arasında rastgele gerçek sayı değerleri oluşturmaktadır. Bu fonksiyon dtype
-parametresine sahip değildir. Her zaman float64 olarak numpy dizisini yaratmaktadır.Fonksiyonun boyut belirten bir parametresi vardır
 ------------------------------------------------------------------------------------
 import numpy  as np
 
@@ -149,31 +152,32 @@ a = np.random.randint(10, 20, (5, 5), dtype='int8')
 # ---------- arange ------------
 """
 ------------------------------------------------------------------------------------
-
 arange fonksiyonu Python'ın built-in range fonksiyonuna benzemektedir. Ancak arange 
 bize dolaşılabilir bir nesne vermez. Doğrudan bir NumPy dizisi verir. start, stop, 
 step parametreleri range fonksiyonunda olduğu gibidir. Ancak Python range fonksiyonunda 
 start, stop ve step değerleri int türünden olmak zorundayken arange fonksiyonunda 
-float türünden de oabilir. Böylelikle biz arange ile noktasal artırımlarla bir 
+float türünden de olabilir. Böylelikle biz arange ile noktasal artırımlarla bir 
 numpy dizisi oluşturabiliriz. arange fonksiyonu dtype parametresi de alabilmektedir. 
 
 Ancak bu fonksiyon her zaman tek boyutlu bir diziyi bize verir.
-------------------------------------------------------------------------------------
 
+------------------------------------------------------------------------------------
 import numpy  as np
+
 a = np.arange(-1, 1, 1)
 # array([-1,  0])
 
 a = np.arange(-1, 1, 0.25)
 #  array([-1.  , -0.75, -0.5 , -0.25,  0.  ,  0.25,  0.5 ,  0.75])
-------------------------------------------------------------------------------------
 
+------------------------------------------------------------------------------------
 arange fonksiyonunu kullanırken dikkat etmek gerekir. Çünkü noktasal artırımlar, 
 noktasal start ve stop değerleri yuvarlama hatalarından dolayı beklenenden fazla 
 ya da az sayıda eleman üretebilir. (Örneğin 0.1 artırımlarla ilerleken yuvarlama 
 hatasından dolayı stop değerine çok yakın ama ondan küçük değer elde edilebilir 
 ve bu değer de dizi içinde bulunabilir.) Zaten Python'daki built-in range sınıfının 
 tamsayı değerler almasının nedeni de budur. 
+
 ------------------------------------------------------------------------------------
 """
 
@@ -246,15 +250,15 @@ print()
 
 b = a.reshape(2,10)
 print(b)
-------------------------------------------------------------------------------------
 
+------------------------------------------------------------------------------------
 Çok boyutlu dizilerin tek boyutlu hale getirilmesi çokça gereksinim duyulan bir 
 işlemdir. Örneğin elimizde 5x4'lük bir NumPy dizisi olsun. Biz bunu tek boyutlu 
 bir dizi haline getirmeye çalışalım. Tabii bu işlemi reshap metoduyla ya da 
 fonksiyonuyla yapabiliriz. Örneğin;
 
 a = np.random.randint(0, 100, (5, 4))
-b = a.reshape(20)
+b = a.reshape(-1)                       # a.reshape(20)
 
 Ancak bu işlem için ravel isimli bir metot ve global bir fonksiyon da 
 bulundurulmuştur. ravel bize reshape işleminde olduğu gibi bir view nesnesi 
@@ -301,8 +305,9 @@ print()
 # bool indeksleme 
 """
 ------------------------------------------------------------------------------------
-Bir NumPy dizisine bool indeksleme uygulanabilir. bool indeksleme için dizi uzunluğu ve boyutu kadar bool türden dolaşılabilir bir nesne
-girilir. Bu dolaşılabilir nesnedeki True olan elemanlara karşı gelen dizi elemanları elde edilmektedir.
+Bir NumPy dizisine bool indeksleme uygulanabilir. bool indeksleme için dizi uzunluğu 
+ve boyutu kadar bool türden dolaşılabilir bir nesne girilir. Bu dolaşılabilir 
+nesnedeki True olan elemanlara karşı gelen dizi elemanları elde edilmektedir.
 
 import numpy as np
 a = np.array( [ 1, 2, 3, 4, 5, 6, 7, 8, 9 ])
@@ -314,10 +319,10 @@ c = a[b]
 print(c)
 ------------------------------------------------------------------------------------
 """
+
 # Matris çarpımı
 """
 ------------------------------------------------------------------------------------
-
 import numpy as np
 
 a = np.random.randint(1,23,(5,5))
@@ -334,7 +339,9 @@ print(np.matmul(a,b))
 ------------------------------------------------------------------------------------
 """
 
+
 #  ----------------------------- Pandas  -----------------------------
+
 """
 ------------------------------------------------------------------------------------
 Pandas kütüphanesi NumPy kütüphanesinin üzerine kurulmuş durumdadır. Yani seviye 
@@ -344,8 +351,8 @@ Pandas'ta sütunlardan ve satırlardan oluşan veri kümeleri DataFrame isimli b
 sınıf ile temsil edilmektedir. Veri kümesindeki belli bir sütun ise Series isimli 
 sınıfla temsil edilir. DataFrame sınıfını Series nesnelerini tutan bir sınıf 
 olarak düşünebiliriz. 
-------------------------------------------------------------------------------------
 
+------------------------------------------------------------------------------------
 Series nesnelerinin de tıpkı NumPy dizilerinde olduğu gibi bir dtype türü vardır. 
 Bir Series nesnesi yaratılırken nesnenin dtype türü dtype parametresiyle belirtilebilir. 
 Pandas içerisinde ayrı dtype sınıfları yoktur. Aslında Pandas Series bilgilerini 
@@ -357,8 +364,8 @@ s = pd.Series([10, 20, 30, 40, 50], dtype=np.float32)
 print(s)
 
 !!! Series nesneleri MUTABLE nesnelerdir. Değiştirilebilir.
-------------------------------------------------------------------------------------
 
+------------------------------------------------------------------------------------
 Series nesnelerinin elemanlarına erişmek için üç yol vardır. Series nesnesi s olmak üzere:
 
 1) Doğrudan köşeli parantez operatörü ile. Yani s[...] biçiminde.
@@ -371,7 +378,6 @@ erişip onu değiştirebiliriz.
 Series nesnesinin index ile belirtilen (ya da index belirten değerlerine) 
 "etiket (label)" da denilmektedir. Örneğin:
 
-
 ------------------------------------------------------------------------------------
 s.iloc[...] biçimindeki erişimde ise köşeli parantez içerisine her zaman sıra 
 numarası yerleştirilmek zorundadır. Biz burada köşeli parantez içerisine etiket 
@@ -380,8 +386,8 @@ yerleştiremeyiz.
 Yani loc örnek özniteliği ile erişimde köşeli parantez içerisinde her zaman etiket 
 bulundurulması gerekmektedir. Bu bakımdan s[...] erişimi ile s.loc[...] erişimi
 birbirine benzemektedir fakat aralarında farklılık vardır.     
-------------------------------------------------------------------------------------
 
+------------------------------------------------------------------------------------
 Doğrudan indekslemede hem etiket hem de sıra numarası bir arada kullanılamz. 
 Ancak bunlardan biri kullanılabilir. Örneğin:
 
@@ -394,8 +400,8 @@ print()
 
 k= s.iloc[[1, 3, 2]]
 print(k)
-------------------------------------------------------------------------------------
 
+------------------------------------------------------------------------------------
 Series nesnesinin içerisindeki değerler values isimli örnek özniteliği ile bir 
 NumPy dizisi olarak elde edilebilmektedir. Aslında Series nesnesi zaten değerleri 
 NumPy dizisi içerisinde tutmaktadır. values elemanı da bize doğrudan aslında bu 
@@ -438,8 +444,8 @@ Eğer Series nesnesi içerisindeki değerleri bir Python listesi biçiminde elde
 istersek Series sınıfının to_list metodunu kullanabiliriz. 
 
 Tabii to_list her çağrıldığında aslında bize farklı bir list nesnesi verecektir.
-------------------------------------------------------------------------------------
 
+------------------------------------------------------------------------------------
 Series nesnesinden eleman silmek için Series sınıfının drop metodu kullanılmaktadır 
 (drop isimli bir fonksiyon yoktur). Bu metot her zaman etiket temelinde çalışır. 
 Hiçbir zaman sıra numarasıyla çalışmaz. Biz tek bir etiket de kullanabiliriz. Bir 
@@ -459,8 +465,8 @@ Bu durumda metot None değerine geri döner.
 
 s.drop(['a', 'e'], inplace=True)
 print(s)            
-------------------------------------------------------------------------------------
 
+------------------------------------------------------------------------------------
 Series sınıfının pek çok faydalı metodu vardır. Bu metotlar bize yaptıklar işlem 
 sonucunda yeni bir Series nesnesi verirler. Aslında bu metotlar NumPy metotlarına 
 çok benzemektedir. NumPy'da pek çok işlem hem metotlarla hem de fonksiyonlarla 
@@ -469,16 +475,23 @@ Yani pek çok fonksiyon yalnızca metot biçiminde bulundurulmuştur.
 
 abs metodu elemanların mutlak değerlerini elde eder. add metodu karşılıklı elemanları 
 toplar (yani + operatörü ile yapılanı yapar). argmax, argmin, argsort metotoları 
-sırasıyla en büyük elemanın indeksisni, en küçük elemanın indeksini ve sort 
+sırasıyla en büyük elemanın indeksini, en küçük elemanın indeksini ve sort 
 edilme durumundaki indeksleri vermektedir.
 
 s = pd.Series([12, 8, -4, 2, 9], dtype='float32')
+
 print(s.abs())
+print('-----')
+
 print(s.argmin())
 print(s.argmax())
-print(s.argsort()) 
-------------------------------------------------------------------------------------
+print('-----')
 
+print(s.argsort()) 
+print('-----')
+print(s[s.argsort()])
+
+------------------------------------------------------------------------------------
 dropna metodu eksik verileri atmak için kullanılmaktadır. Yani NaN değerleri 
 Series nesnesinden silinir.
 
@@ -502,7 +515,7 @@ print(reul)
 ------------------------------------------------------------------------------------
 Pandas'taki en önemli veri yapısı DataFrame denilen veri yapısıdır. DataFrame tipik 
 olarak istatistiksel veri kümesini temsil etmek için düşünülmüştür. DataFrame 
-nesnesinin sütunlardan oluşan matrisel bir yapısı vardır. Aslında DataFrame nesnesi 
+nesnesinin sütunlardan oluşan matriksel bir yapısı vardır. Aslında DataFrame nesnesi 
 Series nesnelerinden oluşmaktadır. Yani DataFrame nesnelerinin sütunları Series 
 nesneleridir. 
 
@@ -517,12 +530,13 @@ da benzetilebilir.
 DataFrame nesnesi iki boyutlu bir Python listesi ile oluşturulabilir. Eğer index 
 parametresi ve columns parametresi belirtilmezse oluşturulan DataFrame nesnesinin 
 satır etiketleri ve sütun etiketleri 0, 1, 2, ... biçiminde atanır
+
 ------------------------------------------------------------------------------------
 import pandas as pd
 df = pd.DataFrame([[1, 2, 3], [4, 5, 6], [7, 8, 9]], index=['a', 'b', 'c'], columns=['x', 'y', 'z'])
 print(df)
-------------------------------------------------------------------------------------
 
+------------------------------------------------------------------------------------
 Bir DataFrame nesnesi iki boyutlu bir NumPy dizisi ile de yaratılabilir. Örneğin:
 
 import numpy as np
@@ -532,20 +546,20 @@ df = pd.DataFrame(a, columns=['a', 'b', 'c'], index= [3,7,4])
 print(df)
 print()
 
-print(df.loc[7]) # df.loc[0] -> indexError
+print(df.loc[7]) # df.loc[1] -> indexError
 print()
 
 print(df.iloc[1]) # df.iloc[7] -> indexError
-------------------------------------------------------------------------------------
 
+------------------------------------------------------------------------------------
 DataFrame nesnesi bir sözlük ile de yaratılabilir. Bu durumda sözlüğün anahtarları 
 sütun isimlerini, değerleri de sütunlardaki değerleri belirtir. Örneğin:
     
 d = {'Adı Soyadı': ['Kaan Aslan', 'Ali Serçe', 'Ayşe Er'], 'Boy': [182, 174, 168], 'Kilo': [78, 69, 56]}
 df = pd.DataFrame(d)
 print(df)
-------------------------------------------------------------------------------------
 
+------------------------------------------------------------------------------------
 DataFrame üzerinde bir sütun insert etmek için DataFrame sınıfının insert metodu 
 metodu kullanılabilmektedir. insert metodunun birinci parametresi her zaman insert 
 edilecek sütunun indeks numarasını alır. İkinci parametre indeks edilecek sütunun 
@@ -569,7 +583,9 @@ print(df)
 ------------------------------------------------------------------------------------
 """
 
+
 #  ----------------------------- Statistics  -----------------------------
+
 """
 ------------------------------------------------------------------------------------
 İstatistikte verilerin merkezine ilişkin bilgi veren ölçülere "merkezi eğilim ölçüleri 
