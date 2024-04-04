@@ -1336,12 +1336,12 @@ print(result)                               # 0.25
 
 result = uniform.ppf(0.5, A, B - A)
 print(result)                               # 15
-------------------------------------------------------------------------------------
 
+------------------------------------------------------------------------------------
 Düzgün dağılmış rastgele sayı aslında bizim aşina olduğumuz klasik rastgele üretimidir. 
 Örneğin Python standart kütüphanesindeki random modülünde bulnan random fonksiyonu 
 0 ile 1 arasında rastgele bir sayı veriyordu. Aslında bu fonksiyon a = 0, b = 1 olan
-düzgün dağılımda rastegele sayı veren fonksiyonla tamamne aynıdır. Bnezer biçimde 
+düzgün dağılımda rastegele sayı veren fonksiyonla tamamen aynıdır. Benzer biçimde 
 NumPy'daki random modülündeki random fonksiyonu 0 ile 1 arasında düzgün dağılmış 
 rastgele sayı üretmektedir. Örneğin:
 
@@ -1358,6 +1358,7 @@ uniform.rvs(100, 200, 10)
 ------------------------------------------------------------------------------------
 """
 
+
 # t Dağılımı
 
 """   
@@ -1365,12 +1366,12 @@ uniform.rvs(100, 200, 10)
 Özellikle güven aralıklarında (confidence interval) ve hipotez testlerinde kullanılan 
 diğer önemli bir sürekli dağılım da "t dağılımı (t distribution)" denilen dağılımdır.
 
-t dağılımı standart normal dağılıma oldukça benzemektedir. Bu dağılımın ortalaması 0'dır. 
-Ancak standart sapması "serbestlik derecesi (degrees of freedom)" denilen bir değere 
-göre değişir. t dağılımının standart sapması sigma = karekök(df / (df - 2)) biçimindedir. 
-t dağılımın olasılık yoğunluk fonksiyonu biraz karmaşık bir görüntüdedir. Ancak 
-fonksiyon standart normal dağılıma göre "daha az yüksek ve biraz daha şişman" gibi 
-gözükmektedir. t dağılımının serbestlik derecesi artırıldığında dağılım standart 
+t dağılımı standart normal dağılıma oldukça benzemektedir. Bu dağılımın ortalaması 
+0'dır. Ancak standart sapması "serbestlik derecesi (degrees of freedom)" denilen 
+bir değere göre değişir. t dağılımının standart sapması sigma = karekök(df / (df - 2)) 
+biçimindedir. t dağılımın olasılık yoğunluk fonksiyonu biraz karmaşık bir görüntüdedir. 
+Ancak fonksiyon standart normal dağılıma göre "daha az yüksek ve biraz daha şişman" 
+gibi gözükmektedir. t dağılımının serbestlik derecesi artırıldığında dağılım standart 
 normal dağılıma çok benzer hale gelir. Serbestlik derecesi >= 30 durumunda standart 
 normal dağılımla oldukça örtüşmektedir. Yani serbestlik derecesi >= 30 durumunda 
 artık t dağılımı kullanmakla standart normal dağılım kullanmak arasında önemli bir 
@@ -1405,7 +1406,7 @@ Ancak yukarıda da belirttiğimiz gibi t dağılımı denildiğinde genel olarak
 0, standart sapması 1 olan t dağılımı anlaşılır.
 
 ------------------------------------------------------------------------------------
-Aşağıdaki programda standart normal dağılım ile 5 serbestlik derecesi ve 30 30 
+Aşağıdaki programda standart normal dağılım ile 5 serbestlik derecesi ve 30 
 serbestlik derecesine ilişkin t dağılımlarının olasılık yoğunluk fonksiyonları 
 çizdirilmiştir. Burada özellikle 30 serbestlik derecesine ilişkin t dağılımının 
 grafiğinin standart normal dağılım grafiği ile örtüşmeye başladığına dikkat ediniz. 
@@ -1415,7 +1416,7 @@ import numpy as np
 from scipy.stats import norm, t
 import matplotlib.pyplot as plt
 
-plt.figure(figsize=(20, 15))
+plt.figure(figsize=(10, 6))
 x = np.linspace(-5, 5, 1000)
 y = norm.pdf(x)
 
@@ -1438,8 +1439,8 @@ plt.plot(x, y, color='red')
                     
                 # >= 30'dan sonra normal dağılımla hemen hemen aynı grafik oluyor  
 plt.show()
-------------------------------------------------------------------------------------
 
+------------------------------------------------------------------------------------
 Değişik Serbestlik Derecelerine İlişkin t Dağılımı Grafikleri
 
 
@@ -1489,6 +1490,7 @@ print(result)               # [0.31914944 0.5        0.81839127 0.86669189]
 ------------------------------------------------------------------------------------
 """
 
+
 # Kesikli (discrete) dağılım
 """  
 ------------------------------------------------------------------------------------
@@ -1503,11 +1505,10 @@ fonksiyonu f(x) olmak üzere her x için f(x) değerlerinin toplamının yine 1 
 gerekmektedir.
 
 ------------------------------------------------------------------------------------
-
 # Poisson dağılımı
 
 En çok karşılaşılan kesikli dağılımlardan biri "poisson (genellikle "puason" biçiminde 
-okumuyor)" dağılımıdır. Bu kesikli dağılım adeta normal dağılımın kesikli versiyonu 
+okunuyor)" dağılımıdır. Bu kesikli dağılım adeta normal dağılımın kesikli versiyonu 
 gibidir. Poisson dağılımının olasılık kütle fonksiyonu şöyledir:
 
     P(X = x) = (e^-lambda * lambda^x) / x!
