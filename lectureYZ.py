@@ -649,6 +649,7 @@ np.median(a, axis=0)
 
 df = pd.DataFrame(a)
 df.median()
+
 ------------------------------------------------------------------------------------
 ------------------------------------------------------------------------------------
 Merkezi eğilim ölçülerinin bir diğeri de "mod" denilen ölçüdür. Bir grup verideki 
@@ -698,9 +699,9 @@ genellikle bunun ilk satırı ile ilgilenir. Diğer satırlar eşit miktarda tek
 elemanlardan oluşmaktadır. Tabii belli bir sütunda eşit miktarda tekrarlanan elemanların
 sayısı az ise artık geri döndürülen DataFrame'in o sütuna ilişkin satırlarında 
 NaN değeri bulunacaktır.
-------------------------------------------------------------------------------------
-------------------------------------------------------------------------------------
 
+------------------------------------------------------------------------------------
+------------------------------------------------------------------------------------
 Değerlerin merkezine ilişkin bilgiler dağılım hakkında iyi bir fikir vermeyebilir. 
 Örneğin iki ülkede kişi başına düşen ortalama yıllık gelir (gayri safi milli hasıla) 
 15000 dolar olabilir. Ancak bu iki ülke arasında gelir dağılımında önemli farklılıklar 
@@ -716,7 +717,6 @@ kurmak içinidir. Bu durumda ortalama 0 çıkmaz. Ancak bu yöntem de aslında �
 bir yöntem değildir. Aşağıda aynı dilimin ortalamadan ortalama mutlak uzaklığı 
 hesaplanmışır.
 
-   
 import numpy as np
 
 a = np.array([1, 4, 6, 8, 4, 2, 1, 8, 9, 3, 6, 8])
@@ -725,8 +725,8 @@ print(mean)                # 5
 
 result = np.mean(np.abs(a - mean))
 print(result)               # 2.5
-------------------------------------------------------------------------------------
 
+------------------------------------------------------------------------------------
 Aslında ortalamadan ortalama uzaklık için "standart sapma (standard deviation)" 
 denilen ölçü tercih edilmektedir. Standart sapmada ortalamadan uzaklıkların mutlak 
 değeri değil kareleri alınarak negatiflikten kurtulunmaktadır. Kare alma işlemi 
@@ -743,8 +743,8 @@ def sd(a, ddof = 0):
 a = [1, 4, 6, 8, 4, 2, 1, 8, 9, 3, 6, 8]
 result = sd(a)
 print(result)           # 2.7688746209726918
-------------------------------------------------------------------------------------
 
+------------------------------------------------------------------------------------
 Python'ın Standart Kütüphanesinde statistics modülü içerisinde standart sapma hesabı 
 yapan stdev ve pstdev fonksiyonları bulunmaktadır. stdev fonksiyonu (n - 1)'e bölme 
 yaparken, pstdev  (buradaki 'p' harfi "population" sözcüğünden gelmektedir) fonksiyonu 
@@ -757,9 +757,10 @@ a = [1, 4, 6, 8, 4, 2, 1, 8, 9, 3, 6, 8]
 std = statistics.stdev(a)
 print(std)                          # 2.891995221924885  
 
-std = statistics.pstdev(a)
-------------------------------------------------------------------------------------
+std = statistics.pstdev(a)          # 2.7688746209726918
+print(std) 
 
+------------------------------------------------------------------------------------
 NumPy kütüphanesinde std isimli fonksiyon eksensel standart sapma hesaplayabilmektedir. 
 Fonksiyonun ddof parametresi default durumda 0'dır. Yani default durumda fonksiyon 
 n'e bölme yapmaktadır.
@@ -767,10 +768,10 @@ n'e bölme yapmaktadır.
 import numpy as np
 
 a = np.array([1, 4, 6, 8, 4, 2, 1, 8, 9, 3, 6, 8])
-result = np.std(a)
+result = np.std(a, ddof=0)
 print(result)                       # 2.7688746209726918 
-------------------------------------------------------------------------------------
 
+------------------------------------------------------------------------------------
 Pandas kütüphanesinde de Series ve DataFrame sınıflarının std isimli metotları
 eksensel standart sapma hesabı yapabilmektedir. Ancak bu metotlarda ddof parametresi 
 default 1 durumundadır. Yani bu metotlar default durumda (n - 1)'e bölme yapmaktadır.
@@ -784,9 +785,9 @@ print(result)                       # 2.891995221924885
 s = pd.Series([1, 4, 6, 8, 4, 2, 1, 8, 9, 3, 6, 8])
 result = s.std(ddof=0)
 print(result)                       # 2.7688746209726918 
-------------------------------------------------------------------------------------
-------------------------------------------------------------------------------------
 
+------------------------------------------------------------------------------------
+------------------------------------------------------------------------------------
 Standart sapmanın karesine "varyans (variance)" denilmektedir. Varyans işlemi standart 
 kütüphanedeki statistics modülünde bulunan variance ve pvariance fonksiyonlarıyla 
 yapılmaktadır. NumPy kütüphanesinde varyans işlemi var fonksiyonuyla ya da ndarray 
@@ -815,6 +816,7 @@ print(result)               # 7.666666666666667
 s = pd.Series(data)
 result = s.var(ddof=0)
 print(result)               # 7.666666666666667
+
 ------------------------------------------------------------------------------------
 """
 """
@@ -837,7 +839,6 @@ tanımlarından birisi ------>>  "göreli sıklık (relative frequency)" tanım�
 Bu tanıma göre bir rassal olay çok sayıda yinelendikçe elde edilen olasılık değeri 
 belli bir değere yakınsamaya başlar. Örneğin bir paranın 100 kere atılmasında 
 50 kere yazı 50 tura gelmeyebilir. 
-
 
 Ancak para sonsuz sayıda atılırsa (ya da çok fazla sayıda atılırsa) tura gelme 
 sayısının paranın atılma sayısına oranı 0.5'e yakınsayacaktır. 
@@ -878,7 +879,6 @@ insanı onun kilosuna eşleyen bir fonksiyondur.
 Rassal değişkenler kümeler üzerinde işlemler yapmak yerine gerçek sayılar üzerinde 
 işlem yapmamızı sağlayan, anlatımlarda ve gösterimlerde kolaylık sağlayan bir kavramdır. 
 
-
 Rassal değişkenler tıpkı matematiksel diğer fonksiyonlarda olduğu gibi "kesikli 
 (discrete)" ya da "sürekli (continuous)" olabilmektedir. eğer bir rassal değişken 
 (yani fonksiyon) teorik olarak belli bir aralıkta tüm gerçek sayı değerlerini 
@@ -916,7 +916,6 @@ değişkenin olasılık yoğunluk fonksiyonuna "o rassal değişkenin dağılım
 denilmektedir.
 
 ------------------------------------------------------------------------------------
-	
 Değişik ortalama ve standart sapmaya ilişkin sonsuz sayıda Gauss eğrisi çizilebilir. 
 Ortalaması 0, standart sapması 1 olan normal dağılıma "standart normal dağılım" da 
 denilmektedir. Genellikle istatistiktre standart normal dağılımdaki X değerlerine
@@ -978,7 +977,7 @@ yani P{mu - std < X < mu + std} olasılığı 0.6827, ortalamadna iki standart s
 soldan ve sağdan kaplanan alan yani P{mu - std * 2< X < mu + std * 2} olasılığı 
 0.9545 biçimindedir. 
 
-Matplotlib'te bir eğrinin altındaki aalanı boyamak için fill_between isimli fonksiyon 
+Matplotlib'te bir eğrinin altındaki alanı boyamak için fill_between isimli fonksiyon 
 kullanılmaktadır. Bu fonksiyon axis sınıfının bir metodu olarak da bulundurulmuştur. 
 Aşağıdaki örnekte eğrinin altındaki belli bir alan fill_between metodu ile boyanmıştır.
 
@@ -1075,8 +1074,8 @@ print(result)                       # 2.3263478740408408
 
 result = nd.cdf(2.3263478740408408) # 0.99
 print(result)
-------------------------------------------------------------------------------------
 
+------------------------------------------------------------------------------------
 Belli bir x değeri için Gauss fonksiyonunda ona karşı gelen y değeri sınıfın pdf 
 metduyla elde edilmektedir. Örneğin x = 0 için standart normal dağılımda Gauss 
 fonksiyonu değerini aşağıdaki gibi elde edebiliriz:
@@ -1084,8 +1083,8 @@ fonksiyonu değerini aşağıdaki gibi elde edebiliriz:
 nd = statistics.NormalDist()
 result = nd.pdf(0)
 print(result)   # 0.3989422804014327
-------------------------------------------------------------------------------------
 
+------------------------------------------------------------------------------------
 !!!! Normal dağılmış !!!! rastgele n tane sayı üretmek için NormalDist sınıfının 
 samples isimli metodu kullanılmaktadır. Bu metot bize bir liste olarak n tane 
 float değer verir. Örneğin:
@@ -1110,8 +1109,8 @@ import matplotlib.pyplot as plt
 
 plt.hist(result, bins=30)
 plt.show()
-------------------------------------------------------------------------------------
 
+------------------------------------------------------------------------------------
 Python'ın statistics modülündeki NormalDist sınıfı vektörel işlemler yapamamaktadır. 
 Maalesef NumPy ve Pandas kütüphanelerinde normal dağılım üzerinde vektörel işlem 
 yapan öğeler yoktur. Ancak SciPy kütüphanesi içerisinde pek çok dağılım üzerinde 
@@ -1142,7 +1141,6 @@ result = norm.cdf([100, 130, 140], 100, 15)
 print(result)
 
 ------------------------------------------------------------------------------------
-
 norm nesnesinin ilişkin olduğu sınıfın ppf (percentage point function) isimli metodu 
 cdf işleminin tersini yapmaktadır. Yani kümülatif olasılığı bilindiği durumda bize 
 bu kümalatif olasılığa karşı gelen x değerini verir. (Yani ppf NormalDist sınıfındaki 
@@ -1163,7 +1161,7 @@ Yani ortalamaya eşittir.
 
 İstatistikte tam ortadan bölen değil de diğer noktalardan bölen değerler için 
 "percentage point" de denilmektedir. Örneğin normal dağılımda 1/4 noktasından bölen 
-değer aslında birikimli dağılm fonksiyonunun 0.25 için değeridir. 
+değer aslında birikimli dağılım fonksiyonunun 0.25 için değeridir. 
 
 ------------------------------------------------------------------------------------
 norm nesnesinin ilişkin olduğu sınıfın pdf (probability density function) isimli 
@@ -1196,8 +1194,8 @@ sayı üretmek için kullanılmaktadır. Metodun parametrik yapısı şöyledir:
     rvs(loc=0, scale=1, size=1)
 
 statistics.NormalDist()'in sample metodunun bezeri
-------------------------------------------------------------------------------------
 
+------------------------------------------------------------------------------------
 import numpy as np
 from scipy.stats import norm
 import matplotlib.pyplot as plt
@@ -1231,7 +1229,7 @@ axis.spines['top'].set_color(None)
 axis.spines['right'].set_color(None)
 
 axis.set_xticks(range(-4, 5))
-axis.text(2, 0.3, f'{result:.3f}', fontsize=14, fontweight='bold')
+axis.text(2.5, 0.3, f'{result:.3f}', fontsize=14, fontweight='bold')
 
 plt.plot(x, y)
 
