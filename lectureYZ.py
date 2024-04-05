@@ -1654,7 +1654,7 @@ Bu teoreme göre bir "anakütleden (population)" çekilen belli büyüklükteki 
 ortalamaları normal dağılmaktadır. Örneğin elimizde 100,000 elemanlı bir anakütle 
 olsun. Bu anakütleden 50'lik tüm alt kümeleri yani örnekleri elde edip bunların 
 ortalamalarını hesaplayalım. İşte bu ortalamalar normal dağılmaktadır. Bir anakütleden 
-alınan altkümelere "örnek (sample)" denilmektedir. Bu işleme de genel olarak 
+alınan alt kümelere "örnek (sample)" denilmektedir. Bu işleme de genel olarak 
 "örnekleme (sampling)" denir. Örneğimizdeki 100,000 elemanın 50'li alt kümelerinin 
 sayısı çok fazladır. O halde deneme için 100,000 elemanlı anakütlenin tüm alt 
 kümelerini değil belli sayıda alt kümelerini elde ederek histogram çizebiliriz. Bu 
@@ -1731,8 +1731,8 @@ print(f'Anakütle ortalaması: {population_mean}')
 print(f'Örnek ortalamalarının Ortalaması: {samples_means_mean}')
 
 ------------------------------------------------------------------------------------
-------------------------------------------------------------------------------------
 
+------------------------------------------------------------------------------------
 Peki bir anakütleden alınan örnek ortalamaları normal dağılmaktadır ve bu normal 
 dağılımın ortalaması anakütle ortalamasına eşittir. Peki örnek ortalamalarına 
 ilişkin normal dağılımın standart sapması nasıldır? İşte merkezi limit teoremine 
@@ -1780,7 +1780,6 @@ print()
 print(f'Örnek ortalamalarının standart sapması: {sample_means_std}')
 
 ------------------------------------------------------------------------------------
-
 Merkezi limit teoremine göre eğer anakütleden çekilen örnekler büyükse yani tipik 
 olarak n örnek büyüklüğü N ise anakütle büyüklüğü olmak üzere n / N >= 0.05 ise 
 bu durumda örneklem dağılımın standart sapması için "anakütle standart sapması / kök(n)" 
@@ -1791,7 +1790,6 @@ Biz 30 elemanlı örnekler çekersek bu düzeltme faktörünü kullanmalıyız. 
 paratikte genellikle n / N değeri 0.05'ten oldukça küçük olmaktadır.
 
 ------------------------------------------------------------------------------------
-
 Merkezi limit teoreminde anakütlenin normal dağılmış olması gerekmez. Nitekim 
 yukarıdaki örneklerimizde bir anakütleyi "düzgün dağılıma (uniform distribution)" 
 ilişkin olacak biçimde oluşturduk. Ancak eğer anakütle normal dağılmamışsa örneklem 
@@ -1815,7 +1813,6 @@ olması için örnek büyüklüğünün >= 30 olması gerekir. Tabii n < 30 duru
 
 """
 ------------------------------------------------------------------------------------
- 
 Sonuç çıkartıcı istatistikte (inferential statisics) bazen anakütlenin normal dağılıp 
 dağılmadığını örneğe dayalı olarak test etmek gerebilir. Bunun için anakütleden 
 bir örnek alınır. Sonra bu örneğe bakılarak anakütlenin normal dağılıp dağılmadığı 
@@ -1985,8 +1982,8 @@ ilişkin normal dağılımın standart sapmasını hesaplayabildik. Buradan elde
 güven aralığı şöyle olmaktadır:
 
 105.20454606435501, 112.79545393564499
------------------------------------------------------------------------------------- 
 
+------------------------------------------------------------------------------------ 
 Güven düzeyini yükseltirsek güven aralığının genişleyeceği açıktır. Örneğin bu 
 problem için güven düzeyini %99 olarak belirlemiş olalım:
 
@@ -2125,8 +2122,7 @@ lower_bound, upper_bound = norm.interval(0.95, sample_mean, sampling_mean_std)
 
 print(f'[lower_bound= {lower_bound}, upper_bound= {upper_bound}]')
 
-------------------------------------------------------------------------------------  
-------------------------------------------------------------------------------------  
+------------------------------------------------------------------------------------   
 """
 """
 ------------------------------------------------------------------------------------  
@@ -2205,7 +2201,7 @@ parametrik yapısı şöyledir:
 
 interval(confidence, df, loc=0, scale=1)
 
-Buradaki confidence paarametresi yine "güven düzeyini (confidence level)" belirtmektedir. 
+Buradaki confidence parametresi yine "güven düzeyini (confidence level)" belirtmektedir. 
 df parametresi serbestlik derecesini belirtir. loc ve scale parametreleri de sırasıyla 
 ortalama ve standart sapma değerlerini belirtmektedir. Burada loc parametresine 
 biz örneğimizin ortalamasını, scale parametresine de örneklem dağılımının standart 
@@ -2239,7 +2235,6 @@ print(f'[{lower_bound}, {upper_bound}]')
 
 ------------------------------------------------------------------------------------  
 ------------------------------------------------------------------------------------  
-
 Merkezi limit teoremine göre eğer ana kütle normal dağılmamışsa ancak n >= 30 koşulunu 
 sağlayan örneklem dağılımlarının normal dağıldığı kabul edilmektedir. Yani 
 örneklerimizdeki gibi anakütle ortalamasının tahmin edilmesi ve güven aralıklarının 
@@ -2249,11 +2244,11 @@ oluşturulması için şu iki koşuldan en az biri sağlanmalıdır:
 2) Anakütle normal dağılmamıştır ve örneklem dağılımı için n >= 30 durumu söz konusudur.
 
                                 
-Pekiyi örneğimiz küçükse (tipik oalrak < 30) ve ana kütle normal dağılmamışsa güven 
+Pekiyi örneğimiz küçükse (tipik olarak < 30) ve ana kütle normal dağılmamışsa güven 
 aralıklarını oluşturamaz mıyız? İşte bu tür durumlarda güven aralıklarının oluşturulması 
-ve bazı hipotez testleri için "parametrik olmayan (nonparametric) yöntemler kullanılmaktadır. 
-Ancak genel olarak parametrik olmayan yöntemler parametrik yöntemlere göre daha 
-daha az güvenilir sonuçlar vermektedir. 
+ve bazı hipotez testleri için "parametrik olmayan (nonparametric) yöntemler 
+kullanılmaktadır. Ancak genel olarak parametrik olmayan yöntemler parametrik 
+yöntemlere göre daha daha az güvenilir sonuçlar vermektedir. 
 ------------------------------------------------------------------------------------  
 """
 
