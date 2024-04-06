@@ -2451,7 +2451,7 @@ sütunun ismini listeye ekledik.
 ------------------------------------------------------------------------------------  
 import pandas as pd
 
-df = pd.read_csv('melb_data.csv')
+df = pd.read_csv('C:/Users/Lenovo/Desktop/GitHub/YapayZeka/Src/1- DataPreparation/melb_data.csv')
 
 missing_columns = [colname for colname in df.columns if df[colname].isna().any()]
 print(f'Eksik verilen bulunduğu sütunlar: {missing_columns}', end='\n\n')
@@ -2518,7 +2518,7 @@ metodun inplace parametresi True yapılırsa  nesne üzerinde atım yapılmaktad
 
 import pandas as pd
 
-df = pd.read_csv('melb_data.csv')
+df = pd.read_csv('C:/Users/Lenovo/Desktop/GitHub/YapayZeka/Src/1- DataPreparation/melb_data.csv')
 
 print(f'Veri kümesinin boyutu: {df.shape}')
 print("---------")
@@ -2572,7 +2572,7 @@ df['CouncilArea'] = df['CouncilArea'].fillna(impute_val[0])
 -----------------------------------------------------------------------------------  
 import pandas as pd
 
-df = pd.read_csv('melb_data.csv')
+df = pd.read_csv('C:/Users/Lenovo/Desktop/GitHub/YapayZeka/Src/1- DataPreparation/melb_data.csv')
 
 print(df.isna().sum())
 print("-----------------------------")
@@ -2600,10 +2600,9 @@ print(f'kontrol için: {df.isna().sum()}')
 -----------------------------------------------------------------------------------  
 NumPy ve Pandas genel amaçlı kütüphanelerdir. SciPy ise matematik ve lineer cebir 
 konularına odaklanmış genel bir kütüphanedir. Oysa scikit-learn makine öğrenmesi 
-amacıyla tasarlanmış ve bu amaçla kullanılan bir kütüphanedir. Kütüphanenin yüklenmesi 
-şöyle yapılabilir:
+amacıyla tasarlanmış ve bu amaçla kullanılan bir kütüphanedir.
 
-Ancak scikit-learn kütüphanesi yapay sinir ağları ve derin öğrenme ağlarına yönelik 
+scikit-learn kütüphanesi yapay sinir ağları ve derin öğrenme ağlarına yönelik 
 tasarlanmamıştır. Ancak kütüphane verilerin kullanıma hazır hale getirilmesine 
 ilişkin öğeleri de içermektedir. scikit-learn içerisindeki sınıflar matematiksel 
 ve istatistiksel ağırlıklı öğrenme yöntemlerini uygulamaktadır. scikit-learn 
@@ -2693,7 +2692,7 @@ seçilirse doldurulacak değerin fill_value parametresiyle belirtilmesi gerekir.
 Diğer parametreler için sınıfın dokümantasyonuna bakabilirsiniz
 
 -----------------------------------------------------------------------------------  
-SimpleImputer sınıfının fit, transform ve fit_transform metotları iki boyutlu bir 
+SimpleImputer sınıfının fit, transform ve fit_transform metotları İKİ BOYUTLU bir 
 dizi almaktadır. Yani bu metotlara bir NumPy dizisi geçirecekseniz onun iki boyutlu 
 olması gerekir. Pandas'ın Series nesnelerinin tek boyutlu bir dizi belirttiğini 
 anımsayınız. Bu durumda biz bu metotlara Series nesnesi geçemeyiz. Ancak DataFrame 
@@ -2724,13 +2723,14 @@ si.set_params(strategy='median')
 SimpleImputer sınıfında yukarıda belirttiğimiz gibi fit metodu asıl doldurma işlemini 
 yapmaz. Doldurma işlemi için gereken bilgileri elde eder. Yani örneğin:
 
+from sklearn.impute import SimpleImputer
 a = np.array([1, 1, None, 4, None]).reshape(-1, 1)
 
 si = SimpleImputer(strategy='mean')
 si.fit(a)
 
 Burada fit metodu aslında yalnızca bu a dizisindeki sütunların ortalamalarını elde 
-etmektedir. (Örneğimizde tek br sütun var). Biz fit yaptığımız bilgiyi transform 
+etmektedir. (Örneğimizde tek bir sütun var). Biz fit yaptığımız bilgiyi transform 
 etmek zorunda değiliz. Örneğin:
 
 b = np.array([1, 1, None, 4, None]).reshape(-1, 1)
@@ -2747,7 +2747,7 @@ işlem yapabilmektedir. Bu nedenle bu sınıfların fit ve transform metotları 
 iki boyutlu dizi istemektedir. tranform metotları da bize iki iki boyutlu dizi 
 geri döndürmektedir.
 
-Örneğin SimpleImputer sınıfına biz fit işlemind eiki bıyutlu bir dizi veriririz. 
+Örneğin SimpleImputer sınıfına biz fit işleminde iki boyutlu bir dizi veriririz. 
 Bu drumda fit metodu her sütunu diğerinden ayrı bir biçimde ele alır ve o sütunlara 
 ilişkin bilgileri oluşturur. Örneğin biz fit metoduna aşağıdaki gibi iki boyutlu 
 bir dizi vermiş olalım:
@@ -2824,7 +2824,6 @@ yapılmaktadır. Ancak bazen önce kategorik dönüştürmeyi yapıp sonra imput
 işlemi de yapılabilir.
 
 -----------------------------------------------------------------------------------  
-
 Kategorik verilerin sayısal biçime dönüştürülmesi genellikle her kategori (sınıf) 
 için 0'dan başlayarak artan bir tamsayı karşı düşürerek yapılmaktadır. Örneğin bir 
 sütunda kişilerin renk tercihleri olsun. Ve sütun içeriği aşağıdaki gibi olsun:
@@ -2884,7 +2883,7 @@ import pandas as pd
 
 df = pd.read_csv('C:/Users/Lenovo/Desktop/GitHub/YapayZeka/Src/1- DataPreparation/test.csv')
 print(df)
-print('-----------------------------------------------------------------------')
+print('-------------------------------------------------')
 
 def label_encode(df, colnames):
     for colname in colnames:
@@ -2893,7 +2892,7 @@ def label_encode(df, colnames):
             df.loc[df[colname] == label, colname] = index
             
             
-label_encode(df, ['Renk ercihi', 'Cinsiyet'])
+label_encode(df, ['RenkTercihi', 'Meslek'])
 print(df)
 
 
@@ -2956,7 +2955,7 @@ fit metodu yukarıda bizim yaptığımız gibi unique elemanları tespit edip bu
 içerisinde saklamaktadır. Asıl dönüştürme işlemi transform metoduyla yapılmaktadır. 
 Tabii eğer fit ve transform metotlarında aynı veriler kullanılacaksa bu işlemler 
 tek hamlede fit_transform metoduyla da yapılabilir. Örneğin yukarıdaki "test.csv" 
-veri kümesindeki "Cinsiyet" ve "RenkTercihi" sütunlarını kategorik olmaktan çıkartıp 
+veri kümesindeki "Meslek" ve "RenkTercihi" sütunlarını kategorik olmaktan çıkartıp 
 sayısal biçime şöyle dönüştürebiliriz:
     
 -----------------------------------------------------------------------------------
@@ -2971,8 +2970,8 @@ le = LabelEncoder()
 transformed_data = le.fit_transform(df['RenkTercihi'])
 df['RenkTercihi'] = transformed_data
 
-transformed_data = le.fit_transform(df['Cinsiyet'])
-df['Cinsiyet'] = transformed_data
+transformed_data = le.fit_transform(df['Meslek'])
+df['Meslek'] = transformed_data
 print(df)
 
 -----------------------------------------------------------------------------------
@@ -3035,6 +3034,7 @@ label_names = le.inverse_transform(transformed_data)
 print(label_names)
 
 -----------------------------------------------------------------------------------
+
 -----------------------------------------------------------------------------------
 Aslında kategorik verilerin 0'dan itibaren birer tamsayı ile numaralandırılması 
 iyi bir teknik değildir. Kategorik verilen "one hot encoding" denilen biçimde 
@@ -3077,7 +3077,7 @@ sütunu (özelliği) dönüştürmektedir.
 -----------------------------------------------------------------------------------
 Örneğin "test.csv" veri kümesi için:
     
-Burada "Cinsiyet" ve "RenkTercihi" kategorik (nominal) ölçekte sütunlardır. "EğitimDurumu" 
+Burada "Meslek" ve "RenkTercihi" kategorik (nominal) ölçekte sütunlardır. "EğitimDurumu" 
 sütunu kategorik ya da sıralı olarak ele alınabilir. Eğer biz İlkokul = 0, Ortaokul = 1, 
 Lise = 2, Üniversite = 3 biçiminde sıralı ölçeğe ilişkin bir kodlama yapmak istersek 
 bunu LabelEncoder ya da OrdinalEncoder ile sağlayamayız. Örneğin:
@@ -3089,8 +3089,8 @@ df = pd.read_csv('C:/Users/Lenovo/Desktop/GitHub/YapayZeka/Src/1- DataPreparatio
 print(df, end='\n\n')
 
 oe = OrdinalEncoder()
-transformed_data = oe.fit_transform(df[['Cinsiyet', 'RenkTercihi', 'Eğitim Durumu']])
-df[['Cinsiyet', 'RenkTercihi', 'Eğitim Durumu']] = transformed_data 
+transformed_data = oe.fit_transform(df[['Meslek', 'RenkTercihi', 'Eğitim Durumu']])
+df[['Meslek', 'RenkTercihi', 'EğitimDurumu']] = transformed_data 
 
  Buradan şöyle bir DataFrame elde edilecektir:
 
@@ -3215,7 +3215,7 @@ from sklearn.preprocessing import OneHotEncoder
 
 df = pd.read_csv('C:/Users/Lenovo/Desktop/GitHub/YapayZeka/Src/1- DataPreparation/test.csv')
 
-ohe = OneHotEncoder(sparse=False, dtype='uint8')
+ohe = OneHotEncoder(sparse_output=False, dtype='uint8')
 transformed_data = ohe.fit_transform(df[['RenkTercihi']])
 
 df.drop(['RenkTercihi'], axis=1, inplace=True)
@@ -3228,11 +3228,11 @@ print(df)
 -----------------------------------------------------------------------------------
 DataFrame nesnesine yukarıdaki gibi birden fazla sütun eklerken dikkat etmek gerekir. 
 Çünkü tesadüfen bu kategori isimlerine ilişkin sütunlardan biri zaten varsa o sütun 
-yok edilip yerine bu kategori sütunu oluşturulacaktır. Bunu engellemek için oluşturacağınız 
-kategori sütunlarını önek vererek isimlendirebilirsiniz. Önek verirken orijinal 
-sütun ismini kullanırsanız bu durumda çakışma olmayacağı garanti edilebilir. Yani 
-örneğin RenkTercihi sütunu için "Kırmızı", "Mavi" "Yeşil" isimleri yerine 
-"RenkTercihi_Kırmızı", "RenkTercihi_Mavi" ve "RenkTercihi_Yeşil" isimlerini 
+yok edilip yerine bu kategori sütunu oluşturulacaktır. Bunu engellemek için 
+oluşturacağınız kategori sütunlarını önek vererek isimlendirebilirsiniz. Ön ek 
+verirken orijinal sütun ismini kullanırsanız bu durumda çakışma olmayacağı garanti 
+edilebilir. Yani örneğin RenkTercihi sütunu için "Kırmızı", "Mavi" "Yeşil" isimleri 
+yerine "RenkTercihi_Kırmızı", "RenkTercihi_Mavi" ve "RenkTercihi_Yeşil" isimlerini 
 kullanabilirsiniz. Bu biçimde isim elde etmek "liste içlemiyle" oldukça kolaydır. 
 Örneğin:
 
@@ -3244,7 +3244,7 @@ from sklearn.preprocessing import OneHotEncoder
 
 df = pd.read_csv('C:/Users/Lenovo/Desktop/GitHub/YapayZeka/Src/1- DataPreparation/test.csv')
 
-ohe = OneHotEncoder(sparse=False, dtype='uint8')
+ohe = OneHotEncoder(sparse_output=False, dtype='uint8')
 
 transformed_data = ohe.fit_transform(df[['RenkTercihi']])
 
@@ -3257,8 +3257,8 @@ df[category_names] = transformed_data
 print(df)
     
 -----------------------------------------------------------------------------------
-Burada "RenkTercihi"nin yanı sıra "Eğitim Durumu" de kategorik bir sütundur. Bunun her 
-ikisini birden tek hamlede "one hot encoding" işlemine sokabiliriz:
+Burada "RenkTercihi"nin yanı sıra "Eğitim Durumu" de kategorik bir sütundur. 
+Bunun her ikisini birden tek hamlede "one hot encoding" işlemine sokabiliriz:
 
 ohe = OneHotEncoder(sparse=False, dtype='uint8')
 transformed_data = ohe.fit_transform(df[['RenkTercihi', 'Eğitim Durumu']])
@@ -3274,13 +3274,14 @@ df[categories1 + categories2] = transformed_data
 ----------------------------------------------------------------------------------
 # get_dummies
 
-One hot encoding yapmanın diğer bir yolu Pandas kütüphanesindeki get_dummies fonksiyonunu 
-kullanmaktadır. get_dummies fonksiyonu bizden bir DataFrame, Series ya da dolaşılabilir 
-herhangi bir nesneyi alır. Eğer biz get_dummies fonksiyonuna bütün bir DataFrame
-geçirirsek fonksiyon oldukça akıllı davranmaktadır. Bu durumda fonksiyon DataFrame 
-nesnesi içerisindeki yazısal sütunları tespit eder. Yalnızca yazısal sütunları 
-"one hot encoding" işlemine sokar ve bize yazısal sütunları dönüştürülmüş yeni bir 
-DataFrame nesnesi verir. Pandas ile çalışırken bu fonksiyon çok kolaylık sağlamaktadır.
+One hot encoding yapmanın diğer bir yolu Pandas kütüphanesindeki get_dummies 
+fonksiyonunu kullanmaktadır. get_dummies fonksiyonu bizden bir DataFrame, Series 
+ya da dolaşılabilir herhangi bir nesneyi alır. Eğer biz get_dummies fonksiyonuna 
+bütün bir DataFrame geçirirsek fonksiyon oldukça akıllı davranmaktadır. Bu durumda 
+fonksiyon DataFrame nesnesi içerisindeki yazısal sütunları tespit eder. Yalnızca 
+yazısal sütunları "one hot encoding" işlemine sokar ve bize yazısal sütunları 
+dönüştürülmüş yeni bir DataFrame nesnesi verir. Pandas ile çalışırken bu fonksiyon 
+çok kolaylık sağlamaktadır.
 
 Biz aslında get_dummies fonksiyonu yoluyla yapmış olduğumuz işlemleri tek hamlede 
 yapabiliriz:
@@ -3290,6 +3291,7 @@ import pandas as pd
 df = pd.read_csv('C:/Users/Lenovo/Desktop/GitHub/YapayZeka/Src/1- DataPreparation/test.csv')    
 
 transformed_df = pd.get_dummies(df, dtype='uint8')
+print(transformed_df )
 
 
 Burada biz tek hamlede istediğimiz dönüştürmeyi yapabildik. Bu dönüştürmede yine 
