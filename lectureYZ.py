@@ -3866,7 +3866,6 @@ bunları bölerek dörtlü bir listeye geri dönmüştür.
 Keras'ta bir sinir ağı oluşturmanın çeşitli adımları vardır. Burada sırasıyla bu 
 adımlardan ve adımlarla ilgili bazı olgulardan bahsedeceğiz.
 
-
 1-) Öncelikle bir model nesnesi oluşturulmalıdır. tensorflow.keras modülü içerisinde 
 çeşitli model sınıfları bulunmaktadır. En çok kullanılan model sınıfı Sequential 
 isimli sınıftır. Tüm model sınıfları Model isimli sınıftan türetilmiştir. Sequential 
@@ -3883,7 +3882,7 @@ bu katmanlar da verilebilmektedir. Ancak sınıfın tipik kullanımında katmanl
 sonra izleyen maddelerde ele alınacağı gibi sırasıyla eklenmektedir.
 
 ---------------------------------------------------------------------------------
-
+---------------------------------------------------------------------------------
 2-) Model nesnesinin yaratılmasından sonra katman nesnelerinin oluşturulup model nesnesine 
 eklenmesi gerekir. Keras'ta farklı gereksinimler için farklı katman sınıfları 
 bulundurulmuştur. En çok kullanılan katman sınıfı tensorflow.keras.layers modülündeki 
@@ -3918,14 +3917,14 @@ Dense fonksiyonun use_bias parametresi default durumda True biçimdedir. Bu para
 katmandaki nöronlarda "bias" değerinin kullanılıp kullanılmayacağını belirtmektedir. 
 
 Metodun kernel_initializer parametresi katmandaki nöronlarda kullanılan w parametrelerinin 
-ilkdeğerlerinin rastgele biçimde hangi algoritmayla oluşturulacağını belirtmektedir. 
-Bu parametrenin default değeri "glorot_unfiorm" biçimindedir. 
+ilk değerlerinin rastgele biçimde hangi algoritmayla oluşturulacağını belirtmektedir. 
+Bu parametrenin default değeri "glorot_uniform" biçimindedir. 
 
 Metodun bias_initializer parametresi ise katmandaki nöronların "bias" değerlerinin 
 başlangıçta nasıl alınacağını belirtmektedir. Bu parametrenin default değeri de 
 "zero" biçimdedir. Yani bias değerleri başlangıçta 0 durumundadır.
 
-
+---------------------------------------------------------------------------------
 Keras'ta Sequential modelde girdi katmanı programcı tarafından yaratılmaz. İlk 
 saklı katman yaratılırken girdi katmanındaki nöron sayısı input_dim parametresiyle 
 ya da input_shape parametresiyle belirtilmektedir. input_dim tek boyutlu girdiler için 
@@ -3936,7 +3935,7 @@ layer = Dense(100, activation='relu', input_dim=8) # tek boyutlu 8 tane nöronda
 input_shape= (10,10) # girdi katmanı 2 boyutlu 10'a 10'luk matris demek
 
 Tabii input_dim ya da input_shape parametrelerini yalnızca ilk saklı katmanda kullanabiliriz. 
-Genel olarak ağın girdi katmanında dataset_x'tekü sütun sayısı kadar nöron olacağına 
+Genel olarak ağın girdi katmanında dataset_x'teki sütun sayısı kadar nöron olacağına 
 göre ilk katmandaki input_dim parametresini aşağıdaki gibi de girebiliriz:
 
 layer = Dense(100, activation='relu', input_dim= training_dataset_x.shape[1])
@@ -4073,7 +4072,7 @@ Loss fonksiyonları ağın ürettiği değerlerle gerçek değerler arasındaki 
 temsil eden fonksiyonlardır. Loss fonksiyonları genel olarak iki girdi alıp bir 
 çıktı vermektedir. Loss fonksiyonunun girdileri gerçek değerler ile ağın ürettiği 
 değerlerdir. Çıktı değeri ise aradaki farklığı belirten bir değerdir. Eğitim sırasında 
-gitgide loss fonksiyonun değerinin düşmesini bekleriz. Tabii loss değerinin düşmesi 
+git gide loss fonksiyonun değerinin düşmesini bekleriz. Tabi loss değerinin düşmesi 
 aslında ağın gerçek değerlere daha yakın değerler üretmesi anlamına gelmektedir.
 
 Loss fonksiyonları çıktının biçimine yani problemin türüne bağlı olarak seçilmektedir. 
@@ -4164,7 +4163,7 @@ model.compile(optimizer='rmsprop', loss='binary_crossentropy', metrics=['binary_
 
 ---------------------------------------------------------------------------------
 5) Model derlenip çeşitli belirlemeler yapıldıktan sonra artık gerçekten eğitim 
-aşamasına geçilir. Eğitim süreci Sequential sınıfının fit metoduyle yapılmaktadır. 
+aşamasına geçilir. Eğitim süreci Sequential sınıfının fit metoduyla yapılmaktadır. 
 fit metodunun en önemli parametresi ilk iki parametre olan x ve y veri kümeleridir. 
 Biz burada training_dataset_x ve training_dataset_y verilerini fit metodunun ilk 
 iki parametresine geçirmeliyiz.
@@ -4203,7 +4202,7 @@ işlemi kesebilir. Eğitim sırasında Keras bizim belirlediğimiz fonksiyonlar�
 Buna Keras'ın "callback" mekanizması denilmektedir. Uygulamacı bu yolla model belli 
 bir duruma geldiğinde eğitim işlemini kesebilir. Ya da uygulamacı eğer eğitim çok 
 uzamayacaksa yüksek bir epoch ile eğitimini yapabilir. İşlemler bitince epoch'lardaki 
-performansa bakabilir. Olması gerekn epoch değerini kestirebilir. Sonra modeli 
+performansa bakabilir. Olması gereken epoch değerini kestirebilir. Sonra modeli 
 yeniden bu sayıda epoch ile eğitir. 
 
 fit metodunun shuffle parametresi her epoch'tan sonra eğitim veri kümesinin karıştırılıp 
@@ -4227,7 +4226,7 @@ belirtmektedir.
 fit metodu işin başında eğitim veri kümesini eğitimde kullanılacak kısım ile sınamada 
 kullanılacak kısım biçiminde ikiye ayırmaktadır. Sonra her epoch'ta yalnızca eğitimde 
 kullanılacak kümeyi karıştırmaktadır. Sınama işlemi aynı kümeyle her epoch sonrasında 
-karıştırılmadan yapılmaktadır. fit metodunda ayrıca bir de validation_data isimli 
+karıştırılmadan yapılmaktadır. fit metodunda ayrıca birde validation_data isimli 
 bir parametre vardır. Bu parametre sınama verilerini girmek için kullanılmaktadır. 
 Bazen programcı sınama verilerinin eğitim veri kümesinden çekilip alınmasını istemez. 
 Onu ayrıca fit metoduna vermek isteyebilir. Tabii validation_data parametresi girildiyse 
@@ -4323,7 +4322,7 @@ epoch'ları uygun bir noktada kesmek gerekir.
 edilmesi gerekir. Bu işlem Sequential sınıfının evaluate isimli metodu ile yapılmaktadır.
 evaluate metodunun ilk iki parametresi test_dataset_x ve test_dataset_y değerlerini 
 almaktadır. Diğer bir parametresi yine batch_size parametresidir. Buradaki bacth_size 
-eğitim işlemi yapılırken fit metodunda kullanılan batch_size ile benzer anlamdadır 
+eğitim işlemi yapılırken fit metodunda kullanılan batch_size ile benzer anlamdadır, 
 ancak işlevleri farklıdır. Model test edilirken test işlemi de birer birer değil batch 
 batch yapılabilir. Ancak bu batch'ler arasında herhangi bir şey yapılmamaktadır. 
 (Eğitim sırasındaki batch işlemleri sonrasında ağ parametrelerinin ayarlandığını 
@@ -4362,6 +4361,51 @@ girdi katmanına uygulanacak sütun verilerini veriririz. predict metodu da bize
 İKİ BOYUTLU bir numpy dizisi vermeliyiz. Çünkü predict metodu tek hamlede birden 
 çok satır için kestirim yapabilmektedir. Biz predict metoduna bir satır verecek 
 olsak bile onu İKİ BOYUTLU  bir matris biçiminde vermeliyiz.
+
+predict_dataset = np.array([[2 ,90, 68, 12, 120, 38.2, 0.503, 28],
+                            [4, 111, 79, 47, 207, 37.1, 1.39, 56],
+                            [3, 190, 65, 25, 130, 34, 0.271, 26],
+                            [8, 176, 90, 34, 300, 50.7, 0.467, 58],
+                            [7, 106, 92, 18, 200, 35, 0.300, 48]])
+
+predict_result = model.predict(predict_data)
+print(predict_result)
+
+predict metodu bize tahmin edilen değerleri iki boyutlu bir NumPy dizisi biçiminde 
+vermektedir. Bunun nedeni aslında ağın birden fazla çıktısının olabilmesidir. Örneğin 
+ağın bir çıktısı varsa bu durumda predict metodu bize "n tane satırdan 1 tane 
+sütundan" oluşan bir matris, ağın iki çıktısı varsa "n tane satırdan 2 iki tane 
+sütundan oluşan bir matris verecektir. O halde örneğin çıktı olarak tek nöronun 
+bulunduğu bir ağda ("diabetes" örneğindeki gibi) biz kestirim değerlerini şöyle 
+yazdırabiliriz:
+
+for i in range(len(predict_result)):
+    print(predict_result[i, 0])
+
+Ya da şöyle yazdırabiliriz:
+
+for result in predict_result[:, 0]:
+    print(result)
+
+Tabii iki boyutlu diziyi Numpy'ın flatten metoduyla ya da ravel metoduyla tek 
+boyutlu hale getirerek de yazırma işlemini yapabilirdik:
+
+for val in predict_result.flatten():
+    print(val)
+
+--------------------------------------------------------------------------------- 
+predict metodu bize ağın çıktı değerini vermektedir. Yukarıdaki "diabetes.csv" 
+örneğimizde ağın çıktı katmanındaki aktivasyon fonksiyonunun "sigmoid" olduğunu 
+anımsayınız. Sigmoid fonksiyonu 0 ile 1 arasında bir değer vermektedir. O halde 
+biz ağın çıktısındaki değer 0.5'ten büyükse ilgili kişinin şeker hastası olduğu 
+(çünkü 1'e daha yakındır), 0.5'ten küçükse o kişinin şeker hastası olmadığı 
+(çünkü 0'a daha yakındır) sonucunu çıkartabiliriz. O halde sigmoid fonksiyonun 
+çıktısının bir olasılık belirttiğini söyleyebiliriz. Bu durumda kişinin şeker 
+hastası olup olmadığı ağın çıktı değerinin 0.5'ten büyük olup olmamasıyla 
+kesitirilebilir:
+    
+for result in predict_result[:, 0]:
+    print('Şeker hastası' if result > 0.5 else 'Şeker Hastası Değil')   
 
 --------------------------------------------------------------------------------- 
 """
