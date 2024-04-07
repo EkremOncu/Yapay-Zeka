@@ -4409,3 +4409,68 @@ for result in predict_result[:, 0]:
 
 --------------------------------------------------------------------------------- 
 """
+
+"""
+--------------------------------------------------------------------------------- 
+# Deep Learning (Derin Öğrenme)
+
+Şimdi yukarıdaki adımların bazı detayları üzerinde duralım. Daha önceden de belirttiğimiz 
+gibi pek çok problem iki saklı katmanla ve Dense bir bağlantı ile tatminkar biçimde 
+çözülebilmektedir. Dolayısıyla bizim ilk aklımıza gelen model iki saklı katmanlı 
+klasik modeldir. Ancak özel problemler (şekil tanıma, yazıdan anlam çıkartma, 
+görüntü hakkında çıkarım yapma gibi) iki saklı katmanla tatminkar biçimde çözülememektedir. 
+Bu durumda ikiden fazla saklı katman kullanılır. Bu modellere "derin öğrenme 
+(deep learning)" modelleri de denilmektedir. 
+
+Girdi katmanındaki nöron sayısı zaten problemdeki sütun sayısı (feature sayısı kadar) 
+olmalıdır. Tabii kategorik sütunlar "one hot encoding" işlemine sokulmalıdır. 
+Çıktı katmanındaki nöron sayıları ise yine probleme bağlı olmaktadır. İkili 
+sınıflandırma (binary classification) problemlerinde çıktı katmanı tek nörondan, 
+çoklu sınıflandırma problemlerinde (multiclass classification) çıktı katmanı sınıf 
+sayısı kadar nörondan oluşur. Lojistik olmayan regresyon problemlerinde ise çıktı
+katmanındaki nöron sayıları genellikle bir tane olmaktadır.
+
+--------------------------------------------------------------------------------- 
+Saklı katmanlardaki nöron sayıları için çok pratik şeyler söylemek zordur. Çünkü 
+saklı katmanlardaki nöron sayıları bazı faktörlere de bağlı olabilmektedir. Örneğin 
+eğitimde kullanılacak veri miktarı, problemin karmaşıklığı, hyper parametrelerin 
+durumları saklı katmanlardaki nöron sayıları üzerinde etkili olabilmektedir. Saklı 
+katmanlardaki nöron sayıları için şunlar söylenebilir:
+    
+- Problem karmaşıklaştıkça saklı katmanlardaki nöron sayılarını artırmak uygun 
+olabilmektedir. 
+
+- Saklı katmanlarda çok az nöron bulundurmak "underfitting" yani yetersiz öğrenmeye 
+yol açabilmektedir. 
+
+- Saklı katmanlarda gereksiz biçimde fazla sayıda nöron bulundurmak eğitim süresini 
+uzatabileceği gibi hem de "overfitting" durumuna yol açabilir. Aynı zamanda modelin 
+diskte saklanması için gereken disk alanını da artırabilmektedir.
+
+- Eğitim veri kümesi azsa saklı katmanlardaki nöron sayıları düşürülebilir. 
+
+- Pek çok problemde saklı katmanlardaki nöron sayıları çok fazla ya da çok az 
+olmadıktan sonra önemli olmayabilmektedir. 
+
+- Saklı katmanlardaki nöron sayısı girdi katmanındaki nöron sayısından az olmamlıdır. 
+
+--------------------------------------------------------------------------------- 
+Çeşitli kaynaklar saklı katmanlardaki nöronların sayıları için ise üstünkörü şu pratik 
+tavsiyelerde bulunmaktadır:
+
+- Saklı katmanlardaki nöronların sayıları girdi katmanındaki nöronların sayılarının 
+2/3'ü ile çıktı katmanındaki nöronların sayısının toplamı kadar olabilir. Örneğin 
+girdi katmanındaki nöron sayısı 5, çıktı katmanındaki 1 olsun. Bu durumda saklı 
+katmandaki nöron sayısı 5 olabilir. 
+
+- Saklı katmandaki nöronların sayısı girdi katmanındaki nöron sayısının iki 
+katından fazla olmamalıdır.
+
+--------------------------------------------------------------------------------- 
+"""        
+
+
+
+
+
+
