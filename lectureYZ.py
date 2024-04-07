@@ -4469,7 +4469,124 @@ katından fazla olmamalıdır.
 --------------------------------------------------------------------------------- 
 """        
 
+"""
+--------------------------------------------------------------------------------- 
+Yapay sinir ağı her farklı eğitimde farklı "w" ve "bias" değerlerini oluşturabilir. 
+Yani ağın peformansı eğitimden eğitime değişebilir. Her eğitimde ağın farklı 
+değerlere konumlanırılmasının nedenleri şunlardır:
 
+1) train_test_split fonksiyonu her çalıştırıldığında aslında fonksiyon training_dataset 
+ve test_dataset veri kümelerini karıştırarak elde etmektedir. 
+
+2) Katmanlardaki "w" değerleri (ve istersek "bias" değerleri) programın her 
+çalıştırılmasında rastgele başlangıç değerleriyle set edilmektedir.
+
+3) fit işleminde her epoch sonrasında veri kümesi yeniden karıştırılmaktadır. 
+
+Bir rastgele sayı üretiminde üretim aynı "tohum değerden (seed)" başlatılırsa hep 
+aynı değerler elde edilir. Bu duruma rassal sayı üretiminin "reproducible olması" 
+denmektedir. Eğer tohum değer belirtilmezse NumPy ve Tensorflow gibi kütüphanelerde 
+bu tohum değer programın her çalıştırılmasında rastgele biçimde bilgisayarın 
+saatinden alınmaktadır. 
+
+--------------------------------------------------------------------------------- 
+O halde eğitimden hep aynı sonucun elde edilmesi için (yani eğitimin "reproducible" 
+hale getirilmesi için) yukarıdaki unsurların dikkate alınması gerekir. Tipik 
+yapılması gereken birkaç şeyi şöyle belirtebiliriz:
+
+1) scikit-learn makine öğrenmesi kütüphanelerinde aşağı seviyeli kütüphane olarak 
+NumPy kullanıldığı için NumPy'ın rassal sayı üreticisinin tohum değeri belli bir 
+değerle set edilebilir. Örneğin:
+
+import numpy as np
+
+np.random.seed(12345)
+
+
+2) Tensorflow kütüphanesi bazı işlemlerde kendi rassal sayı üreticisini kullanmaktadır. 
+Onun tohum değeri de belli bir değerle set edilebilir. Örneğin:
+
+from tensorflow.keras.utils import set_random_seed
+
+set_random_seed(78901)
+
+
+Tabii yukarıdaki işlemler yapılsa bile rassal sayı üretimi "reproducible" hale 
+getirilemeyebilir. Çünkü bu durum bu kütüphanelerin rassal sayı üretiminin hangi 
+kütüphaneler kullanılarak yapıldığı ile ilgilidir. Yukarıdaki iki madde sezgisel 
+bir çıkarımı ifade etmektedir.    
+
+Pekiyi neden ağın her eğitilmesinde aynı sonuçların elde edilmesi (yani ağın 
+"reproducible" sonuçlar vermesini) isteyebiliriz? İşte bazen modellerimizde ve 
+algoritmalarımızda yaptığımız değişiklikleri birbirleriyle kıyaslamak isteyebiliriz. 
+Bu durumda kıyaslamanın hep aynı biçimde yapılmasını sağlayabilmek için rassal 
+bir biçimde alınan değerlerin her çalıştırmada aynı değerler olmasını sağlamamız 
+gerekir. Tabii aslında algoritmaları karşılaştırmak için bu biçimde "reproducible" 
+rassal sayı üretimi yapmak yerine algoritmaları çokça çalıştırıp bir ortalama 
+değere de bakılabilir. 
+
+O halde biz bu iki ayarlamayı yaparak yukarıdaki modelimizi çalıştırırsak bu durumda 
+her eğitimde ve test işleminde aynı sonucu elde edebiliriz.
+
+Aşağıda buna bir örnek verilmiştir. 
+
+--------------------------------------------------------------------------------- 
+import pandas as pd
+import numpy as np
+from tensorflow.keras.utils import set_random_seed
+
+np.random.seed(1234567)
+set_random_seed(678901)
+
+df = pd.read_csv('diabetes.csv')
+
+from sklearn.impute import SimpleImputer
+
+si = SimpleImputer(strategy='mean', missing_values=0)
+
+df[['Glucose', 'BloodPressure', 'SkinThickness', 'Insulin', 'BMI']] = si.fit_transform(df[['Glucose', 'BloodPressure', 'SkinThickness', 'Insulin', 'BMI']])
+
+dataset = df.to_numpy()
+
+dataset_x = dataset[:, :-1]
+dataset_y = dataset[:, -1]
+
+from sklearn.model_selection import train_test_split
+
+training_dataset_x, test_dataset_x, training_dataset_y, test_dataset_y = train_test_split(dataset_x, dataset_y, test_size=0.2)
+
+from tensorflow.keras import Sequential
+from tensorflow.keras.layers import Input, Dense
+
+model = Sequential(name='Diabetes')
+
+model.add(Input((training_dataset_x.shape[1],)))
+model.add(Dense(16, activation='relu', name='Hidden-1'))
+model.add(Dense(16, activation='relu', name='Hidden-2'))
+model.add(Dense(1, activation='sigmoid', name='Output'))
+model.summary()
+
+model.compile(optimizer='rmsprop', loss='binary_crossentropy', metrics=['binary_accuracy'])
+model.fit(training_dataset_x, training_dataset_y, batch_size=32, epochs=100, validation_split=0.2)
+eval_result = model.evaluate(test_dataset_x, test_dataset_y, batch_size=32)
+
+for i in range(len(eval_result)):
+    print(f'{model.metrics_names[i]}: {eval_result[i]}')
+
+predict_dataset = np.array([[2 ,90, 68, 12, 120, 38.2, 0.503, 28],
+                            [4, 111, 79, 47, 207, 37.1, 1.39, 56],
+                            [3, 190, 65, 25, 130, 34, 0.271, 26],
+                            [8, 176, 90, 34, 300, 50.7, 0.467, 58],
+                            [7, 106, 92, 18, 200, 35, 0.300, 48]])
+
+predict_result = model.predict(predict_dataset)
+print(predict_result)
+
+for result in predict_result[:, 0]:
+    print('Şeker hastası' if result > 0.5 else 'Şeker Hastası Değil')
+
+--------------------------------------------------------------------------------- 
+"""    
 
 
 
