@@ -4469,6 +4469,9 @@ katından fazla olmamalıdır.
 --------------------------------------------------------------------------------- 
 """        
 
+
+# reproducible traning
+
 """
 --------------------------------------------------------------------------------- 
 Yapay sinir ağı her farklı eğitimde farklı "w" ve "bias" değerlerini oluşturabilir. 
@@ -4588,9 +4591,12 @@ for result in predict_result[:, 0]:
 --------------------------------------------------------------------------------- 
 """    
 
+
+# Aktivasyon Fonksiyonları
+
 """
 --------------------------------------------------------------------------------- 
-# Aktivasyon Fonksiyonları
+
 
 Katmanlardaki aktivasyon fonksiyonları ne olmalıdır? Girdi katmanı gerçek bir katman olmadığına göre orada bir aktivasyon 
 fonksiyonu yoktur. Saklı katmanlardaki aktivasyon fonksiyonları için çeşitli seçenekler bulunmaktadır.
@@ -4940,5 +4946,47 @@ plt.show()
 """
 
 
+# Loss Fonksiyonları
+
+"""
+--------------------------------------------------------------------------------- 
+loss fonksiyonları gerçek değerlerle ağın tahmin ettiği değerleri girdi olarak 
+alıp bu farklılığı bir sayısal sayısal değerle ifade eden fonksiyonlardır. Optimizasyon 
+algoritmaları bu loss fonksiyonlarının değerini düşürmeye çalışmaktadır. Gerçek
+değerlerle ağın ürettiği değerlerin arasındaki farkın minimize edilmesi aslında 
+ağın gerçek değerlere yakın değerler üretmesi anlamına gelmektedir. 
+
+Eğitim batch batch yapıldığı için loss fonksiyonları tek bir satırın çıktısından 
+değil n tane satırın çıktısından hesaplanmaktadır. Yani bir batch işleminin gerçek 
+sonucu ile ağdan o batch için elde edilecek kestirim sonuçlarına dayanılarak loss 
+değerleri hesaplanmaktadır. Örneğin batch_size = 32 olduğu durumda aslında Keras 
+ağa 32'lik bir giriş uygulayıp 32'lik bir çıktı elde eder. Bu 32 çıktı değeri 
+gerçek 32 değerle loss fonksiyonuna sokulur.
+
+--------------------------------------------------------------------------------- 
+Lojistik olmayan regresyon problemleri için en yaygın kullanılan loss fonksiyonu 
+"Mean Squared Error (MSE)" denilen fonksiyondur.  Bu fonksiyona Türkçe "Ortalama 
+Karesel Hata" diyebiliriz.  MSE fonksiyonu çıktı olarak gerçek değerlerden kestirilen 
+değerlerin farkının karelerinin ortalamasını vermektedr. Fonksiyonun sembolik 
+gösterimi şöyledir:
+
+mse = np.mean((y - y_hat) ** 2)
+
+Burada y gerçek değerleri, y_hat ise kestirilen değerleri belirtmektedir. Örneğin:
+
+>>> y = np.array([1, 2, 3, 4, 5])
+>>> y_hat = np.array([1.1, 1.9, 3.2, 3.8, 5.02])
+>>> np.mean((y - y_hat) ** 2)
+0.020080000000000032
+
+Aynı işlemi tensorflow.keras.losses modülündeki mse (ya da mean_squared_error) 
+fonksiyonuyla da aşağıdaki gibi yapabilirdik:
+
+>>> from tensorflow.keras.losses import mse
+>>> mse(y, y_hat)
+<tf.Tensor: shape=(), dtype=float64, numpy=0.020080000000000032>
+
+---------------------------------------------------------------------------------
+"""
 
 
