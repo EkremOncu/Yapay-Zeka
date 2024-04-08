@@ -4588,6 +4588,225 @@ for result in predict_result[:, 0]:
 --------------------------------------------------------------------------------- 
 """    
 
+"""
+--------------------------------------------------------------------------------- 
+# Aktivasyon Fonksiyonları
 
+Katmanlardaki aktivasyon fonksiyonları ne olmalıdır? Girdi katmanı gerçek bir katman olmadığına göre orada bir aktivasyon 
+fonksiyonu yoktur. Saklı katmanlardaki aktivasyon fonksiyonları için çeşitli seçenekler bulunmaktadır.
+
+Özellikle son yıllarda saklı katmanlarda en fazla tercih edilen aktivasyon fonksiyonu 
+"relu (rectified linear unit)" denilen aktivasyon fonksiyonudur. Bu fonksiyona 
+İngilizce "rectifier" da denilmektedir.  Relu fonksiyonu şöyledir:
+
+x >= 0  ise y = x
+x < 0   ise 0
+
+Yani relu fonksiyonu x değeri 0'dan büyük ise (ya da eşit ise) aynı değeri veren, 
+x değeri 0'dan küçük ise 0 değerini veren fonksiyondur. relu fonksiyonunu basit 
+bir biçimde aşağıdaki gibi yazabiliriz:
+
+def relu(x):
+  return np.maximum(x, 0)  
+
+NumPy kütüphanesinin maximum fonksiyonunun birinci parametresi bir NumPy dizisi 
+ya da Python listesi biçiminde girilirse fonksiyon bu dizinin ya da listenin her 
+elemanı ile maximum işlemi yapmaktadır. Örneğin:
+
+>>> import numpy as np
+>>> x = [10, -4, 5, 8, -2]
+>>> y = np.maximum(x, 3)
+>>> y
+array([10,  3,  5,  8,  3])
+
+Relu fonksiyonun grafiği aşağıdaki gibi çizilebilir. 
+
+--------------------------------------------------------------------------------- 
+import numpy as np
+import matplotlib.pyplot as plt
+
+def relu(x):
+      return np.maximum(x, 0)  
+
+x = np.linspace(-10, 10, 1000)
+y = relu(x)
+
+plt.title('Relu Function', fontsize=14, fontweight='bold', pad=20)
+axis = plt.gca()
+axis.spines['left'].set_position('center')
+axis.spines['bottom'].set_position('center')
+axis.spines['top'].set_color(None)
+axis.spines['right'].set_color(None)
+axis.set_ylim(-10, 10)
+plt.plot(x, y, color='red')
+plt.show()
+
+--------------------------------------------------------------------------------- 
+Aktivasyon fonksiyonları katman nesnelerine isimsel girilebileceği gibi 
+tensorflow.keras.activations modülündeki fonksiyonlar biçiminde de  girilebilir. 
+Örneğin:
+
+from tensorflow.keras.activations import relu
+...
+model.add(Dense(16, activation=relu, name='Hidden'))
+
+
+Bu modüldeki fonksiyonlar keras Tensorflow kullanılarak yazıldığı için çıktı olarak 
+Tensor nesneleri vermektedir. Biz relu grafik çizdirirken fonksiyonunu kendimiz 
+yazmak yerine tensorflow içerisindeki fonksiyonu doğurdan kullanabiliriz. Tensor
+nesnelerinin NumPy dizilerine dönüştürülmesi için Tensor sınıfının numpy metodu 
+kullanılabilir. Örneğin:
+
+    
+from tensorflow.keras.activations import relu
+
+x = np.linspace(-10, 10, 1000)
+y = relu(x).numpy()
+
+--------------------------------------------------------------------------------- 
+import numpy as np
+import matplotlib.pyplot as plt
+
+x = np.linspace(-10, 10, 1000)
+
+# y = relu(x)
+
+from tensorflow.keras.activations import relu
+y = relu(x)
+
+plt.title('Relu Function', fontsize=14, fontweight='bold', pad=20)
+axis = plt.gca()
+axis.spines['left'].set_position('center')
+axis.spines['bottom'].set_position('center')
+axis.spines['top'].set_color(None)
+axis.spines['right'].set_color(None)
+axis.set_ylim(-10, 10)
+plt.plot(x, y, color='red')
+plt.show()
+
+--------------------------------------------------------------------------------- 
+
+--------------------------------------------------------------------------------- 
+İkili sınıflandırma problemlerinde çıktı katmanında en fazla kullanılan aktivasyon 
+fonksiyonu "sigmoid" denilen fonksiyondur. Yukarıdaki "diabetes" örneğinde biz çıktı 
+katmanında sigmoid fonksiyonunu kullanmıştık. Gerçekten de ikili sınıflandırma 
+problemlerinde ağın çıktı katmanında tek bir nöron bulunur ve bu nörounun da 
+aktivasyon fonksiyonu "sigmoid" olur. 
+
+Pekiyi sigmoid nasıl bir fonksiyondur? Bu fonksiyona "lojistik (logistic)" fonksiyonu 
+da denilmektedir. Fonksiyonun matematiksel ifadesi şöyledir:
+
+y = 1 / (1 + e ** -x)
+
+Burada e değeri 2.71828... biçiminde irrasyonel bir değerdir. Yukarıdaki kesrin 
+pay ve paydası e ** x ile çarpılırsa fonksiyon aşağıdaki gibi de ifade edilebilir:
+
+y = e ** x / (1 + e ** x)
+
+Fonksiyona "sigmoid" isminin verilmesinin nedeni S şekline benzemesinden dolayıdır. 
+Sigmoid eğrisi x = 0 için 0.5 değerini veren x pozitif yönde arttıkça 1 değerine 
+hızla yaklaşan, x negatif yönde arttıkça 0 değerine hızla yaklaşan S şeklinde bir 
+eğridir. Sigmoid fonksiyonunun (0, 1) arasında bir değer verdiğine dikkat ediniz. 
+x değeri artıkça eğri 1'e yaklaşır ancak hiçbir zaman 1 olmaz. Benzer biçimde x 
+değeri azaldıkça eğri 0'a yaklaşır ancak hiçbir zaman 0 olmaz. 
+
+Sigmoid fonksiyonu makine öğrenmesinde ve istatistikte belli bir gerçek değeri 0 
+ile 1 arasına hapsetmek için sıkça kullanılmaktadır. Sigmoid çıktısı aslında bir 
+bakımdan çıktının 1 olma olasılığını vermektedir. Tabii biz kestirimde bulunurken 
+kesin bir yargı belirteceğimiz için eğrinin orta noktası olan 0.5 değerini referans 
+alırız. Ağın ürettiği değer 0.5'ten büyükse bunu 1 gibi, 0.5'ten küçükse 0 gibi 
+yorumlayabiliriz.  Sigmoid eğrisi aşağıdaki gibi çizilebilir.
+
+--------------------------------------------------------------------------------- 
+import numpy as np
+import matplotlib.pyplot as plt
+
+x = np.linspace(-10, 10, 1000)
+y = np.e ** x / (1 + np.e ** x)
+
+plt.title('Sigmoid (Logistic) Function', fontsize=14, pad=20, fontweight='bold')
+axis = plt.gca()
+axis.spines['left'].set_position('center')
+axis.spines['bottom'].set_position('center')
+axis.spines['top'].set_color(None)
+axis.spines['right'].set_color(None)
+
+axis.set_ylim(-1, 1)
+
+plt.plot(x, y)
+plt.show()
+
+
+Yine benzer biçimde tensorflow.keras.activations modülü içerisinde sigmoid fonksiyonu 
+zaten hazır biçimde bulunmaktadır. Tabii bu fonksiyon da bize Tensorflow'daki bir 
+Tensor nesnesini vermektedir.
+
+--------------------------------------------------------------------------------- 
+Sigmoid fonksiyonu nasıl ortaya çıkartılmıştır. Aslında bu fonksiyonun elde edilmesinin 
+bazı mantıksal gerekçeleri vardır. Ayrıca sigmoid fonksiyonunun birinci türevi 
+Gauss eğrisine bencemektedir. Aşağıdaki örnekte Sigmoid fonksiyonunun birinci 
+türevi alınıp eğrisi çizdirilmiştir. Ancak bu örnekte henüz görmediğimiz SymPy 
+kütüphanesini kullandık. Sigmoid fonksiyonun birinci türevi şöyledir:
+
+sigmoid'(x) = exp(x)/(exp(x) + 1) - exp(2*x)/(exp(x) + 1)**2
+
+--------------------------------------------------------------------------------- 
+import sympy
+from sympy import init_printing
+
+init_printing()
+
+x = sympy.Symbol('x')
+fx = sympy.E ** x / (1 + sympy.E ** x)
+dx = sympy.diff(fx, x)
+
+print(dx)
+
+import numpy as np
+
+np.linspace(-10, 10, 1000)
+pdx = sympy.lambdify(x, dx)
+
+x = np.linspace(-10, 10, 1000)
+y = pdx(x)
+
+import matplotlib.pyplot as plt
+
+plt.title('First Derivative of Sigmoid Function', fontsize=14, pad=20, fontweight='bold')
+axis = plt.gca()
+axis.spines['left'].set_position('center')
+axis.spines['bottom'].set_position('center')
+axis.spines['top'].set_color(None)
+axis.spines['right'].set_color(None)
+
+axis.set_ylim(-0.4, 0.4)
+
+plt.plot(x, y)
+plt.show()
+
+--------------------------------------------------------------------------------- 
+
+--------------------------------------------------------------------------------- 
+Diğer çok kullanılan bir aktivasyon fonksiyonu da "hiperbolik tanjant" fonksiyonudur. 
+Bu fonksiyona kısaca "tanh" fonksiyonu da denilmektedir. Fonksiyonun matematiksel 
+ifadesi şöyledir:
+
+f(x) = (e ** (2 * x) - 1) / (e ** (2 * x) + 1)
+
+Fonksiyonun sigmoid fonksiyonuna benzediğine ancak üstel ifadenin x yerine 2 * x 
+olduğuna dikkat ediniz. Tanh fonksiyonu adeta sigmoid fonksiyonunun (-1, +1) arası 
+değer veren biçimi gibidir. Fonksiyon yine S şekli biçimindedir. Orta noktası 
+x = 0'dadır.
+
+Tanh fonksiyonu saklı katmanlarda da bazen çıktı katmanlarında da kullanılabilmektedir. 
+Eskiden bu fonksiyon çok yoğun kullanılıyordu. Ancak artık saklı katmanlarda en 
+çok relu fonksiyonu tercih edilmektedir. Fakat tanh fonksiyonunun daha iyi sonuç 
+verdiği modeller de bulunmaktadır. 
+
+tanh fonksiyonu Keras'ta tensorflow.keras.activations modülünde tanh ismiyle de 
+bulunmaktadır.
+
+--------------------------------------------------------------------------------- 
+"""
 
 
