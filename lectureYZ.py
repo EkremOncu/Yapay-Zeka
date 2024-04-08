@@ -4807,6 +4807,138 @@ tanh fonksiyonu Keras'ta tensorflow.keras.activations modülünde tanh ismiyle d
 bulunmaktadır.
 
 --------------------------------------------------------------------------------- 
+import numpy as np
+import matplotlib.pyplot as plt
+
+x = np.linspace(-10, 10, 1000)
+y = (np.e ** (2 * x) - 1) / (np.e ** (2 * x) + 1)
+
+plt.title('Hiperbolik Tanjant (tanh) Fonksiyonunun Grafiği', fontsize=14, pad=20, fontweight='bold')
+axis = plt.gca()
+axis.spines['left'].set_position('center')
+axis.spines['bottom'].set_position('center')
+axis.spines['top'].set_color(None)
+axis.spines['right'].set_color(None)
+
+axis.set_ylim(-1, 1)
+
+plt.plot(x, y)
+plt.show()
+
+---------------------------------------------------------------------------------
+ 
+--------------------------------------------------------------------------------- 
+Diğer çok karşılaşılan bir aktivasyon fonksiyonu da "softmax" isimli fonksiyondur. 
+Softmax fonksiyonu çok sınıflı sınıflandırma problemlerinde çıktı katmanlarında 
+kullanılmaktadır. Bu aktivasyon fonksiyonu Keras'ta "softmax" ismiyle bulunmaktadır. 
+Örneğin bir resmin "elma", "armut", "kayısı", "şeftali", "karpuz" resimlerinden 
+hangisi olduğunu anlamak için kullanılan sınıflandırma modeli çok sınıflı bir 
+sınıflandırma modelidir. Buna istatistikte "çok sınıflı lojistik regresyon (multinomial 
+logistic regression)" da denilmektedir. Bu tür problemlerde sinir ağında sınıf 
+sayısı kadar nöron bulundurulur. Örneğin yukarıdaki "elma", "armut", "kayısı", 
+"şeftali", "karpuz" resim sınıflandırma probleminde ağın çıktısında 5 nöron bulunacaktır. 
+
+Ağın çıktı katmanındaki tüm nöronların aktivasyon fonksiyonları "softmax" yapılırsa 
+tüm çıktı katmanındaki nöronların çıktı değerlerinin toplamı her zaman 1 olur. 
+Böylece çıktı katmanındaki nöronların çıktı değerleri ilgili sınıfın olasılığını 
+belirtir hale gelir. Biz de toplamı 1 olan çıktıların en yüksek değerine bakarız 
+ve sınıflandırmanın o sınıfı kestirdiğini kabul ederiz. Örneğin yukarıdaki "elma", 
+"armut", "kayısı", "şeftali", "karpuz" sınıflandırma probleminde ağın çıktı 
+katmanındaki nöronların çıktı değerlerinin şöyle olduğunu varsayalım: 
+
+Elma Nöronunun Çıktısı ---> 0.2
+Armut Nöronunun Çıktısı ---> 0.2
+Kayısı Nöronunun Çıktısı ---> 0.3
+Şeftali Nöronunun Çıktısı ---> 0.2
+karpuz Nöronunun Çıktısı ---> 0.1
+
+Burada en büyük çıktı 0.3 olan kayısı nöronuna ilişkindir. O halde biz bu kestirimin 
+"kayısı" olduğuna karar veririz. Softmax fonksiyonu bir grup değer için o grup 
+değerlere bağlı olarak şöyle hesaplanmaktadır: 
+
+softmax(x) = np.e ** x / np.sum(np.e ** x)
+
+Burada gruptaki değerler x vektörüyle temsil edilmektedir.  Fonksiyonda değerlerinin 
+e tabanına göre kuvvetleri x değerlerinin e tabanına göre kuvvetlerinin toplamına 
+bölünmüştür. Bu işlemden yine gruptaki eleman sayısı kadar değer elde edilecektir. 
+Tabii bu değerlerin toplamı da 1 olacaktır. Örneğin elimizde aşağıdaki gibi x 
+değerleri olsun:
+    
+x = np.array([3, 6, 4, 1, 7])
+
+Şimdi bu x değerlerinin softmax değerlerini elde edelim:  
+
+>>> import numpy as np
+>>> x = np.array([3, 6, 4, 1, 7])
+>>> x
+array([3, 6, 4, 1, 7])
+>> sm = np.e ** x / np.sum(np.e ** x)
+>>> sm
+array([0.0127328 , 0.25574518, 0.03461135, 0.0017232 , 0.69518747])
+>>> np.sum(sm)
+1.0    
+
+--------------------------------------------------------------------------------- 
+
+--------------------------------------------------------------------------------- 
+Diğer çok kullanılan aktivasyon fonksiyonlarından biri de "linear" aktivasyon 
+fonksiyonudur. Aslında bu fonksiyon y = x ya da f(x) = x fonksiyonudur. Yani "linear" 
+fonksiyonu girdi ile aynı değeri üretmektedir. Başka bir deyişle bir şey yapmayan 
+bir fonksiyondur. Pekiyi böyle bir aktivasyon fonksiyonunun ne anlamı olabilir? 
+
+Bu aktivasyon fonksiyonu "regresyon problemlerinde (lojistik olmayan regresyon 
+problemlerinde)" çıktı katmanında kullanılmaktadır. Lojistik olmayan regresyon 
+problemleri çıktı olarak bir sınıf bilgisi değil gerçek bir değer bulmaya çalışan 
+problemlerdir. Örneğin bir evin fiyatının kestirilmesi, bir otomobilin mil başına 
+yaktığı yakıt miktarının kestirilemsi gibi problemler lojistik  olmayan regresyon 
+problemleridir. 
+
+Anımsanacağı gibi biz kursumuzda bir sayı kestirmek için kullanılan regresyon 
+modellerine vurgulama amaçlı "lojistik olmayan regresyon modelleri)" diyoruz. 
+Aslında "regresyon modeli" denildiğinde zaten default olarak lojistik olmayan 
+regresyon modelleri anlaşılmaktadır.
+
+linear aktivasyon fonksiyonu Keras'ta "linear" ismiyle kullanılmaktadır. Her ne 
+kadar bir şey yapmıyorsa da bu aktivasyon fonksiyonu aynı zamanda 
+tensorflow.keras.activations modülünde linear isimli bir fonksiyon biçiminde de 
+bulunmaktadır. Örneğin:
+
+>>> from tensorflow.keras.activations import linear
+>>> x = [1, 2, 3, 4, 5]
+>>> x = np.array([1, 2, 3, 4, 5], dtype=np.float64)
+>>> result = linear(x)
+>>> result
+array([1., 2., 3., 4., 5.])
+
+--------------------------------------------------------------------------------- 
+import numpy as np
+import matplotlib.pyplot as plt
+
+def linear(x):
+      return x
+
+x = np.linspace(-10, 10, 1000)
+y = linear(x)
+
+
+# from tensorflow.keras.activations import linear
+
+# y = linear(x).numpy()
+
+
+plt.title('Linear Function', fontsize=14, fontweight='bold', pad=20)
+axis = plt.gca()
+axis.spines['left'].set_position('center')
+axis.spines['bottom'].set_position('center')
+axis.spines['top'].set_color(None)
+axis.spines['right'].set_color(None)
+axis.set_ylim(-10, 10)
+plt.plot(x, y, color='red')
+plt.show()
+
+--------------------------------------------------------------------------------- 
 """
+
+
 
 
