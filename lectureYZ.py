@@ -5053,4 +5053,89 @@ Tabii aynı işlemi yine tensorflow.keras.losses modülündeki "mape" fonksiyonu
 <tf.Tensor: shape=(), dtype=float64, numpy=5.413333333333335>
 
 ---------------------------------------------------------------------------------
+
+---------------------------------------------------------------------------------
+Lojistik olmayan regresyon problemleri için diğer bir loss fonksiyonu da "Mean 
+Squared Logarithmic Error (MSLE)" isimli fonksiyondur.  Bu fonksiyon gerçek değerlerle 
+kestirilen değerlerin logaritmalarının farklarının karelerinin ortalaması 
+biçiminde hesaplanır. Sembolik ifadesi şöyledir:
+
+msle = np.mean((np.log(y) - np.log(y_hat)) ** 2)
+
+Bazen bu fonksiyon gerçek ve kestirilen değerlere 1 toplanarak da oluşturulabilmektedir.
+(Tensorflow "msle" fonksiyonunu bu biçimde kullanmaktadır):
+
+msle = np.mean((np.log(y + 1) - np.log(y_hat + 1)) ** 2)
+
+Örneğin:
+
+>>> y = np.array([1, 2, 3, 4, 5], dtype=np.float64)
+>>> y_hat = np.array([1.1, 1.9, 3.2, 3.8, 5.02])
+>>> msle = np.mean((np.log(y + 1) - np.log(y_hat + 1)) ** 2)
+>>> msle
+0.0015175569737783628
+
+Aynı işlemi tensorflow.keras.losses modülündeki "msle" fonksiyonuyla da yapabiliriz:
+
+>>>     
+>>> y = np.array([1, 2, 3, 4, 5], dtype=np.float64)
+>>> y_hat = np.array([1.1, 1.9, 3.2, 3.8, 5.02])
+>>> result = msle(y, y_hat)
+>>> result
+    <tf.Tensor: shape=(), dtype=float64, numpy=0.0015175569737783555>
+---------------------------------------------------------------------------------
+
+---------------------------------------------------------------------------------
+İkili sınıflandırma problemleri için en yaygın kullanılan loss fonksiyonu 
+"Binary Cross-Entropy (BCE)" denilen fonksiyondur. Bu fonksiyonun sembolik gösterimi 
+şöyledir:
+
+bce = -np.mean(y * np.log(y_hat) + (1 - y) * np.log(1 - y_hat))
+
+Burada bir toplam teriminin olduğunu görüyorsunuz. Gerçek değerler 0 ya da 1 olduğuna 
+göre bu toplam teriminin ya sol tarafı ya da sağ tarafı 0 olacaktır. Burada yapılmak 
+istenen şey aslında isabet olasılığının logaritmalarının ortalamasının alınmasıdır. 
+
+Örneğin gerçek y değeri 0 olsun ve ağda sigmoid çıktısından 0.1 elde etmiş olsun. 
+Bu durumda toplam ifadesinin sol tarafı 0, sağ tarafı ise log(0.9) olacaktır. Şimdi 
+gerçek değerin 1 ancak ağın sigmoid çıktısından elde edilen değerim 0.9 olduğunu 
+düşününelim. Bu kez toplamın sağ tarafı 0, sol tarafı ise log(0.9) olacaktır. İşte 
+fonksiyonda bu biçimde isabet olasılıklarının logaritmalarının ortalaması bulunmaktadır. 
+Örneğin:
+
+>>> y = np.array([1, 0, 1, 1, 0])
+>>> y_hat = np.array([0.9, 0.05, 0.095, 0.89, 0.111])
+>>> -np.mean(y * np.log(y_hat) + (1 - y) * np.log(1 - y_hat))
+0.5489448114302314
+
+Aynı işlemi tensorflow.keras.losses modülündeki binary_crossentropy isimli fonksiyonla 
+da yapabiliriz:
+
+>>> y_hat = np.array([0.9, 0.05, 0.095, 0.89, 0.111])
+>>> result = binary_crossentropy(y, y_hat)
+>>> result
+<tf.Tensor: shape=(), dtype=float64, numpy=0.5489445126600796>
+
+---------------------------------------------------------------------------------
+
+---------------------------------------------------------------------------------
+Cok sınıflı sınıflandırma problemleri için en yaygın kullanılan loss fonksiyonu 
+ise "Categorical Cross-Entropy (CCE)" isimli fonksiyondur. CCE fonksiyonu aslında 
+BCE fonksiyonun çoklu biçimidir. Tabii CCE değerini hesaplayabilmek için ağın 
+kategori sayısı kadar çıktıya sahip olması ve bu çıktıların toplamının da 1 olması 
+gerekmektedir. Başka bir deyişle ağın çıktı katmanındaki nöronların aktivasyon 
+fonksiyonları "softmax" olmalıdır. Ayrıca CCE çok sınıflı bir entropy hesabı 
+yaptığına göre gerçek değerlerin one hot encoding biçiminde kodlanmış olması gerekir. 
+(Yani örneğin ileride göreceğimiz gibi K sınıflı bir sınıflandırma problemi için 
+biz ağa çıktı olarak "one hot encoding" kodlanmış K tane y değerini vermeliyiz.) 
+K tane sınıf belirtem bir satırın CCE değeri şöyle hesaplanır (tabii burada K tane 
+"one hot encoding" edilmiş gerçek değer ile M tane softmax çıktı değeri söz konusu 
+olmalıdır):
+
+cce = -np.sum(yk * log(yk_hat))
+
+Burada yk one hot encoding yapılmış gerçek değerleri yk_hat ise softmax biçiminde 
+elde edilmiş ağın çıktı katmanındaki değerleri temsil etmektedir. 
+
+---------------------------------------------------------------------------------
 """
