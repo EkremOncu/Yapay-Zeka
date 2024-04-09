@@ -4987,6 +4987,70 @@ fonksiyonuyla da aşağıdaki gibi yapabilirdik:
 <tf.Tensor: shape=(), dtype=float64, numpy=0.020080000000000032>
 
 ---------------------------------------------------------------------------------
+
+---------------------------------------------------------------------------------
+Yine lojistik olmayan regresyon problemleri için kullanılabilen diğer bir loss 
+fonksiyonu da "Mean Absolute Error (MAE)" isimli fonksiyondur. Bu fonksiyona da 
+Türkçe "Ortalama Mutlak Hata" diyebiliriz. Ortalama mutlak hata gerçek değerlerden 
+kestirilen değerlerin farklarının mutlak değerlerinin ortalaması biçiminde 
+hesaplanmaktadır. Sembolik gösterimi şöyledir:
+
+mae = np.mean(np.abs(y - y_hat))
+
+Burada y gerçek değerleri y_hat ise ağın kestirdiği değerleri belirtmektedir. 
+Lojistik olmayan Regresyon problemleri için loss fonksiyonu olarak çoğu kez MSE 
+tercih edilmektedir. Çünkü kare alma işlemi algoritmalar için daha uygun bir işlemdir. 
+Aynı zamanda değerleri daha fazla farklılaştırmaktadır. MAE loss fonksiyonundan 
+ziyade metrik değer olarak "insan algısına yakınlık" oluşturduğu için tercih 
+edilmektedir. Örneğin:
+
+>>> y = np.array([1, 2, 3, 4, 5], dtype=np.float64)
+>>> y_hat = np.array([1.1, 1.9, 3.2, 3.8, 5.02])
+>>> mae = np.mean(np.abs(y - y_hat))
+>>> mae
+0.12400000000000003
+
+
+Ortalama karesel hata bir metrik değer olarak bizim için iyi bir çağrışım yapmamaktadır. 
+Halbuki ortalama mutlak hata bizim için anlamlı bir çağrışım yapmaktadır. Örneğin 
+ağımızın ortalama mutlak hatası 0.124 ise gerçek değer ağımızın bulduğu değerden 
+0.124 solda ya da sağda olabilir. 
+
+Yine ortalama mutlak hata tensorflow.keras.losses modülü içerisindeki "mae" ya da 
+"mean_absolute_error" isimli fonksiyonla da hesaplanabilmektedir. Örneğin:
+
+>>> from tensorflow.keras.losses import mae
+>>> y = np.array([1, 2, 3, 4, 5], dtype=np.float64)
+>>> y_hat = np.array([1.1, 1.9, 3.2, 3.8, 5.02])
+>>> result = mae(y, y_hat)
+>>> result
+<tf.Tensor: shape=(), dtype=float64, numpy=0.12400000000000003>
+
+---------------------------------------------------------------------------------
+
+---------------------------------------------------------------------------------
+Lojistik olmayan regresyon problemleri için diğer bir loss fonksiyonu da "Mean 
+Absolute Percentage Error (MAPE)" isimli fonksiyondur. Fonkisyonun sembolik 
+ifadesi şöyledir:
+
+mape = 100 * np.mean(np.abs(y - y_hat) / y)
+
+Burada y gerçek değerleri y_hat ise ağın kestirdiği değerleri belirtmektedir. Örneğin:
+
+>>> y = np.array([1, 2, 3, 4, 5], dtype=np.float64)
+>>> y_hat = np.array([1.1, 1.9, 3.2, 3.8, 5.02])
+>>> mape = 100 * np.mean(np.abs(y - y_hat) / y)
+>>> mape
+5.413333333333335
+
+Tabii aynı işlemi yine tensorflow.keras.losses modülündeki "mape" fonksiyonuyla da yapabiliriz:
+
+>>> from tensorflow.keras.losses import mape
+>>> y = np.array([1, 2, 3, 4, 5], dtype=np.float64)
+>>> y_hat = np.array([1.1, 1.9, 3.2, 3.8, 5.02])
+>>> result = mape(y, y_hat)
+>>> result
+<tf.Tensor: shape=(), dtype=float64, numpy=5.413333333333335>
+
+---------------------------------------------------------------------------------
 """
-
-
