@@ -5277,7 +5277,7 @@ konusu olduğu için buna uygun tasarımı olan dosya formatları tercih edilmel
 ilk akla gelen format "HDF (Hieararchical Data Format)" denilen formattır. Bu 
 formatın beşinci versiyonu HDF5 ya da H5 formatı olarak bilinmektedir. 
 
-Modeli bir bütün olarak saklamak için Sequential sınıfının save isimli metodu kullanılır. 
+Modeli bir bütün olarak saklamak için Sequential sınıfının save isimli metodu kullanılır 
 save metodunun birinci parametresi dosyanın yol ifadesini almaktadır. save_format 
 parametresi saklanacak dosyanın formatını belirtir. Bu parametre girilmezse dosya 
 TensorFlow kütüphanesinin kullandığı "tf" formatı ile saklanmaktadır. Biz HDF5 
