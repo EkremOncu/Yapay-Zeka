@@ -5169,25 +5169,71 @@ bir metrik fonksiyon gibi de kullanılabilir. Ancak her metrik fonksiyon bir los
 fonksiyonu olarak kullanılmaz. 
 
 ---------------------------------------------------------------------------------    
+"binary_accuracy" isimli metrik fonksiyon ikili sınıflandırma problemleri için en 
+yaygın kullanılan metrik fonksiyondur. Bu fonksiyon kabaca kaç gözlemin değerinin 
+kestirilen değerle aynı olduğunun yüzdesini vermektedir. Örneğin "diabetes.csv" 
+veri kümesinde "binary_accuracy" değerinin 0.70 olması demek her yüz ölçümün 70 
+tanesinin doğru biçimde kestirilmesi demektir. "binary_accuracy" metrik değeri 
+Keras'ta isimsel olarak girilebileceği gibi tensorflow.keras.metrics modülündeki 
+fonksiyon ismi olarak da girilebilir. 
 
+Aslında Keras'ta programcı kendi loss fonksiyonlarını ve metrik fonksiyonlarını da 
+yazabilir. Ancak tensorflow bu konuda yeterli dokümantasyona sahip değildir. 
+Tensorflow kütüphanesinin çeşitli versiyonlarında çeşitli farklılıklar bulunabilmektedir. 
+Bu nedenle bu fonksiyonların programcı tarafından yazılması için bu konuya dikkat 
+etmek gerekir. 
 
+Örneğin biz tensorflow.keras.metrics modülündeki binary_accuracy fonksiyonunu 
+aşağıdaki gibi kullanabiliriz.
 
+---------------------------------------------------------------------------------
+from tensorflow.keras.metrics import binary_accuracy
+import numpy as np
 
+y = np.array([1, 0, 1, 1, 0])
+y_hat = np.array([0.90, 0.7, 0.6, 0.9, 0.6])
+
+result = binary_accuracy(y, y_hat) # %60'ını doğru tahmin edicek
+print(result)
 
 ---------------------------------------------------------------------------------    
 
 ---------------------------------------------------------------------------------    
+Çok sınıflı sınıflandırma problemlerinde tipik okullanılan metrik fonksiyon 
+"categorical_accuracy" isimli fonksiyondur. Bu fonksiyon da yine gözlemlerin yüzde 
+kaçının tam olarak isabet ettirildiğini belirtmektedir. Örneğin ikili sınıflandırmada 
+0.50 değeri iyi bir değer değildir. Çünkü zaten rastgele seçim yapılsa bile ortalama 
+0.50 başarı elde edilmektedir. Ancak 100 sınıflı bir problemde 0.50 başarı düşük 
+bir başarı olmayabilir. Yine biz Keras'ta "categorical_accuracy" metrik fonksiyonunu
+isimsel biçimde ya da tensorflow.keras.metrics modülündeki fonksiyon ismiyle 
+kullanabiliriz. 
 
+tensorflow.keras.metrics modülündeki categorical_accuracy fonksiyonu aslında toplam 
+isabetlere ilişkin bir Tensor nesnesi vermektedir, ortalama vermemektedir. Aşağıda 
+bu fonksiyonun kullanımına bir örnek verilmiştir.
+
+---------------------------------------------------------------------------------    
+from tensorflow.keras.metrics import categorical_accuracy
+import numpy as np
+
+# elma, armut, kayısı
+
+y = np.array([[0, 1, 0], [0, 0, 1], [1, 0, 0], [0, 1, 0], [1, 0, 0]])
+y_hat = np.array([[0.2, 0.7, 0.1], [0.2, 0.1, 0.7], [0.8, 0.1, 0.1], [0.7, 0.2, 0.1], [0.6, 0.2, 0.2]])
+
+result = categorical_accuracy(y, y_hat)  
+result_ratio = np.sum(result) / len(result)
+
+print(result_ratio) # %80
+
+---------------------------------------------------------------------------------    
 
 ---------------------------------------------------------------------------------    
 """    
     
     
     
-    
-    
-    
-    
+
     
     
     

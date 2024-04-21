@@ -31,7 +31,7 @@ model.summary()
 model.compile(optimizer='rmsprop', loss='binary_crossentropy', metrics=['binary_accuracy'])
 model.fit(training_dataset_x, training_dataset_y, batch_size=32, epochs=100, validation_split=0.2)
 eval_result = model.evaluate(test_dataset_x, test_dataset_y, batch_size=32)
-
+    
 for i in range(len(eval_result)):
     print(f'{model.metrics_names[i]}: {eval_result[i]}')
 
