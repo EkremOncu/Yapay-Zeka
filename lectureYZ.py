@@ -5229,14 +5229,63 @@ print(result_ratio) # %80
 ---------------------------------------------------------------------------------    
 
 ---------------------------------------------------------------------------------    
+Lojistik olmayan regresyon problemleri için pek çok loss fonksiyonu aslında metrik 
+olarak da kullanılabilmektedir. Örneğin biz böyle bir problemde loss fonksiyonu 
+olarak "mean_squared_error" seçmişsek metrik fonksiyon olarak "mean_absolute_error" 
+seçebiliriz. mean_absolute_error fonksiyonu loss fonksiyonu olarak o kadar iyi 
+olmasa da metrik anlamda kişilerin kolay anlayabileceği bir fonksiyondur. Benzer 
+biçimde lojistik olmayan regresyon problemlerinde "mean_asbolute_percentage_error", 
+"mean_squared_logarithmic_error" fonksiyonları da metrik olarak kullanılabilmektedir. 
+
+Loss fonksiyonların metrik fonksiyonlar olarak kullanılabileceğini belirtmiştik. 
+Aslında örneğin mean_absolute_error loss fonksiyonu ile mean_absolute_error metrik 
+fonksiyonu aynı işlemi yapmaktadır. Ancak Keras'ta bu fonksiyonlar tensorflow.keras.losses 
+ve tensorflow.keras.metrics modüllerinde ayrı ayrı bulundurulmuştur. 
+
+Metrik fonksiyonlar yazısal biçimde girilecekse onlar için uzun ya da kısa isimler 
+kullanılabilmektedir. Örneğin:
+
+'binary_accuracy' (kısa ismi yok)
+'categorical_accuracy' (kısa ismi yok)
+'mean_absolute_error' (kısa ismi 'mae')
+'mean_absolute_percentage_error' (kısa ismi 'mape')
+'mean_squared_error' kısa ismi ('mse')
+
+---------------------------------------------------------------------------------    
 """    
     
-    
+
+
+# Model Parametrelerinin Saklanması   
+"""
+---------------------------------------------------------------------------------    
+Bir sinir ağı eğitildikten sonra onun diskte saklanması gerekebilir. Çünkü eğitim 
+uzun sürebilir ve her bilgisayarı açtığımızda ağı yeniden eğitmemiz verimsiz bir 
+çalışma biçimidir. Ayrıca eğitim tek seferde de yapılmayabilir. Yani örneğin bir 
+kısım verilerle eğitim yapılıp sonuçlar saklanabilir. Sonra yeni veriler elde 
+edildikçe eğitime devam edilebilir.
+
+Keras'ta yapılan eğitimlerin saklanması demekle neyi kastediyoruz? Tabii öncelikle 
+tüm nöronlardaki "w" ve "bias" değerleri kastedilmektedir. Ayrıca Keras bize tüm 
+modeli saklama imkanı da vermektedir. Bu durumda modelin yeniden kurulmasına da 
+gerek kalmaz. Tüm model katmanlarıyla "w" ve "bias" değerleriyle saklanıp geri 
+yüklenebilmektedir. 
+
+Sinir ağı modelini saklamak için hangi dosya formatı uygundur? Çok fazla veri söz 
+konusu olduğu için buna uygun tasarımı olan dosya formatları tercih edilmelidir. 
+Örneğin bu işlem için "CSV" dosyaları hiç uygun değildir. İşte bu tür amaçlar için 
+ilk akla gelen format "HDF (Hieararchical Data Format)" denilen formattır. Bu 
+formatın beşinci versiyonu HDF5 ya da H5 formatı olarak bilinmektedir. 
+
+Modeli bir bütün olarak saklamak için Sequential sınıfının save isimli metodu kullanılır. 
+save metodunun birinci parametresi dosyanın yol ifadesini almaktadır. save_format 
+parametresi saklanacak dosyanın formatını belirtir. Bu parametre girilmezse dosya 
+TensorFlow kütüphanesinin kullandığı "tf" formatı ile saklanmaktadır. Biz HDF5 
+formatı için bu parametreye 'h5' girmeliyiz. Örneğin:
+
+model.save('diabetes.h5', save_format='h5')
+
+---------------------------------------------------------------------------------    
+"""
     
 
-    
-    
-    
-    
-    
-    
