@@ -4524,7 +4524,9 @@ Pekiyi neden ağın her eğitilmesinde aynı sonuçların elde edilmesi (yani a�
 algoritmalarımızda yaptığımız değişiklikleri birbirleriyle kıyaslamak isteyebiliriz. 
 Bu durumda kıyaslamanın hep aynı biçimde yapılmasını sağlayabilmek için rassal 
 bir biçimde alınan değerlerin her çalıştırmada aynı değerler olmasını sağlamamız 
-gerekir. Tabii aslında algoritmaları karşılaştırmak için bu biçimde "reproducible" 
+gerekir. 
+
+Tabii aslında algoritmaları karşılaştırmak için bu biçimde "reproducible" 
 rassal sayı üretimi yapmak yerine algoritmaları çokça çalıştırıp bir ortalama 
 değere de bakılabilir. 
 
@@ -4541,7 +4543,7 @@ from tensorflow.keras.utils import set_random_seed
 np.random.seed(1234567)
 set_random_seed(678901)
 
-df = pd.read_csv('diabetes.csv')
+df = pd.read_csv('C:\\Users\\Lenovo\\Desktop\\GitHub\\YapayZeka\\Src\\2- KerasIntroduction\diabetes.csv')
 
 from sklearn.impute import SimpleImputer
 
@@ -4571,6 +4573,7 @@ model.summary()
 
 model.compile(optimizer='rmsprop', loss='binary_crossentropy', metrics=['binary_accuracy'])
 model.fit(training_dataset_x, training_dataset_y, batch_size=32, epochs=100, validation_split=0.2)
+
 eval_result = model.evaluate(test_dataset_x, test_dataset_y, batch_size=32)
 
 for i in range(len(eval_result)):
@@ -4596,17 +4599,16 @@ for result in predict_result[:, 0]:
 
 """
 --------------------------------------------------------------------------------- 
-
-
-Katmanlardaki aktivasyon fonksiyonları ne olmalıdır? Girdi katmanı gerçek bir katman olmadığına göre orada bir aktivasyon 
-fonksiyonu yoktur. Saklı katmanlardaki aktivasyon fonksiyonları için çeşitli seçenekler bulunmaktadır.
+Katmanlardaki aktivasyon fonksiyonları ne olmalıdır? Girdi katmanı gerçek bir katman 
+olmadığına göre orada bir aktivasyon fonksiyonu yoktur. Saklı katmanlardaki aktivasyon 
+fonksiyonları için çeşitli seçenekler bulunmaktadır.
 
 Özellikle son yıllarda saklı katmanlarda en fazla tercih edilen aktivasyon fonksiyonu 
 "relu (rectified linear unit)" denilen aktivasyon fonksiyonudur. Bu fonksiyona 
 İngilizce "rectifier" da denilmektedir.  Relu fonksiyonu şöyledir:
 
 x >= 0  ise y = x
-x < 0   ise 0
+x < 0   ise y = 0
 
 Yani relu fonksiyonu x değeri 0'dan büyük ise (ya da eşit ise) aynı değeri veren, 
 x değeri 0'dan küçük ise 0 değerini veren fonksiyondur. relu fonksiyonunu basit 
@@ -4620,7 +4622,7 @@ ya da Python listesi biçiminde girilirse fonksiyon bu dizinin ya da listenin he
 elemanı ile maximum işlemi yapmaktadır. Örneğin:
 
 >>> import numpy as np
->>> x = [10, -4, 5, 8, -2]
+>>> x = [10, -4, 5, 8, 1]
 >>> y = np.maximum(x, 3)
 >>> y
 array([10,  3,  5,  8,  3])
@@ -4750,7 +4752,7 @@ Tensor nesnesini vermektedir.
 --------------------------------------------------------------------------------- 
 Sigmoid fonksiyonu nasıl ortaya çıkartılmıştır. Aslında bu fonksiyonun elde edilmesinin 
 bazı mantıksal gerekçeleri vardır. Ayrıca sigmoid fonksiyonunun birinci türevi 
-Gauss eğrisine bencemektedir. Aşağıdaki örnekte Sigmoid fonksiyonunun birinci 
+Gauss eğrisine benzemektedir. Aşağıdaki örnekte Sigmoid fonksiyonunun birinci 
 türevi alınıp eğrisi çizdirilmiştir. Ancak bu örnekte henüz görmediğimiz SymPy 
 kütüphanesini kullandık. Sigmoid fonksiyonun birinci türevi şöyledir:
 
@@ -5139,3 +5141,56 @@ elde edilmiş ağın çıktı katmanındaki değerleri temsil etmektedir.
 
 ---------------------------------------------------------------------------------
 """
+
+
+# metric fonksiyonlar
+"""    
+---------------------------------------------------------------------------------
+Anımsanacağı gibi "metrik fonksiyonlar" her epoch'tan sonra sınama verlerine uygulanan 
+ve eğitimin gidişatı hakkında bilgi almak için kullanılan performans fonksiyonlar 
+idi. Problemin türüne göre çeşitli metrik fonksiyonlar hazır biçimde bulunmaktadır. 
+Birden fazla metrik fonksiyon kullanılabileceği için metrik fonksiyonlar compile 
+metodunda "metrics" parametresine bir liste biçiminde girilmektedir. Metrik fonksiyonlar 
+yazısal biçimde girilebilceği gibi tensorflow.keras.metrics modülündeki fonksiyonlar 
+ve sınıflar biçiminde de girilebilmektedir. 
+
+Metrik fonksiyonlar da tıpkı loss fonksiyonları gibi gerçek çıktı değerleriyle 
+ağın ürettiği çıktı değerlerini parametre olarak almaktadır. Aslında loss fonksiyonları 
+da bir çeşit metrik fonksiyonlardır. Ancak loss fonksiyonları optimizasyon 
+algoritmaları tarafından minimize edilmek için kullanılmaktadır. Halbuki metrik 
+fonksiyonlar bizim durumu daha iyi anlamamız için bizim tarafımızdan kullanılmaktadır.
+
+Aslında loss fonksiyonları da bir çeşit metrik fonksiyonlar olarak kullanılabilir. 
+Ancak Keras zaten bize loss fonksiyonlarının değerlerini her epoch'ta eğitim ve 
+sınama verileri için vermektedir. Dolayısıyla örneğin ikili sınıflandırma problemi 
+için eğer biz loss fonksiyonu olarak "binary_crossentropy" girmişsek ayrıca bu 
+fonksiyonu metrik olarak girmenin bir anlamı yoktur. Özetle her loss fonksiyonu 
+bir metrik fonksiyon gibi de kullanılabilir. Ancak her metrik fonksiyon bir loss 
+fonksiyonu olarak kullanılmaz. 
+
+---------------------------------------------------------------------------------    
+
+
+
+
+
+---------------------------------------------------------------------------------    
+
+---------------------------------------------------------------------------------    
+
+
+---------------------------------------------------------------------------------    
+"""    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
