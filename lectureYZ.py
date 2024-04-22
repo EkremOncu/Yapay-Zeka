@@ -5279,11 +5279,130 @@ formatın beşinci versiyonu HDF5 ya da H5 formatı olarak bilinmektedir.
 
 Modeli bir bütün olarak saklamak için Sequential sınıfının save isimli metodu kullanılır 
 save metodunun birinci parametresi dosyanın yol ifadesini almaktadır. save_format 
-parametresi saklanacak dosyanın formatını belirtir. Bu parametre girilmezse dosya 
-TensorFlow kütüphanesinin kullandığı "tf" formatı ile saklanmaktadır. Biz HDF5 
+parametresi saklanacak dosyanın formatını belirtir.??? Bu parametre girilmezse dosya 
+TensorFlow kütüphanesinin kullandığı "tf" formatı ile saklanmaktadır.??? Biz HDF5 
 formatı için bu parametreye 'h5' girmeliyiz. Örneğin:
 
 model.save('diabetes.h5', save_format='h5')
+
+---------------------------------------------------------------------------------   
+
+---------------------------------------------------------------------------------   
+Aslında modelin tamamını değil yalnızca "w" ve "bias" değerlerini save etmek de 
+mümkündür. Bunun için Sequential sınıfının save_weights metodu kullanılmaktadır. 
+Örneğin:
+
+model.save_weights('diabetes-weights', save_format='h5')
+
+Yalnızca modelin "w" ve "bias" değerleri saklanmıştır. 
+
+---------------------------------------------------------------------------------   
+
+---------------------------------------------------------------------------------   
+HDF5 formatıyla sakladığımız model bir bütün olarak tensorflow.keras.models modülündeki 
+load_model fonksiyonu ile geri yüklenebilir. load_model fonksiyonu bizden yüklenecek 
+dosyanın yol ifadesini alır. Fonksiyon geri dönüş değeri olarak model nesnesini 
+vermektedir. Örneğin:
+
+from tensorflow.keras.models import load_model
+
+model = load_model('diabetes.h5')
+
+
+Artık biz modeli fit ettiğimiz biçimiyle tamamen geri almış durumdayız. Doğrudan 
+predict metoduyla kestirim yapabiliriz. 
+
+Aşağıdaki örnekte yukarıda save ettigimiz model yüklenebilir. 
+
+---------------------------------------------------------------------------------  
+from tensorflow.keras.models import load_model
+import numpy as np
+
+model = load_model('diabetes.h5')
+
+predict_dataset = np.array([[2 ,90, 68, 12, 120, 38.2, 0.503, 28],
+                            [4, 111, 79, 47, 207, 37.1, 1.39, 56],
+                            [3, 190, 65, 25, 130, 34, 0.271, 26],
+                            [8, 176, 90, 34, 300, 50.7, 0.467, 58],
+                            [7, 106, 92, 18, 200, 35, 0.300, 48]])
+
+predict_result = model.predict(predict_dataset)
+print(predict_result)
+
+---------------------------------------------------------------------------------   
+
+---------------------------------------------------------------------------------   
+save_weights metodu yalnızca "w" ve "bias" değerlerini save etmektedir. Bizim bunu 
+geri yükleyebilmemiz için modeli yeniden aynı biçimde oluşturmamız ve compile işlemini 
+yapmamız gerekir. "w" ve "bias" değerlerinin geri yüklenmesi için Sequential 
+sınıfının load_weights metodu kullanılmaktadır. Örneğin:
+
+model.load_weights('diabetes-weights.h5')
+
+save_weights model bilgilerini saklamadığı için modelin aynı biçimde yeniden 
+oluşturulması gerekmektedir. Modelin "w" ve "bias" değerlerini load_weights metodu 
+ile geri yüklerken veri kümesini oluşturmamız gerekmemektedir. save_weights"
+metodu model yalnızca "w" ve "bias" değerlerini save ettiği için model programcı 
+tarafından orijinal haliyle oluşturulmalıdır.
+
+---------------------------------------------------------------------------------   
+from tensorflow.keras import Sequential
+from tensorflow.keras.layers import Input, Dense
+
+model = Sequential(name='Diabetes')
+
+model.add(Input((8,)))
+model.add(Dense(16, activation='relu', name='Hidden-1'))
+model.add(Dense(16, activation='relu', name='Hidden-2'))
+model.add(Dense(1, activation='sigmoid', name='Output'))
+model.summary()
+
+model.compile(optimizer='rmsprop', loss='binary_crossentropy', metrics=['binary_accuracy'])
+
+model.load_weights('diabetes-weights.h5')
+
+import numpy as np  
+
+predict_dataset = np.array([[2 ,90, 68, 12, 120, 38.2, 0.503, 28],
+                            [4, 111, 79, 47, 207, 37.1, 1.39, 56],
+                            [3, 190, 65, 25, 130, 34, 0.271, 26],
+                            [8, 176, 90, 34, 300, 50.7, 0.467, 58],
+                            [7, 106, 92, 18, 200, 35, 0.300, 48]])
+
+predict_result = model.predict(predict_dataset)
+print(predict_result)
+
+for result in predict_result[:, 0]:
+    print('Şeker hastası' if result > 0.5 else 'Şeker Hastası Değil')
+    
+---------------------------------------------------------------------------------    
+
+---------------------------------------------------------------------------------    
+Biz katman nesnelerini (Dense nesnelerini) model sınıfının (Sequential sınıfının) 
+add metotlarıyla modelimize ekledik. Bu katman nesnelerini ileride kullanmak 
+istediğimizde nasıl geri alabiliriz? Tabi ilk akla gelen yöntem katman nesnelerini 
+yaratırken aynı zamanda saklamak olabilir. Örneğin:
+
+model = Sequential(name='Diabetes')
+
+model.add(Input((8,)))
+layer1 = Dense(16, activation='relu', name='Hidden-1')
+model.add(layer1)
+layer2 = Dense(16, activation='relu', name='Hidden-2')
+model.add(layer2)
+layer3 = Dense(1, activation='sigmoid', name='Output')
+model.add(layer3)
+model.summary()
+
+Aslında böyle saklama işlemine gerek yoktur. Zaten model nesnesinin (Sequential sınıfının) 
+layers isimli özniteliği bir indeks eşliğinde bizim eklediğimiz katman nesnelerini 
+bize vermektedir. layers örnek özniteliği bir Python listesidir. Örneğin:
+
+layer3 = model.layers[2]
+
+
+Tabii layers özniteliği bize Input katmanını gereksiz olduğundan dolayı vermemktedir. 
+Buradaki 0'ıncı indeks ilk saklı katmanı belirtmektedir. 
 
 ---------------------------------------------------------------------------------    
 """
