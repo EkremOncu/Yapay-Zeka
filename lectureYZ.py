@@ -5521,9 +5521,57 @@ hidden1.set_weights([weights, bias])
 ---------------------------------------------------------------------------------    
 
 ---------------------------------------------------------------------------------    
+Yapay sinir ağları ile kestirim yapabilmek için bazı aşamalardan geçmek gerekir. 
+Bu aşamaları şöyle özetleyebiliriz:
+
+1) Hedefin Belirlenmesi: Öncelikle uygulamacının ne yapmak istediğine karar vermesi 
+   gerekir. Yani uygulamacının çözmek istediği problem nedir? Bir sınıflandırma 
+   problemi midir? Lojistik olmayan regresyon problemi midir? Şekil tanıma problemi 
+   midir? Doğal dili anlama problemi midir? gibi...
+
+2) Kestirimle İlgili Olacak Özellerin (Sütunların) Belirlenmesi: Tespit edilen 
+   problemin kestirimi için hangi bilgilere 
+   gereksinim duyulmaktadır? Kestirim ile ilgili olabilecek özellikler nelerdir? 
+   Örneğin bir eczanenin cirosunu tahmin etmek isteyelim. Burada ilk gelecek 
+   özellikler şunlar olabilir:
+
+    - Eczanenin konumu
+    - Ecnanenin önünden geçen günlük insan sayısı
+    - Eczanenin destek ürünleri satıp satmadığı
+    - Eczanenin kozmetik ürünler satıp satmadığı
+    - Eczanenin anlaşmalı olduğu kurumlar
+    - Eczanenin büyüklüğü
+    - Eczanenin yakınındaki, hastenelerin ve sağlık ocaklarının sayısı
+    - Eczacının tanıdığı doktor sayısı
+
+3) Eğitim İçin Verilerin Toplanması: Eğitim için verilerin toplanması en zor 
+   süreçlerden biridir. Veri toplama için şu yöntemler söz konusu olabilir:
+
+    - Anketler (Surveys)
+    - Daha önce elde edilmiş veriler
+    - Çeşitli kurumlar tarafından zaten elde edilmiş olan veriler
+    - Sensörler yoluyla elde edilen veriler
+    - Sosyal ağlardan elde edilen veriler
+    - Birtakım doğal süreç içerisinde oluşan veriler (Örneğin her müşteri için bir fiş kesildiğine göre bunlar kullanılabilir)
+
+4) Verilerin Kullanıma Hazır Hale Getirilmesi: Veriler toplandıktan sonra bunların 
+   üzerinde bazı önişlemlerin yapılması gerekmektedir. Örneğin gereksiz sütunlar 
+   atılmalıdır. Eksik veriler varsa bunlar bir biçimde ele alınmalıdır. Kategorik 
+   veriler sayısallaştırılmalıdır. Text ve görüntü verileri kullanıma hazır hale 
+   getirilmelidir. Özellik "ölçeklemeleri (feature scaling)" ve "özellik mühendisliği 
+   (feature engineering)" işlemleri yapılmalıdır. 
+
+5) Yapay Sinir Ağı Modelinin Oluşturulması: Probleme uygun bir yapay sinir ağı 
+   modeli oluşturulmalıdır. 
+
+6) Modelin Eğitilmesi ve Test Edilmesi: Oluşturulan model eldeki veri kümesiyle 
+   eğitilmeli ve test edilmelidir. 
+
+7) Kestirim İşleminin Yapılması: Nihayet eğtilmiş model artık kestirim amacıyla 
+   kullanılmalıdır. 
+                                                                   
+---------------------------------------------------------------------------------    
 """
-
-
 
 
 
