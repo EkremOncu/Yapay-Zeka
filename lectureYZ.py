@@ -5405,6 +5405,135 @@ Tabii layers özniteliği bize Input katmanını gereksiz olduğundan dolayı ve
 Buradaki 0'ıncı indeks ilk saklı katmanı belirtmektedir. 
 
 ---------------------------------------------------------------------------------    
-"""
-    
 
+---------------------------------------------------------------------------------    
+Biz yukarıda tüm modeli, modelin "w" ve "bias" değerlerini saklayıp geri yükledik. 
+Peki yalnızca tek bir katmandaki ağırlık değerlerini alıp geri yükleyebilir miyiz? 
+İşte bu işlem katman sınıfının (yani Dense sınıfının) get_weights  ve set_weights 
+isimli metotları ile yapılmaktadır. Biz bu metotlar sayesinde bir katman nesnesindeki 
+"w" ve "bias" değerlerini NumPy dizisi olarak elde edip geri yükleyebiliriz. 
+
+Dense sınıfının get_weights metodu iki elemanlı bir listeye geri dönmektedir. Bu 
+listenin her iki elemanı da NumPy dizisidir. Listenin ilk elemanı (0'ıncı indeksli 
+elemanı) o katmandaki nöronların "w" değerlerini, ikinci elemanı ise "bias" değerlerini 
+belirtmektedir. Katmandaki nöronların "w" değerleri iki boyutlu bir NumPy dizisi 
+biçimindedir. 
+
+Burada k'ıncı sütun önceki katmanın nöronlarının sonraki katmanın k'ıncı nöronuna 
+bağlanmasındaki ağırlık değerlerini belirtmektedir. Benzer biçimde i'inci satır 
+ise önceki katmanın i'inci nöronunun ilgili katmanın nöron bağlantısındaki ağırlık 
+değerlerini belirtmektedir. Bu durumda örneğin [i, k] indeksindeki eleman önceki 
+katmanın i'inci nörounun ilgili katmanın k'ıncı nöronu ile bağlantısındaki ağırlığı 
+belirtmektedir. 
+
+get_weights metodunun verdiği listenin ikinci elemanı (1'inci indeksli elemanı) 
+nöronların "bias" değerlerini vermektedir. Bias değerlerinin ilgili katmandaki 
+nöron sayısı kadar olması gerektiğine dikkat ediniz. Çünkü her nöron için bir 
+tane bias değeri vardır. 
+
+Örneğin yukarıdaki "diabetes" örneğinde ilk saklı katmandaki ağırlıkları şöyle 
+elde edebiliriz:
+
+layer = model.layers[0]
+weights, bias = layer.get_weights()
+
+Burada weights dizisinin shape'i yazdırıldığında (8, 16) görülecektir. bias 
+dizisinin shape'i yazdırıldığında ise (16,) görülecektir.
+
+---------------------------------------------------------------------------------    
+import pandas as pd
+
+df = pd.read_csv('C:\\Users\\Lenovo\\Desktop\\GitHub\\YapayZeka\\Src\\2- KerasIntroduction\diabetes.csv')
+
+from sklearn.impute import SimpleImputer
+
+si = SimpleImputer(strategy='mean', missing_values=0)
+
+df[['Glucose', 'BloodPressure', 'SkinThickness', 'Insulin', 'BMI']] = si.fit_transform(df[['Glucose', 'BloodPressure', 'SkinThickness', 'Insulin', 'BMI']])
+
+dataset = df.to_numpy()
+
+dataset_x = dataset[:, :-1]
+dataset_y = dataset[:, -1]
+
+from sklearn.model_selection import train_test_split
+
+training_dataset_x, test_dataset_x, training_dataset_y, test_dataset_y = train_test_split(dataset_x, dataset_y, test_size=0.2)
+
+from tensorflow.keras import Sequential
+from tensorflow.keras.layers import Input, Dense
+
+model = Sequential(name='Diabetes')
+
+model.add(Input((training_dataset_x.shape[1],)))
+model.add(Dense(16, activation='relu', name='Hidden-1'))
+model.add(Dense(16, activation='relu', name='Hidden-2'))
+model.add(Dense(1, activation='sigmoid', name='Output'))
+model.summary()
+
+model.compile(optimizer='rmsprop', loss='binary_crossentropy', metrics=['binary_accuracy'])
+model.fit(training_dataset_x, training_dataset_y, batch_size=32, epochs=100, validation_split=0.2)
+eval_result = model.evaluate(test_dataset_x, test_dataset_y, batch_size=32)
+
+for i in range(len(eval_result)):
+    print(f'{model.metrics_names[i]}: {eval_result[i]}')
+    
+    
+    
+hidden1 = model.layers[0]
+weights, bias = hidden1.get_weights()
+
+
+print(weights)
+
+print(bias)
+
+print("5'inci girdi nöronunun ilk katmanın 9'uncu nöronununa bağlantısındaki w değeri")
+w = weights[5, 9]
+print(w)
+
+---------------------------------------------------------------------------------    
+
+---------------------------------------------------------------------------------    
+Bir katmandaki "w" ve "bias" değerlerini Dense sınıfının set_weights metodu ile 
+geri yükleyebiliriz. Örneğin:
+    
+hidden1 = model.layers[0]
+weights, bias = hidden1.get_weights()
+
+weights = weights + 0.1
+hidden1.set_weights([weights, bias])
+
+Burada birinci saklı katmandaki ağırlık değerlerine 0.1 eklenerek ağırlık değerleri 
+geri yüklenmiştir. set_weights metodunun iki elemanı bir liste aldığına dikkat 
+ediniz. Nasıl get_weights metodu hem "w" hem de "bias" değerlerini veriyorsa 
+set_weights metodu da hem "w" hem de "bias" değerlerini istemektedir. 
+
+Aşağıdaki örnekte ilk saklı katmandaki "w" değerlerine 0.1 toplanarak değerler 
+geri yüknemiştir. 
+
+hidden1 = model.layers[0]
+weights, bias = hidden1.get_weights()
+
+weights = weights + 0.1
+hidden1.set_weights([weights, bias])
+
+---------------------------------------------------------------------------------    
+
+---------------------------------------------------------------------------------    
+"""
+
+
+
+
+
+
+
+
+
+
+
+
+
+    
+    
