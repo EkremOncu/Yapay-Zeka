@@ -5574,13 +5574,174 @@ Bu aşamaları şöyle özetleyebiliriz:
 """
 
 
+# Kerasta Callback Mekanizması
+
+"""
+---------------------------------------------------------------------------------    
+Callback sözcüğü programlamada belli bir olay devam ederken programcının verdiği 
+bir fonksiyonun (genel olarak callable bir nesnenin) çağrılmasına" ilişkin mekanizmayı 
+anlatmak için kullanılmaktadır. Keras'ın da bir callback mekanizması vardır. Bu 
+sayede biz çeşitli olaylar devam ederken bu olayları sağlayan metotların bizim 
+callable nesnelerimizi çağırmasını sağlayabiliriz. Böylece birtakım işlemler devam 
+ederken arka planda o işlemleri programlama yoluyla izleyebilir duruma göre gerekli 
+işlemleri yapabiliriz. 
+
+Sequential sınıfının fit, evalaute ve predict metotları "callbacks" isimli bir 
+parametre almaktadır. İşte biz bu parametreye callback fonksiyonlarımızı ve sınıf 
+nesnelerimizi verebiliriz. Bu metotlar da ilgili olaylar sırasında bizim verdiğimiz 
+bu callable nesneleri çağırır. 
+
+Aslında Keras'ta hazır bazı callback sınıflar zaten vardır. Dolayısıyla her ne 
+kadar programcı kendi callback sınıflarını yazabilirse de aslında buna fazlaca 
+gereksinim duyulmamaktadır. Keras'ın sağladığı hazır callback sınıfları genellikle 
+gereksinimi karşılamaktadır. Keras'ın hazır callback sınıfları tensorflow.keras.callbacks 
+modülü içerisinde bulunmaktadır.
+
+---------------------------------------------------------------------------------    
+
+---------------------------------------------------------------------------------
+# History
+
+En sık kullanılan callback sınıfı History isimli callback sınıftır. Aslında programcı 
+bu callback sınıfını genellikle kendisi kullanmaz. Sequential sınıfının fit metodu 
+zaten bu sınıf türünden bir nesneye geri dönmektedir. Örneğin:
+
+hist = model.fit(....)
+
+History callback sınıfı aslında işlemler sırasında devreye girmek için değil 
+(bu da sağlanabilir) epcoh'lar sırasındaki değerlerin kaydedilmesi için kullanılmaktadır. 
+Yani programcı fit işlemi bittikten sonra bu callback nesnenin içerisinden fit 
+işlemi sırasında elde edilen epoch değerlerini alabilmektedir. Dolayısıyla fit 
+metodunun bize verdiği History nesnesi eğitim sırasında her epoch'tan sonra elde 
+edilen loss ve metrik değerleri barındırmaktadır. Anımsanacağı gibi fit metodu 
+zaten eğitim sırasında her epoch'tan sonra birtakım değerleri ekrana yazıyordu. 
+İşte fit metodunun geri döndürdüğü bu history nesnesi aslında bu metodun ekrana 
+yazdığı bilgileri barındırmaktadır. History nesnesinin epoch özniteliği uygulanan 
+epoch numaralarını bize verir. 
+
+Ancak nesnenin en önemli elemanı history isimli özniteliğidir. Nesnenin history 
+isimli özniteliği bir sözlük türündendir. Sözlüğün anahtarları yazısal olarak loss 
+ve metrik değer isimlerini barındırır. Bunlara karşı gelen değerler ise her epoch'taki 
+ilgili değerleri belirten list türünden nesnelerdir. History nesnesinin history 
+sözlüğü her zaman "loss" ve "val_loss" anahtarlarını barındırır. Bunun dışında 
+bizim belirlediğimiz metriklere ilişkin eğitim ve sınama sonuçlarını da barındırmaktadır. 
+
+Örneğin biz metrik olarak "binary_accuracy" girmiş olalım. history sözlüğü bu durumda 
+"binary_accuracy" ve "val_binary_accuracy" isimli iki anahtara da sahip olacaktır. 
+Burada "val_xxx" biçiminde "val" ile başlayan anahtarlar sınama verisinden elde 
+edilen değerleri "val" ile başlamayan anahtarlar ise eğitim veri kümesinden elde 
+edilen değerleri belirtir. "loss" değeri ve diğer metrik değerler epoch'un tamamı 
+için elde edilen değerlerdir. Her epoch sonucunda bu değerler sıfırlanmaktadır. 
+(Yani bu değerler kümülatif bir ortalama değil, her epoch'taki ortalamalara ilişkindir.)
+
+---------------------------------------------------------------------------------    
+Epoch'lar sonrasında History nesnesi yoluyla elde edilen bilgilerin grafiği çizdirilebilir. 
+Uygulamacılar eğitimin gidişatı hakkında fikir edinebilmek için genellikle epoch 
+grafiğini çizdirirler. Epoch sayıları arttıkça başarının artacağını söyleyemeyiz. 
+Hatta tam tersine belli bir epoch'tan sonra "overfitting" denilen olgu kendini 
+gösterebilmekte model gitgide yanlış şeyleri öğrenir duruma gelebilmektedir. İşte 
+uygulamacı gelellikle "loss", "val_loss", "binary_accuracy", "val_binary_accuracy" 
+gibi grafikleri epoch sayılarına göre çizerek bunların uyumlu gidip gitmediğine 
+bakabilir. 
+
+Eğitimdeki verilerle sınama verilerinin birbirbirlerinden kopması genel olarak 
+kötü bir gidişata işaret etmektedir. Uygulamacı bu grafiklere bakarak uygulaması 
+gereken epoch sayısına karar verebilir. 
 
 
+import matplotlib.pyplot as plt
 
+plt.figure(figsize=(14, 6))
+plt.title('Epoch - Loss Graph', pad=10, fontsize=14)
+plt.xticks(range(0, 300, 10))
+plt.plot(hist.epoch, hist.history['loss'])
+plt.plot(hist.epoch, hist.history['val_loss'])
+plt.legend(['Loss', 'Validation Loss'])
+plt.show()
 
+plt.figure(figsize=(14, 6))
+plt.title('Epoch - Binary Accuracy Graph', pad=10, fontsize=14)
+plt.xticks(range(0, 300, 10))
+plt.plot(hist.epoch, hist.history['binary_accuracy'])
+plt.plot(hist.epoch, hist.history['val_binary_accuracy'])
+plt.legend(['Accuracy', 'Binary Accuracy'])
+plt.show()
 
+Aşağıda "diabetes" örneği için fit metodunun geri döndürdüğü History callback nesnesi 
+kullanılarak epoch grafikleri çizdirilmiştir. 
 
+---------------------------------------------------------------------------------    
 
+import pandas as pd
+
+df = pd.read_csv('C:\\Users\\Lenovo\\Desktop\\GitHub\\YapayZeka\\Src\\2- KerasIntroduction\diabetes.csv')
+
+from sklearn.impute import SimpleImputer
+
+si = SimpleImputer(strategy='mean', missing_values=0)
+
+df[['Glucose', 'BloodPressure', 'SkinThickness', 'Insulin', 'BMI']] = si.fit_transform(df[['Glucose', 'BloodPressure', 'SkinThickness', 'Insulin', 'BMI']])
+
+dataset = df.to_numpy()
+
+dataset_x = dataset[:, :-1]
+dataset_y = dataset[:, -1]
+
+from sklearn.model_selection import train_test_split
+
+training_dataset_x, test_dataset_x, training_dataset_y, test_dataset_y = train_test_split(dataset_x, dataset_y, test_size=0.2)
+
+from tensorflow.keras import Sequential
+from tensorflow.keras.layers import Input, Dense
+
+model = Sequential(name='Diabetes')
+
+model.add(Input((training_dataset_x.shape[1],)))
+model.add(Dense(16, activation='relu', name='Hidden-1'))
+model.add(Dense(16, activation='relu', name='Hidden-2'))
+model.add(Dense(1, activation='sigmoid', name='Output'))
+model.summary()
+
+model.compile(optimizer='rmsprop', loss='binary_crossentropy', metrics=['binary_accuracy'])
+hist = model.fit(training_dataset_x, training_dataset_y, batch_size=32, epochs=300, validation_split=0.2)
+
+import matplotlib.pyplot as plt
+
+plt.figure(figsize=(14, 6))
+plt.title('Epoch - Loss Graph', pad=10, fontsize=14)
+plt.xticks(range(0, 300, 10))
+plt.plot(hist.epoch, hist.history['loss'])
+plt.plot(hist.epoch, hist.history['val_loss'])
+plt.legend(['Loss', 'Validation Loss'])
+plt.show()
+
+plt.figure(figsize=(14, 6))
+plt.title('Epoch - Binary Accuracy Graph', pad=10, fontsize=14)
+plt.xticks(range(0, 300, 10))
+plt.plot(hist.epoch, hist.history['binary_accuracy'])
+plt.plot(hist.epoch, hist.history['val_binary_accuracy'])
+plt.legend(['Accuracy', 'Binary Accuracy'])
+plt.show()
+
+eval_result = model.evaluate(test_dataset_x, test_dataset_y, batch_size=32)
+
+for i in range(len(eval_result)):
+    print(f'{model.metrics_names[i]}: {eval_result[i]}')
+
+--------------------------------------------------------------------------------- 
+Aslında History callback nesnesi fit metodunun callbacks parametresi yoluyla da 
+elde edilebilir. Örneğin:
+
+from tensorflow.keras.callbacks import History
+hist = History()
+
+model.fit(training_dataset_x, training_dataset_y, batch_size=32, epochs=300, validation_split=0.2, callbacks=[hist])
+
+Tabii buna hiç gerek yoktur. Zaten bu History callback nesnesi fit metodu tarafından 
+metodun içerisinde oluşturulup geri dönüş değeri yoluyla bize verilmektedir.
+
+---------------------------------------------------------------------------------
+"""
 
 
     
