@@ -5552,10 +5552,11 @@ Bu aşamaları şöyle özetleyebiliriz:
     - Çeşitli kurumlar tarafından zaten elde edilmiş olan veriler
     - Sensörler yoluyla elde edilen veriler
     - Sosyal ağlardan elde edilen veriler
-    - Birtakım doğal süreç içerisinde oluşan veriler (Örneğin her müşteri için bir fiş kesildiğine göre bunlar kullanılabilir)
+    - Birtakım doğal süreç içerisinde oluşan veriler (Örneğin her müşteri için 
+      bir fiş kesildiğine göre bunlar kullanılabilir)
 
 4) Verilerin Kullanıma Hazır Hale Getirilmesi: Veriler toplandıktan sonra bunların 
-   üzerinde bazı önişlemlerin yapılması gerekmektedir. Örneğin gereksiz sütunlar 
+   üzerinde bazı ön işlemlerin yapılması gerekmektedir. Örneğin gereksiz sütunlar 
    atılmalıdır. Eksik veriler varsa bunlar bir biçimde ele alınmalıdır. Kategorik 
    veriler sayısallaştırılmalıdır. Text ve görüntü verileri kullanıma hazır hale 
    getirilmelidir. Özellik "ölçeklemeleri (feature scaling)" ve "özellik mühendisliği 
@@ -5581,7 +5582,7 @@ Bu aşamaları şöyle özetleyebiliriz:
 Callback sözcüğü programlamada belli bir olay devam ederken programcının verdiği 
 bir fonksiyonun (genel olarak callable bir nesnenin) çağrılmasına" ilişkin mekanizmayı 
 anlatmak için kullanılmaktadır. Keras'ın da bir callback mekanizması vardır. Bu 
-sayede biz çeşitli olaylar devam ederken bu olayları sağlayan metotların bizim 
+sayede biz çeşitli olaylar devam ederken bu olayları gerçekleştiren metotların bizim 
 callable nesnelerimizi çağırmasını sağlayabiliriz. Böylece birtakım işlemler devam 
 ederken arka planda o işlemleri programlama yoluyla izleyebilir duruma göre gerekli 
 işlemleri yapabiliriz. 
@@ -5639,7 +5640,7 @@ Epoch'lar sonrasında History nesnesi yoluyla elde edilen bilgilerin grafiği ç
 Uygulamacılar eğitimin gidişatı hakkında fikir edinebilmek için genellikle epoch 
 grafiğini çizdirirler. Epoch sayıları arttıkça başarının artacağını söyleyemeyiz. 
 Hatta tam tersine belli bir epoch'tan sonra "overfitting" denilen olgu kendini 
-gösterebilmekte model gitgide yanlış şeyleri öğrenir duruma gelebilmektedir. İşte 
+gösterebilmekte model git gide yanlış şeyleri öğrenir duruma gelebilmektedir. İşte 
 uygulamacı gelellikle "loss", "val_loss", "binary_accuracy", "val_binary_accuracy" 
 gibi grafikleri epoch sayılarına göre çizerek bunların uyumlu gidip gitmediğine 
 bakabilir. 
@@ -5739,6 +5740,116 @@ model.fit(training_dataset_x, training_dataset_y, batch_size=32, epochs=300, val
 
 Tabii buna hiç gerek yoktur. Zaten bu History callback nesnesi fit metodu tarafından 
 metodun içerisinde oluşturulup geri dönüş değeri yoluyla bize verilmektedir.
+
+---------------------------------------------------------------------------------
+CSVLogger isimli callback sınıfı epoch işlemlerinden elde edilen değerleri bir 
+CSV dosyasının içerisine yazmaktadır. CSVLogger nesnesi yaratılırken __init__ 
+metodunda CSV dosyasının yol ifadesi verilir. Eğitim bittiğinde bu dosaynın içi 
+doldurulmuş olacaktır. Örneğin:
+
+from tensorflow.keras.callbacks import CSVLogger
+
+hist = model.fit(training_dataset_x, training_dataset_y, batch_size=32, epochs=100, 
+        validation_split=0.2, callbacks=[CSVLogger('diabtes-epoch.csv')])
+
+---------------------------------------------------------------------------------
+
+---------------------------------------------------------------------------------
+Daha önce de belirttiğimiz gibi tüm callback sınıfları tensorflow.keras.callbacks 
+modülündeki Callback isimli sınıftan türetilmiştir. Biz de bu sınıftan türetme 
+yaparak kendi callback sınıflarımızı yazabiliriz. fit, evaluate ve predict metotları
+callbacks parametresine girilen callback nesnelerinin çeşitli metotlarını çeşitli 
+olaylar sırasında çağırmaktadır. 
+
+Programcı da kendi callback sınıflarını yazarken aslında bu taban Callback sınıfındaki 
+metotları override eder. Örneğin her epoch bittiğinde Callback sınıfının on_epoch_end 
+isimli metodu çağrılmaktadır. Callback sınıfının bu metodunun içi boştur. Ancak 
+biz türemiş sınıfta bu metodu overide edersek (yani aynı isimle yeniden yazarsak) 
+bizim override ettiğimiz metot devreye girecektir. on_epoch_end metodunun 
+parametrik yapısı şöyle olmalıdır:
+
+    
+def on_epoch_end(epoch, logs):
+    pass
+
+Buradaki birinci parametre epoch numarasını (yani kaçıncı epoch olduğunu) ikinci 
+parametre ise epoch sonrasındaki eğitim ve sınama işlemlerinden elde edilen "loss", 
+metrik değerleri veren bir sözlük biçimindedir. Bu sözlüğün anahtarları ilgili 
+değerleri belirten yazılardan değerleri o epoch'a ilişkin onların değerlerinden 
+oluşmaktadır. 
+
+---------------------------------------------------------------------------------
+Örneğin her epoch sonrasında biz bir fonksiyonumuzun çağrılmasını isteyelim. Bu 
+fonksiyon içerisinde de "loss" değerini ve "val_loss" ekrana yazdırmak isteyelim. 
+Bu işlemi şöyle yapabiliriz:
+
+class MyCallback(Callback):
+    
+    def on_epoch_end(self, epoch, logs):
+        loss = logs['loss']
+        val_loss = logs['val_loss']
+        print(f'epoch: {epoch}, loss: {loss}, val_loss: {val_loss}')
+ 
+mycallback = MyCallback()
+
+hist = model.fit(training_dataset_x, training_dataset_y, batch_size=32, epochs=300, 
+    validation_split=0.2, callbacks=[mycallback], verbose=0)
+
+
+Burada fit metodunun verbose parametresine 0 değerini geçtik. fit metodu (evaluate 
+ve predict metotlarında da aynı durum söz konusu) çalışırken zaten "loss" ve 
+"metrik değerleri" ekrana yazdırmaktadır. verbose parametre için 0 girildiğinde 
+artık fit metodu ekrana bir şey yazmamaktadır. Dolayısıyşa yalnızca bizim callback 
+fonksiyonda ekrana yazdırdıklarımız ekranda görünecektir. 
+
+---------------------------------------------------------------------------------
+fit, evaluate ve predict tarafından çağrılan Callback sınıfının metotlarının en 
+önemli olanları şunlardır:
+
+on_epoch_begin
+on_epoch_end
+on_batch_begin
+on_batch_end
+on_train_begin
+on_train_end
+
+Tabii bir sınıf söz konusu olduğuna göre bu metotların birinci parametreleri self 
+olacaktır. Bu metotların parametreleri aşağıdaki gibidir:
+
+Metot                    Parametreler
+
+on_epoch_begin	            self, epoch ve logs
+on_epoch_end	            self, epoch ve logs
+on_batch_begin	            self, batch ve logs
+on_batch_end	            self, batch ve logs
+on_train_begin 	            self, logs
+on_train_end	            self, logs
+
+---------------------------------------------------------------------------------
+
+---------------------------------------------------------------------------------
+LambdaCallback isimli callback sınıfı bizden __init__ metodu yoluyla çeşitli fonksiyonlar 
+alır ve bu fonksiyonları belli noktalarda çağırır. Metottaki parametreler belli 
+olaylar gerçekleştiğinde çağrılacak fonksiyonları belirtmektedir. Parametrelerin 
+anlamları şöyledir:
+
+on_train_begin: Eğitim başladığında çağrılacak fonksiyonu belirtir. 
+on_train_end: Eğitim bittiğinde çağrılacak fonksiyonu belirtir. 
+on_epoch_begin: Her epoch başladığında çağrılacak fonksiyonu belirtir.
+on_epoch_end: Her epoch bittiğinde çağrılacak fonksiyonu belirtir.
+on_batch_begin: Her batch işleminin başında çağrılacak fonksiyonu belirtir.
+on_batch_end: Her batch işlemi bittiğinde çağrılacak fonksiyonu belirtir. 
+
+Bu fonksiyonların parametreleri şöyle olmalıdır:
+
+  Fonksiyon                 Parametreler
+
+on_epoch_begin	            epoch ve logs
+on_epoch_end	            epoch ve logs
+on_batch_begin	            batch ve logs
+on_batch_end	            batch ve logs
+on_train_begin 	            logs
+on_train_end	            logs
 
 ---------------------------------------------------------------------------------
 """
