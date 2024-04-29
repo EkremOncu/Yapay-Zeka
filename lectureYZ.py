@@ -5828,6 +5828,8 @@ on_train_end	            self, logs
 ---------------------------------------------------------------------------------
 
 ---------------------------------------------------------------------------------
+# LambdaCallback 
+
 LambdaCallback isimli callback sınıfı bizden __init__ metodu yoluyla çeşitli fonksiyonlar 
 alır ve bu fonksiyonları belli noktalarda çağırır. Metottaki parametreler belli 
 olaylar gerçekleştiğinde çağrılacak fonksiyonları belirtmektedir. Parametrelerin 
@@ -5835,10 +5837,13 @@ anlamları şöyledir:
 
 on_train_begin: Eğitim başladığında çağrılacak fonksiyonu belirtir. 
 on_train_end: Eğitim bittiğinde çağrılacak fonksiyonu belirtir. 
+
 on_epoch_begin: Her epoch başladığında çağrılacak fonksiyonu belirtir.
 on_epoch_end: Her epoch bittiğinde çağrılacak fonksiyonu belirtir.
+
 on_batch_begin: Her batch işleminin başında çağrılacak fonksiyonu belirtir.
 on_batch_end: Her batch işlemi bittiğinde çağrılacak fonksiyonu belirtir. 
+
 
 Bu fonksiyonların parametreleri şöyle olmalıdır:
 
@@ -5846,14 +5851,102 @@ Bu fonksiyonların parametreleri şöyle olmalıdır:
 
 on_epoch_begin	            epoch ve logs
 on_epoch_end	            epoch ve logs
+
 on_batch_begin	            batch ve logs
 on_batch_end	            batch ve logs
+
 on_train_begin 	            logs
 on_train_end	            logs
+
+Burada epoch parametresi epoch numarasını, batch parametresi batch numarasını belirtir. 
+loss parametreleri ise birer sözlük belirtmektedir. Bu sözlüğün içerisinde loss 
+değeri gibi metrik değerler gibi önemli bilgiler vardır. epoch'lar için logs 
+parametresi History nesnesindeki anahtarları içermektedir. Ancak batch'ler için 
+logs parametresi "val" önekli değerleri içermeyecektir.(Çünkü validation işlemi
+epochlar bittiğinde uygulanıyor, her batch sonu değil.)
+
+Örneğin biz her epoch bittiğinde, her batch başladığında ve bittiğinde bir 
+fonksiyonumuzun çağrılmasını isteyelim. Bunu şöyle gerçekleştirebiliriz:
+
+def on_epoch_end_proc(epoch, logs):
+   pass
+
+def on_batch_begin_proc(batch, logs):
+   pass
+
+def on_batch_end_proc(batch, logs):
+    pass
+
+from tensorflow.keras.callbacks import LambdaCallback
+
+
+lambda_callback = LambdaCallback( on_epoch_end=on_epoch_end_proc, 
+                on_batch_begin=on_batch_begin_proc, on_batch_end=on_batch_end_proc)
+
+
+hist = model.fit(training_dataset_x, training_dataset_y, batch_size=32, epochs=300, 
+            validation_split=0.2, callbacks=[lambda_callback], verbose=0)
 
 ---------------------------------------------------------------------------------
 """
 
+
+# Özellik Ölçeklemesi (Feature Scaling)
+
+"""
+---------------------------------------------------------------------------------
+Bir nörona giren değerlerin "w" değerleriyle çarpılıp toplandığını (dot-product) 
+ve sonuca bias değerinin toplanarak aktivasyon fonksiyonuna sokulduğunu biliyoruz. 
+Örneğin modelde girdi katmanında x1, x2 ve x3 olmak üzere üç "sütun (feature)" 
+bulunuyor olsun. Bu girdiler ilk saklı katmana sokulduğunda w1x1 + w2x2 + w3x3 + bias 
+biçiminde bir toplam elde edilecektir. Bu toplam da aktivasyon fonksiyonuna sokulacaktır. 
+İşte bu "dot product" işleminde x1, x2, x3 sütunlarının mertebeleri bir birlerinden 
+çok farklıysa mertebesi yüksek olan sütunun "dot product" etkisi yüksek olacaktır. 
+Bu durum da sanki o sütunun daha önemli olarak değerlendirilmesine yol açacaktır. 
+
+Bu biçimdeki bir sinir ağı "geç yakınsar" ve gücü kestirim bakımından zayıflar. 
+İşte bu nedenden dolayı işin başında sütunların (yani özelliklerin) mertebelerininin 
+birbirlerine yaklaştırılması gerekmektedir. Bu işlemlere "özellik ölçeklemesi 
+(feature scaling)" denilmektedir. Yapay sinir ağlarında sütunlar arasında mertebe 
+farklılıkları varsa mutlaka özellik ölçeklemesi yapılmalıdır. 
+
+Özellik ölçeklemesi makine öğrenmesinde başka konularda da gerekebilmektedir. Ancak 
+bazı konularda ise gerekmemektedir.
+
+Çeşitli özellik ölçeklemesi yöntemleri vardır. Veri kümelerinin dağılımına ve 
+kullanılan yöntemlere göre değişik özellik ölçeklendirmeleri diğerlerine göre 
+avantaj sağlayabilmektedir. En çok kullanılan iki özellik ölçeklendirmesi yöntemi 
+" standart ölçekleme (standard scaling)" ve "minmax ölçeklemesi (minmax scaling)" dir. 
+
+---------------------------------------------------------------------------------
+Özellik ölçeklemesi konusunda aşağıdaki sorular sıkça sorulmaktadır:
+
+Soru:  Yapay sinir ağlarında özellik ölçeklemesi her zaman gerekir mi? 
+Cavap: Eğer sütunlar metrebe olarak birbirlerine zaten yakınsa özellik ölçeklemesi 
+       yapılmayabilir. 
+
+Soru:  Gerektiği halde özellik ölçeklemesini yapmazsak ne olur?
+Cevap: Modelin kestirim gücü azalır. Yani performans düşer.
+
+Soru:  Özellik ölçeklemesi gerekmediği halde özellik ölçeklemesi yaparsak bunun 
+       bir zararı dıkunur mu?
+Cevap: Hayır dokunmaz.
+
+Soru:  Kategorik sütunlara (0 ve 1'lerden oluşan ya da one hot encoding yapılmış) 
+       özellik ölçeklemesi uygulayabilir miyiz?
+Cevap: Bu sütunlara özellik ölçeklemesi uygulanmayabilir. Ancak uygulamanın bir 
+       sakıncası olmaz. Genellikle veri bilimcisi tüm sütunlara özellik ölçeklemesi 
+       uyguladığı için bunlara da uygulamaktadır. 
+
+Özellik ölçeklemesi yalnızca x verilerine uygulanmalıdır, y verilerine özellik 
+ölçeklemesi uygulamanın genel olarak faydası ve anlamı yoktur. Ayrıca bir nokta 
+önemlidir: Biz ağımızı nasıl eğitmişsek öyle test ve kestirim yapmalıyız. Yani ağı 
+eğitmeden önce özellik ölçeklemesi yapmışsak test işleminden önce test verilerini 
+de kestirim işleminden önce kestirim verilerini de aynı biçimde ölçeklendirip 
+işleme sokmalıyız.
+
+---------------------------------------------------------------------------------
+"""
 
     
     
