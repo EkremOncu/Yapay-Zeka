@@ -89,9 +89,3 @@ print(predict_result)
 for result in predict_result[:, 0]:
     print('Şeker hastası' if result > 0.5 else 'Şeker Hastası Değil')
 
-
-
-
-
-
-W
