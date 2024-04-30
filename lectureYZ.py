@@ -5948,6 +5948,8 @@ işleme sokmalıyız.
 ---------------------------------------------------------------------------------
 
 ---------------------------------------------------------------------------------
+# standart ölçekleme 
+
 En çok kullanılan özellik ölçeklendirmesi yöntemlerinden biri "standart ölçekleme 
 (standard scaling)" yöntemidir. Bu yöntemde sütunlar diğerlerden bağımsız olarak 
 kendi aralarında standart normal dağılıma uydurulmaktadır. Bu işlem şöyle yapılmaktadır:
@@ -5984,7 +5986,7 @@ def standard_scaler(dataset):
     return (dataset - np.mean(dataset, axis=0)) / np.std(dataset, axis=0)
 
 ---------------------------------------------------------------------------------
-Asında scikit-learn kütüphanesinde sklearn.preprocessing modülü içerisinde zaten 
+Aslında scikit-learn kütüphanesinde sklearn.preprocessing modülü içerisinde zaten 
 standart ölçekleme yapan StandardScaler isimli bir sınıf vardır. Bu sınıf diğer 
 scikit-learn sınıfları gibi kullanılmaktadır. Yani önce StandardScaler sınıfı 
 türünden bir nesne yaratılır. Sonra bu nesne ile fit ve transform metotları çağrılır. 
@@ -6019,6 +6021,116 @@ print()
 
 scaled_dataset = ss.transform(dataset)
 print(scaled_dataset)
+
+---------------------------------------------------------------------------------
+Sinir ağlarında özellik ölçeklemesi yapılırken şu noktaya dikkat edilmelidir: 
+Özellik ölçeklemesi önce eğitim veri kümesinde gerçekleştirilir. Sonra eğitim veri 
+kümesindeki sütunlardaki bilgiler kullanılarak test veri kümesi ve kestirim veri 
+kümesi ölçeklendirilir. (Yani test veri kümesi ve kestirim veri kümesi kendi arasında 
+ölçeklendirilmez. Eğitim veri kümesi referans alınarak ölçeklendirilir. Çünkü modelin 
+test edilmesi ve kestirimi eğitim şartlarında yapılmalıdır.) Bu durumu kodla şöyle 
+ifade edebiliriz:
+
+ss = StandardScaler()
+
+ss.fit(training_dataset_x)
+scaled_training_dataset_x = ss.transform(training_dataset_x)
+
+scaled_test_dataset_x = ss.transform(test_dataset_x)
+
+scaled_predict_dataset_x = ss.transform(predict_dataset_x)
+
+
+Örneğin "diabetes.csv" veri kümesi üzerinde standart ölçekleme yapmak isteyelim. 
+Bunun için önce veri kümesini dataset_x ve dataset_y biçiminde sonra da "eğitim" 
+ve "test" olmak üzere ikiye ayırırız. Ondan sonra eğitim veri kümesi üzerinde 
+özellik ölçeklemesi yapıp eğitimi uygularız. Yukarıda da belirttiğimiz gibi eğitim 
+veri kümesinden elde edilen ölçekleme bilgisinin test işlemi işlemi öncesinde test 
+veri kümesine de, kestirim işlemi öncesinde kestirim veri kümesine de uygulanması 
+gerekmektedir.
+
+---------------------------------------------------------------------------------
+
+---------------------------------------------------------------------------------
+# min-max ölçekleme
+
+Diğer çok kullanılan bir özellik ölçeklemesi yöntemi de "min-max" ölçeklemesi denilen 
+yöntemdir. Bu ölçeklemede sütun değerleri [0, 1] arasında noktalı sayılarla temsil 
+edilir. Min-max ölçeklemesi aşağıdaki temsili kodda olduğu gibi yapılmaktadır:
+
+( a - min(a) ) / ( max(a) - min(a) )
+
+Örneğin sütun değerleri aşağıdaki gibi olsun:
+
+2
+5
+9
+4
+12
+
+Burada min-max ölçeklemesi şöyle yapılmaktadır:
+
+2 => (2 - 2) / 10 (12 - 2)
+5 => (5 - 2) / 10
+9 => (9 - 2) / 10
+4 => (4 - 2) / 10
+12 => (12 - 2) / 10
+
+Min-max ölçeklemesinde en küçük değerin ölçeklenmiş değerinin 0 olduğuna, en büyük 
+değerin ölçeklenmiş değerinin 1 olduğuna, diğer değerlerin ise 0 ile 1 arasında 
+ölçeklendirildiğine dikkat ediniz. 
+
+Min-max ölçeklemesi yapan bir fonksiyon şöyle yazılabilir:
+
+import numpy as np
+
+def minmax_scaler(dataset):
+    scaled_dataset = np.zeros(dataset.shape)
+    for col in range(dataset.shape[1]):
+        min_val, max_val = np.min(dataset[:, col]), np.max(dataset[:, col])
+        scaled_dataset[:, col] = 0 if max_val - min_val == 0 else (dataset[:, col] - min_val) / (max_val - min_val)
+        
+    return scaled_dataset
+
+
+Bir sütundaki tüm değerlerin aynı olduğunu düşünelim. Böyle bir sütunun veri kümesinde 
+bulunmasının bir faydası olabilir mi? Tabii ki olmaz. Min-max ölçeklemesi yaparken 
+sütundaki tüm değerler aynı ise sıfıra bölme gibi bir anomali oluşabilmektedir.
+Yukarıdak kodda bu durum da dikkate alınmıştır. (Tabii aslında böyle bir sütun 
+ön işleme aşamasında veri kümesinden zaten atılması gerekir.) Yukarıdaki fonksiyonu 
+yine NumPy'ın eksensel işlem yapma yenetiğini kullanarak tek satırda da yazabiliriz:
+
+def minmax_scaler(dataset):
+    return (dataset - np.min(dataset, axis=0)) / (np.max(dataset, axis=0) - np.min(dataset, axis=0))
+
+---------------------------------------------------------------------------------
+sckit-learn kütüphanesinde sklearn.preprocessing modülünde min-max ölçeklemesi 
+yapan MinMaxScaler isimli bir sınıf da bulunmaktadır. Sınıfın kullanımı tamamen 
+benzerleri gibidir. Örneğin:
+
+from sklearn.preprocessing import MinMaxScaler
+
+mms = MinMaxScaler()
+mms.fit(dataset)
+scaled_dataset = mms.transform(dataset)
+
+Yine sınıfın fit ve tarnsform işlemini birlikte yapan fit_transform isimli metodu 
+bulunmaktadır. 
+
+---------------------------------------------------------------------------------
+
+---------------------------------------------------------------------------------
+# maxabs ölçekleme
+
+Diğer bir özellik ölçeklemesi de "maxabs" ölçeklemesi denilen ölçeklemedir. Maxabs 
+ölçeklemesinde sütundaki değerler sütundaki değerlerin mutlak değerlerinin en 
+büyüğüne bölünmektedir.  Böylece sütun değerleri [-1, 1] arasına ölçeklenmektedir. 
+maxabs ölçeklemesi şöyle yapılmaktadır:
+
+x / max(abs(x))
+
+Burada sütundaki tüm değerler en büyük mutlak değere bölündüğüne göre ölçeklenmiş 
+değerler -1 ile +1 arasında olacaktır.
 
 ---------------------------------------------------------------------------------
 """
