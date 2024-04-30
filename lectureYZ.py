@@ -5946,6 +5946,81 @@ de kestirim işleminden önce kestirim verilerini de aynı biçimde ölçeklendi
 işleme sokmalıyız.
 
 ---------------------------------------------------------------------------------
+
+---------------------------------------------------------------------------------
+En çok kullanılan özellik ölçeklendirmesi yöntemlerinden biri "standart ölçekleme 
+(standard scaling)" yöntemidir. Bu yöntemde sütunlar diğerlerden bağımsız olarak 
+kendi aralarında standart normal dağılıma uydurulmaktadır. Bu işlem şöyle yapılmaktadır:
+
+result = (x - mean(x) ) / std(x)
+
+Tabii burada biz formülü temsili kod (pseudo code) olarak verdik. Burdaki "mean" 
+sütunun ortalamasını "std" ise standart sapmasını belirtmektedir. Sütunu bu biçimde 
+ölçeklendirdiğimizde değerler büyük ölçüde 0'ın etrafında toplanır. Standart 
+ölçeklemenin değerleri standart normal dağılma uydurmaya çalıştığına dikkat ediniz. 
+
+Standart ölçeklemeye "standardizasyon (standardization)" da denilmektedir. Standart 
+ölçekleme aşırı uçtaki değerlerden (outliers) olumsuz bir biçimde etkilenme eğilimindedir. 
+Veri bilimcileri genellikle standart ölçeklemeyi default ölçekleme olarak kullanmaktadır. 
+Bir NumPy dizisindeki sütunları aşağıdaki gibi bir fonksiyonla standart ölçeklemeye 
+sokabiliriz.
+
+Standart ölçekleme yapan bir fonksiyonu aşağıdaki gibi yazabiliriz:
+
+def standard_scaler(dataset):
+    scaled_dataset = np.zeros(dataset.shape)
+    
+    for col in range(dataset.shape[1]):
+        scaled_dataset[:, col] = (dataset[:, col] - np.mean(dataset[:, col])) / np.std(dataset[:, col])
+    
+    return scaled_dataset
+
+
+Tabii aslında NumPy'ın eksensel işlem yapma özelliğinden faydalanarak yukarıdaki 
+işlemi aşağıdaki gibi tek satırla da yapabiliriz:
+
+    
+def standard_scaler(dataset):
+    return (dataset - np.mean(dataset, axis=0)) / np.std(dataset, axis=0)
+
+---------------------------------------------------------------------------------
+Asında scikit-learn kütüphanesinde sklearn.preprocessing modülü içerisinde zaten 
+standart ölçekleme yapan StandardScaler isimli bir sınıf vardır. Bu sınıf diğer 
+scikit-learn sınıfları gibi kullanılmaktadır. Yani önce StandardScaler sınıfı 
+türünden bir nesne yaratılır. Sonra bu nesne ile fit ve transform metotları çağrılır. 
+Tabii fit ve transform metotlarında aynı veri kümesi kullanılacaksa bu işlem tek 
+hamlede fit_transform metoduyla yapılabilir. Örneğin:
+
+from sklearn.preprocessing import StandardScaler
+
+ss = StandardScaler()
+ss.fit(dataset)
+scaled_dataset = ss.tranform(dataset)
+
+
+fit işlemi sütunların ortalamasını ve standart sapmasını nesnenin içerisinde saklamaktadır. 
+transform işleminde bu bilgiler kullanılmaktadır. fit işleminden sonra nesnenin 
+özniteliklerinden sütunlara ilişkin bu bilgiler elde edilebilir. Örneğin fit işleminden 
+sonra sınıfın mean_ örnek özniteliğinden sütun ortalamaları, scale_ örnek özniteliğinden 
+sütun standart sapmaları ve var_ örnek özniteliğinden sütunların varyansları elde 
+edilebilir.
+
+
+dataset = np.array([[1, 2, 3], [2, 1, 4], [7, 3, 8], [8, 9, 2], [20, 12, 3]])
+print(dataset)
+
+from sklearn.preprocessing import StandardScaler
+
+ss = StandardScaler()
+ss.fit(dataset)
+
+print(f'{ss.mean_}, {ss.scale_}')
+print()
+
+scaled_dataset = ss.transform(dataset)
+print(scaled_dataset)
+
+---------------------------------------------------------------------------------
 """
 
     
