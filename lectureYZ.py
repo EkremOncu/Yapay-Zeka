@@ -6134,8 +6134,115 @@ x / max(abs(x))
 Burada sütundaki tüm değerler en büyük mutlak değere bölündüğüne göre ölçeklenmiş 
 değerler -1 ile +1 arasında olacaktır.
 
+
+import numpy as np
+
+def maxabs_scaler(dataset):
+    scaled_dataset = np.zeros(dataset.shape)
+    
+    for col in range(dataset.shape[1]):
+        maxabs_val = np.max(np.abs(dataset[:, col]))
+        scaled_dataset[:, col] = 0 if maxabs_val == 0 else  dataset[:, col] / maxabs_val
+        
+    return scaled_dataset
+
+---------------------------------------------------------------------------------
+maxabs ölçeklemesi yapan bir fonksiyon şöyle yazılabilir:
+
+def maxabs_scaler(dataset):
+        return dataset /  np.max(np.abs(dataset), axis=0)
+
+---------------------------------------------------------------------------------
+
+---------------------------------------------------------------------------------
+Biz yukarıda üç ölçeklendirmeyi tanıttık. Bunlar "standart ölçekleme", "minmax 
+ölçeklemesi" ve "maxabs ölçeklemesi" idi. Aslında bunların dışında başka ölçeklemeler 
+de kullanılabilmektedir. Bu konuda başka kaynaklara başvurabilirsiniz. Pekiyi 
+elimizdeki veri kümesi için hangi ölçeklemenin daha iyi olduğuna nasıl karar 
+verebiliriz? Aslında bu kararı vermenin çok pratik yolları yoktur. En iyi yöntem 
+yine de "deneme yanılma yoluyla" kıyaslama yapmaktır. Fakat yine de ölçekleme 
+türünü seçerken aşağıdaki durumlara dikkat edilmelidir:
+
+- Sütunlarda aşırı uç değerlerin (outliers) bulunduğu durumda minmax ölçeklemesi 
+ölçeklenmiş değerlerin birbirinden uzaklaşmasına yol açabilmektedir. Bu durumda 
+bu ölçeklemenin performansı düşürebileceğine dikkat etmek gerekir. 
+
+- Sütunlardaki değerler normal dağılıma benziyorsa (örneğin doğal birtakım olgulardan 
+geliyorsa) standart ölçekleme diğerlerine göre daha iyi performans gösterebilmektedir. 
+
+- Sütunlardaki değerler düzgün dağılmışsa ve aşırı uç değerler yoksa minmax ölçeklemesi 
+tercih edilebilir. 
+
+Ancak yine uygulamacılar veri kümeleri hakkında özel bir bilgiye sahip değilse ve 
+deneme yanılma yöntemini kullanmak istemiyorlarsa standart ölçeklemeyi default 
+ölçekleme olarak tercih etmektedir.  
+
 ---------------------------------------------------------------------------------
 """
+
+"""
+---------------------------------------------------------------------------------
+Peki özellik ölçeklemesi yaptığımız bir modeli nasıl saklayıp geri yükleyebiliriz? 
+Yukarıdaki örneklerde biz özellik ölçeklemesini scikit-learn kullanarak yaptık. 
+Sequential sınıfının save metodu modeli save ederken bu ölçeklemeler modelin bir 
+parçası olmadığı için onları saklayamamaktadır. Bu nedenle bizim bu bilgileri ayrıca 
+save etmemiz gerekmektedir. Ancak Keras'ta özellik ölçeklendirmeleri bir katman 
+nesnesi olarak da bulundurulmuştur. Eğer özellik ölçeklemeleri bir katman ile 
+yapılırsa bu durumda modeli zaten save ettiğimizde bu bilgiler de save edilmiş 
+olacaktır. Biz burada scikit-learn ölçekleme bilgisinin nasıl saklanacağı ve geri 
+yükleneceği üzerinde duracağız. 
+
+---------------------------------------------------------------------------------
+Programalamada bir sınıf nesnesinin diskteki bir dosyaya yazılmasına ve oradan 
+geri yüklenmesine "nesnelerin seri hale getirilmesi (object serialization)" 
+denilmektedir. scikit-learn içerisinde "object serialiazation" işlemine yönelik 
+özel sınıflar yoktur. Ancak seri hale getirme işlemi Python'un standart kütüphanesindeki 
+pickle modülü ile yapılabilmektedir. 
+
+Örneğin scikit-learn ile standard ölçekleme yapmış olalım ve bu ölçekleme bilgisini 
+Python'un standart pickle modülü ile bir dosyada saklamak isteyelim. Bu işlemi 
+şöyle yapabiliriz:
+
+    
+import pickle
+
+with open('diabetes-scaling.dat', 'wb') as f:
+    pickle.dump(ss, f)    
+
+
+Nesneyi dosyadan geri yükleme işlemi de şöyle yapılmaktadır:
+
+    
+with open('diabetes-scaling.dat', 'rb') as f:
+    ss = pickle.load(f)    
+
+
+Aşağıdaki örnekte model "diabetes.h5" dosyası içerisinde, MinMaxScaler nesnesi 
+de "diabetes-scaling.dat" dosyası içerisinde saklanmıştır ve geri yüklenmiştir. 
+
+
+model.save('diabetes.h5')
+
+import pickle
+
+with open('diabetes-scaling.dat', 'wb') as f:
+    pickle.dump(ss, f)    
+
+
+# diabetes-scaling-load.py
+
+import numpy as np
+
+from tensorflow.keras.models import load_model
+import pickle 
+
+model = load_model('diabetes.h5')
+
+with open('diabetes-scaling.dat', 'rb') as f:
+    ss = pickle.load(f)
+    
+---------------------------------------------------------------------------------
+"""        
 
     
     
