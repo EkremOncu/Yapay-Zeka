@@ -5736,7 +5736,8 @@ elde edilebilir. Örneğin:
 from tensorflow.keras.callbacks import History
 hist = History()
 
-model.fit(training_dataset_x, training_dataset_y, batch_size=32, epochs=300, validation_split=0.2, callbacks=[hist])
+model.fit(training_dataset_x, training_dataset_y, batch_size=32, epochs=300, 
+          validation_split=0.2, callbacks=[hist])
 
 Tabii buna hiç gerek yoktur. Zaten bu History callback nesnesi fit metodu tarafından 
 metodun içerisinde oluşturulup geri dönüş değeri yoluyla bize verilmektedir.
@@ -5922,14 +5923,14 @@ avantaj sağlayabilmektedir. En çok kullanılan iki özellik ölçeklendirmesi 
 Özellik ölçeklemesi konusunda aşağıdaki sorular sıkça sorulmaktadır:
 
 Soru:  Yapay sinir ağlarında özellik ölçeklemesi her zaman gerekir mi? 
-Cavap: Eğer sütunlar metrebe olarak birbirlerine zaten yakınsa özellik ölçeklemesi 
+Cavap: Eğer sütunlar mertebe olarak birbirlerine zaten yakınsa özellik ölçeklemesi 
        yapılmayabilir. 
 
 Soru:  Gerektiği halde özellik ölçeklemesini yapmazsak ne olur?
 Cevap: Modelin kestirim gücü azalır. Yani performans düşer.
 
 Soru:  Özellik ölçeklemesi gerekmediği halde özellik ölçeklemesi yaparsak bunun 
-       bir zararı dıkunur mu?
+       bir zararı dokunur mu?
 Cevap: Hayır dokunmaz.
 
 Soru:  Kategorik sütunlara (0 ve 1'lerden oluşan ya da one hot encoding yapılmış) 
@@ -5973,7 +5974,8 @@ def standard_scaler(dataset):
     scaled_dataset = np.zeros(dataset.shape)
     
     for col in range(dataset.shape[1]):
-        scaled_dataset[:, col] = (dataset[:, col] - np.mean(dataset[:, col])) / np.std(dataset[:, col])
+        scaled_dataset[:, col] = dataset[:, col] - np.mean(dataset[:, col]) 
+                                 / np.std(dataset[:, col])
     
     return scaled_dataset
 
@@ -6007,7 +6009,7 @@ sonra sınıfın mean_ örnek özniteliğinden sütun ortalamaları, scale_ örn
 sütun standart sapmaları ve var_ örnek özniteliğinden sütunların varyansları elde 
 edilebilir.
 
-
+import numpy as np
 dataset = np.array([[1, 2, 3], [2, 1, 4], [7, 3, 8], [8, 9, 2], [20, 12, 3]])
 print(dataset)
 
