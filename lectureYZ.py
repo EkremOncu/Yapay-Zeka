@@ -6196,9 +6196,17 @@ yükleneceği üzerinde duracağız.
 Programalamada bir sınıf nesnesinin diskteki bir dosyaya yazılmasına ve oradan 
 geri yüklenmesine "nesnelerin seri hale getirilmesi (object serialization)" 
 denilmektedir. scikit-learn içerisinde "object serialiazation" işlemine yönelik 
-özel sınıflar yoktur. Ancak seri hale getirme işlemi Python'un standart kütüphanesindeki 
-pickle modülü ile yapılabilmektedir. 
+özel sınıflar yoktur. Ancak seri hale getirme işlemi Python'un standart 
+kütüphanesindeki pickle modülü ile yapılabilmektedir. 
 
+object serialization --->> Bir sınıfın bütün bilgilerini bir dosyaya yazıp daha
+                         sonra geri okumaya denir.
+
+--> Nesne serileştirme bir nesnenin bellekteki durumunu veya verilerini, onu 
+saklamak, aktarmak veya başka bir programda yeniden oluşturmak için bir veri 
+akışına dönüştürme işlemidir.
+
+---------------------------------------------------------------------------------    
 Örneğin scikit-learn ile standard ölçekleme yapmış olalım ve bu ölçekleme bilgisini 
 Python'un standart pickle modülü ile bir dosyada saklamak isteyelim. Bu işlemi 
 şöyle yapabiliriz:
@@ -6216,7 +6224,7 @@ Nesneyi dosyadan geri yükleme işlemi de şöyle yapılmaktadır:
 with open('diabetes-scaling.dat', 'rb') as f:
     ss = pickle.load(f)    
 
-
+---------------------------------------------------------------------------------
 Aşağıdaki örnekte model "diabetes.h5" dosyası içerisinde, MinMaxScaler nesnesi 
 de "diabetes-scaling.dat" dosyası içerisinde saklanmıştır ve geri yüklenmiştir. 
 
@@ -6242,7 +6250,80 @@ with open('diabetes-scaling.dat', 'rb') as f:
     ss = pickle.load(f)
     
 ---------------------------------------------------------------------------------
-"""        
+
+---------------------------------------------------------------------------------
+# Normalization
+
+Keras'a sonradan eklenen Normalization isimli katman özellik ölçeklemesi yapabilmektedir. 
+Normalization katmanı default olarak "standart ölçekleme" için düşünülmüştür. Ancak 
+"minmax ölçeklemesi" için de kullanılabilir. Bu katmanı kullanabilmek için önce 
+Normalization türünden bir nesnenin yaratılması gerekir. Normalization sınıfının 
+__init__ metodunun parametrik yapısı şöyledir:
+
+tf.keras.layers.Normalization(axis=-1, mean=None, variance=None, invert=False, **kwargs)
+
+Burada mean sütunların ortalama değerlerini, variance ise sütunların varysans 
+değerlerini almaktadır. Ancak programıcnın bu değerleri girmesine gerek yoktur. 
+Normalization sınıfının adapt isimli metodu bizden bir veri kümesi alıp bu 
+değerleri o kümeden elde edebilmektedir. Bu durumda standart ölçekleme için 
+Normalization katmanı aşağıdaki gibi oluşturulabilir. 
+
+from tensorflow.keras.layers import Normalization
+
+norm_layer = Normalization()
+norm_layer.adapt(traininf_dataset_x)
+
+
+Tabii nu katmanı input katmanından sonra modele eklememiz gerekir. Örneğin:
 
     
-    
+model = Sequential(name='Diabetes')
+
+model.add(Input((training_dataset_x.shape[1],)))
+
+model.add(norm_layer)
+
+model.add(Dense(16, activation='relu', name='Hidden-1'))
+model.add(Dense(16, activation='relu', name='Hidden-2'))
+model.add(Dense(1, activation='sigmoid', name='Output'))
+model.summary()
+
+---------------------------------------------------------------------------------
+import numpy as np
+
+dataset = np.array([[1, 2, 3], [4, 5, 6], [3, 2, 7], [5, 9, 5]])
+print(dataset)
+print('--------')
+
+from tensorflow.keras.layers import Normalization
+
+norm_layer = Normalization()
+norm_layer.adapt(dataset)
+
+print(norm_layer.mean)
+print('--------')
+print(norm_layer.variance)    
+
+---------------------------------------------------------------------------------    
+!!!!
+
+Tabii biz ölçeklemeyi bir katman biçiminde modele eklediğimizde artık test ve 
+predict işlemlerinde ayrıca ölçekleme yapmamıza gerek kalmamaktadır. Bu katman 
+zaten modele dahil olduğuna göre işlemler ölçeklendirilerek yapılacaktır.Yukarıda 
+da belirttiğimiz gibi özellik ölçeklemesini Keras'ın bir katmanına yaptırdığımızda 
+ayrıca ölçekleme bilgilerinin saklanmasına gerek olmadığına dikkat ediniz. Çünkü 
+ölçekleme bilgileri artık modelin bir parçası durumundadır. 
+
+!!!!
+---------------------------------------------------------------------------------
+
+
+
+
+
+
+---------------------------------------------------------------------------------
+"""        
+
+
+
