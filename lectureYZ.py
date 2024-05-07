@@ -6262,7 +6262,7 @@ __init__ metodunun parametrik yapısı şöyledir:
 
 tf.keras.layers.Normalization(axis=-1, mean=None, variance=None, invert=False, **kwargs)
 
-Burada mean sütunların ortalama değerlerini, variance ise sütunların varysans 
+Burada mean sütunların ortalama değerlerini, variance ise sütunların varyans 
 değerlerini almaktadır. Ancak programıcnın bu değerleri girmesine gerek yoktur. 
 Normalization sınıfının adapt isimli metodu bizden bir veri kümesi alıp bu 
 değerleri o kümeden elde edebilmektedir. Bu durumda standart ölçekleme için 
@@ -6271,7 +6271,7 @@ Normalization katmanı aşağıdaki gibi oluşturulabilir.
 from tensorflow.keras.layers import Normalization
 
 norm_layer = Normalization()
-norm_layer.adapt(traininf_dataset_x)
+norm_layer.adapt(training_dataset_x)
 
 
 Tabii nu katmanı input katmanından sonra modele eklememiz gerekir. Örneğin:
@@ -6316,14 +6316,132 @@ ayrıca ölçekleme bilgilerinin saklanmasına gerek olmadığına dikkat ediniz
 
 !!!!
 ---------------------------------------------------------------------------------
+Keras'ta minmax ölçeklemesi için hazır bir katman bulunmamaktadır. Ancak böyle 
+bir katman nesnesi programcı tarafından da oluşturulabilir. 
 
+Tabi biz henüz Tensorflow kütüphanesini incelemediğimiz için şu anda böyle bir 
+örnek vermeyeceğiz.
 
+Aslında hazır Normalization sınıfını biz minmax ölçeklemesi için de kullanabiliriz. 
+Standart ölçeklemenin aşağıdaki gibi yapıldığını anımsayınız:
 
+(X - mu) / sigma
 
+Burada mu ve sigma ilgili sütunun ortalamasını ve standart sapmasını belirtmektedir. 
+Minmax ölçeklemesinin ise şöyle yapıldığını anımsayınız:
 
+(X - min ) / (max - min)
+
+O halde biz aslında standart ölçeklemeyi minmax ölçeklemesi haline de getirebiliriz. 
+Burada mu değerinin min, sigma değerinin ise max - min olması gerektiğine dikkat 
+ediniz. Örneğin.
+
+mins = np.min(training_dataset_x, axis=0)
+maxmin_diffs = np.max(training_dataset_x, axis=0) - np.min(training_dataset_x, axis=0)
+norm_layer = Normalization(mean=mins, variance=maxmin_diffs ** 2)
+
+---------------------------------------------------------------------------------
+Anımsanacağı gibi çıktının sınıfsal olmadığı modellere "regresyon modelleri" deniyordu. 
+Biz kursumuzda bu durumu vurgulamak için "lojistik olmayan regresyon modelleri" 
+terimini de kullanıyorduk. Regreson modellerinde sinir ağının çıktı katmanındaki 
+aktivasyon fonksiyonu "linear" olmalıdır. Linear aktivasyon fonksiyonu bir şey 
+yapmayan fonksiyondur. Başka bir deyişle f(x) değerinin x ile aynı olduğu fonksiyondur. 
+(Zaten anımsanacağı gibi Dense katmanında activation parametresi girilmezse default 
+durumda aktivasyon fonksiyonu "linear" alınmaktaydı.)
 
 ---------------------------------------------------------------------------------
 """        
+
+
+# Lojistik olmayan regresyon modeli
+
+"""
+---------------------------------------------------------------------------------
+Auto-MPG otomobillerin bir galon benzinle kaç mil gidebildiklerininin (başka bir 
+deyişle yakıt tüketiminin) tahmin edilmesi amacıyla oluşturulmuş bir veri kümesidir. 
+Regresyon problemleri için sık kullanılan veri kümelerinden biridir. Veriler 80'li 
+yılların başlarında toplanmıştır. O zamanki otomobil teknolojisi dikkate alınmalıdır. 
+Veri kümesi aşağıdaki adresten indirilebilir:
+
+https://archive.ics.uci.edu/dataset/9/auto+mpg
+
+Veri kümesi bir zip dosyası olarak indirilmektedir. Buradaki "auto-mpg.data" 
+dosyasını kullanabilirsiniz. Zip dosyasındaki "auto-mpg.names" dosyasında veri 
+kümesi hakkında açıklamalar ve sütunların isimleri ve anlamları bulunmaktadır. 
+
+Veri kümsindeki sütunlar SPACE karakterleriyle ve son sütun da TAB karakteriyle 
+birbirlerinden ayrılmıştır. Sütunların anlamları şöyledir:
+
+1. mpg:           continuous
+2. cylinders:     multi-valued discrete
+3. displacement:  continuous
+4. horsepower:    continuous
+5. weight:        continuous
+6. acceleration:  continuous
+7. model year:    multi-valued discrete
+8. origin:        multi-valued discrete
+9. car name:      string (unique for each instance)
+
+Burada orijin kategorik bir sütundur. Buradaki değer 1 ise araba Amerika orijinli, 
+2 ise Avrupa orijinli ve 3 ise Japon orijinlidir.
+
+Veri kümesinin text dosyadaki görünümü aşağıdaki gibidir:
+
+18.0   8   307.0      130.0      3504.      12.0   70  1	"chevrolet chevelle malibu"
+15.0   8   350.0      165.0      3693.      11.5   70  1	"buick skylark 320"
+18.0   8   318.0      150.0      3436.      11.0   70  1	"plymouth satellite"
+16.0   8   304.0      150.0      3433.      12.0   70  1	"amc rebel sst"
+17.0   8   302.0      140.0      3449.      10.5   70  1	"ford torino"
+25.0   4   98.00      ?          2046.      19.0   71  1	"ford pinto"
+19.0   6   232.0      100.0      2634.      13.0   71  1	"amc gremlin"
+16.0   6   225.0      105.0      3439.      15.5   71  1	"plymouth satellite custom"
+17.0   6   250.0      100.0      3329.      15.5   71  1	"chevrolet chevelle malib
+....   
+
+
+Veri kümesi incelendiğinde dördüncü sütunda (horsepower) '?' karakteri ile belirtilen 
+eksik verilerin bulunduğu görülmektedir. Veri kümesindeki veriler az olmadığı için 
+bu eksik verilerin bulunduğuğu satırlar tamamen atılabilir. Ya da daha önceden 
+de yaptığımız gibi ortalama değerle imputation uygulanabilir. Ayrıca arabanın yakıt 
+tüketimi arabanın markası ile ilişkili olsa da arabaların pek çok alt modelleri 
+vardır. Bu nedenle son sütundaki araba isimlerinin kestirimde faydası dokunmayacaktır. 
+Bu sütun da veri kümesinden atılabilir.
+
+Veri kümesinin bir başlık kısmı içermediğine dikkat ediniz. read_csv default durumda 
+veri kümesinde başlık kısmının olup olmadığına kendi algoritması ile karar vermektedir. 
+Ancak başlık kısmının bu biçimde read_csv tarafından otomatik belirlenmesi sağlam 
+bir yöntem değildir. Bu nedenle bu veri kümesi okunurken read_csv fonksiyonunda 
+header parametresi None geçilmelidir. read_csv default olarak sütunlardaki ayıraçların 
+',' karakteri olduğunu varsaymaktadır. Halbuki bu veri kümesinde sütun ayıraçları 
+ASCII SPACE ve TAB karakterleridir. Bu nedenle dosyanın read_csv tarafından düzgün 
+parse edilebilmesi için delimeter parametresine r'\s+' biçiminde "düzenli ifade 
+(regular expression)" kalıbı girilmelidir. (Düzenli ifadeler "Python Uygulamaları" 
+kursunda ele alınmaktadır.) read_csv fonksiyonu eğer dosyada başlık kısmı yoksa 
+sütun isimlerini 0, 1, ... biçiminde nümerik almaktadır. 
+
+Bu durumda yukarıdaki veri kümsinin okunması şöyle yapılabilir:
+
+df = pd.read_csv('auto-mpg.data', delimiter=r'\s+', header=None)
+
+Şimdi bizim araba markalarının bulunduğu son sütundan kurtulmamız gerekir. Bu 
+işlemi şöyle yapabiliriz:
+
+df = df.iloc[:, :-1]
+
+Tabii bu işlemi DataFrame sınıfının drop metodu ile de yapabiliriz:
+
+df.drop(8, axis=1, inplace=True)
+
+Aslında bu sütun read_csv ile okuma sırasında usecols parametresi yardımıyla da 
+atılabilir. 
+---------------------------------------------------------------------------------
+"""   
+
+
+
+
+
+
 
 
 
