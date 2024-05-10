@@ -5962,9 +5962,8 @@ sütunun ortalamasını "std" ise standart sapmasını belirtmektedir. Sütunu b
 ölçeklendirdiğimizde değerler büyük ölçüde 0'ın etrafında toplanır. Standart 
 ölçeklemenin değerleri standart normal dağılma uydurmaya çalıştığına dikkat ediniz. 
 
-Standart ölçeklemeye "standardizasyon (standardization)" da denilmektedir. Standart 
-ölçekleme aşırı uçtaki değerlerden (outliers) olumsuz bir biçimde etkilenme eğilimindedir. 
-Veri bilimcileri genellikle standart ölçeklemeyi default ölçekleme olarak kullanmaktadır. 
+Standart ölçeklemeye "standardizasyon (standardization)" da denilmektedir. Veri 
+bilimcileri genellikle standart ölçeklemeyi default ölçekleme olarak kullanmaktadır. 
 Bir NumPy dizisindeki sütunları aşağıdaki gibi bir fonksiyonla standart ölçeklemeye 
 sokabiliriz.
 
@@ -6434,6 +6433,146 @@ df.drop(8, axis=1, inplace=True)
 
 Aslında bu sütun read_csv ile okuma sırasında usecols parametresi yardımıyla da 
 atılabilir. 
+
+---------------------------------------------------------------------------------
+Şimdi de 3'üncü indeksli sütundaki eksik verileri temsil eden '?' bulunan satırlar 
+üzerinde çalışalım. Yukarıda da belirttiğimiz gibi bu sütundaki eksik verilerin 
+sayıları çok az olduğu için veri kümesinden atılabilirler. Bu işlem şöyle yapılabilir:
+
+df = df[df.iloc[:, 3] != '?']
+
+Ancak biz geçmiş konuları da kullanabilmek için bu eksik verileri sütun ortalamaları 
+ile doldurmaya (imputation) çalışalım. Burada dikkat edilmesi gereken nokta DataFrame 
+nesnesinin 3'üncü indeksli sütununun türünün nümerik olmamasıdır. Bu nedenle
+öncelikle bu sütunun türünü nümerik hale getirmek gerekir. Tabii sütunda '?' 
+karakterleri olduğuna göre önce bu karakterler yerine 0 gibi nümerik değerleri 
+yerleştirmeliyiz:
+
+df.iloc[df.loc[:, 3] == '?', 3] = 0
+
+Tabii eğer ilgili sütunda zaten 0 değerleri varsa bu durumda 0 ile doldurmak yerine 
+np.nan değeri ile dolduma yolunu tercih edebilirsiniz. Örneğin:
+
+df.iloc[df.loc[:, 3] == '?', 3] = np.nan
+
+Artık sütunun türünü nümerik hala getirebiliriz:
+
+df[3] = df[3].astype('float64')
+
+Aslında read_csv ile okuma sırasında da fonksiyonun na_values parametresi yardımıyla 
+işin başında '?' karakterleri yerine fonksiyonun np.nan değerlerini yerleştirmesini 
+de sağlayabiliriz.
+
+Burada doğrudan indekslemede sütun isimlerinin kullanılması gerektiğine, sütun 
+isimlerinin de sütun başlığı olmadığı için sayısal biçimde verildiğine dikkat ediniz. 
+Artık 3'üncü indeksli sütun üzerinde imputation uygulayabiliriz:
+    
+---------------------------------------------------------------------------------
+from sklearn.impute import SimpleImputer
+
+si = SimpleImputer(strategy='mean', missing_values=0)
+df[3] = si.fit_transform(df[[3]])
+
+Henüz NumPy'a dönmeden önce 7'inci sütundaki kategorik verileri Pandas'ın get_dummies 
+fonksiyonu ile "one hot encoding" biçimine dönüştürebiliriz:
+
+df = pd.get_dummies(df, columns=[7], dtype='uint8')
+
+Artık NumPy'a dönebiliriz:
+
+dataset = df.to_numpy()
+
+Şimdi de veri kümesini x ve y olarak ayrıştıracağız. Ancak y verilerinin son 
+sütunda değil ilk sütunda olduğuna dikkat ediniz:
+
+dataset_x = dataset[:, 1:]
+dataset_y = dataset[:, 0]   
+
+Bundan sonra veri kümesi eğitim ve test amasıyla train_test_slit fonksiyonu ile 
+ayrıştrılabiliriz
+
+from sklearn.model_selection import train_test_split
+
+training_dataset_x, test_dataset_x, training_dataset_y, test_dataset_y = 
+
+train_test_split(dataset_x, dataset_y, test_size=0.2)      
+
+
+Artık özellik ölçeklemesi yapabiliriz. Özellik ölçeklemesini scikit-learn kullanarak 
+ya da yukarıda da bahsettiğimiz gibi Normalization isimli Keras katmanı kullanarak 
+da yapabiliriz. Sütun dağılımlarına bakıldığında standart ölçekleme yerine minmax 
+ölçeklemesinin daha iyi performans verebileceği izlenimi edinilmektedir. Ancak 
+bu konuda deneme yanılma yöntemi uygulamak gerekir. Biz default standart ölçekleme 
+uygulayalım:
+
+
+from sklearn.preprocessing import StandardScaler
+
+ss = StandardScaler()
+ss.fit(training_dataset_x)
+
+scaled_training_dataset_x = ss.transform(training_dataset_x)
+
+scaled_test_dataset_x = ss.transform(test_dataset_x)
+
+
+Artık modelimizi oluşturabiliriz. Bunun için yine iki saklı katman kullanacağız. 
+Saklı katmanlardaki aktivasyon fonksiyonlarını yine "relu" olarak alacağız. Ancak 
+çıktı katmanındaki aktivasyonun "linear" olması gerektiğini anımsayınız:
+
+
+model = Sequential(name='Auto-MPG')
+
+model.add(Input((training_dataset_x.shape[1],)))
+
+model.add(Dense(32, activation='relu', name='Hidden-1'))
+model.add(Dense(32, activation='relu', name='Hidden-2'))
+
+model.add(Dense(1, activation='linear', name='Output'))
+model.summary()
+
+Şimdi de modelimizi compile edip fit işlemi uygulayalım. Modelimiz için optimizasyon 
+algoritması yine "rmsprop" seçilebilir. Regresyon problemleri için loss fonksiyonunun 
+genellikle "mean_squared_error" biçiminde alınabileceğini belirtmiştik. Yine 
+regresyon problemleri için "mean_absolute_error" metrik değeri kullanılabilir:
+
+model.compile(optimizer='rmsprop', loss='mse', metrics=['mae'])
+
+hist = model.fit(scaled_training_dataset_x, training_dataset_y, batch_size=32, 
+                 epochs=200, validation_split=0.2)
+
+
+Modelimizi test veri kümesiyle test edebiliriz:
+
+eval_result = model.evaluate(scaled_test_dataset_x, test_dataset_y, batch_size=32)    
+
+for i in range(len(eval_result)):
+    print(f'{model.metrics_names[i]}: {eval_result[i]}')
+
+
+Şimdi kestirim yapmaya çalışalım. Kesitirilecek veriler üzerinde de one-hot encoding 
+dönüştürmesinin ve özellik ölçeklemesinin yapılması gerektiğini anımsayınız. 
+Kestirilecek verileri bir "predict.csv" isimli bir dosyada aşağıdaki gibi oluşturmuş 
+olalım:
+
+8,307.0,130.0,3504,12.0,70,1	
+4,350.0,165.0,3693,11.5,77,2	
+8,318.0,150.0,3436,11.0,74,3
+
+Bu dosyayı okuduktan predict işlemi yapmadan önce sonra sırasıyla "one hot encoding" 
+ve standart ölçeklemenin uygulanması gerekir:
+
+predict_df = pd.read_csv('predict.csv', header=None)
+predict_df = pd.get_dummies(predict_df, columns=[6])
+
+predict_dataset_x = predict_df.to_numpy() 
+scaled_predict_dataset_x = ss.transform(predict_dataset_x)
+
+predict_result = model.predict(scaled_predict_dataset_x)
+
+
+for val in predict_result[:, 0]:
+    print(val)
 ---------------------------------------------------------------------------------
 """   
 
