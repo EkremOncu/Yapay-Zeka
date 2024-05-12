@@ -55,7 +55,7 @@ model.add(Dense(32, activation='relu', name='Hidden-2'))
 model.add(Dense(1, activation='linear', name='Output'))
 model.summary()
 
-model.compile(optimizer='rmsprop', loss='mse', metrics=['mae'])
+model.compile(optimizer='rmsprop', loss='mean_squared_error', metrics=['mae'])
 hist = model.fit(scaled_training_dataset_x, training_dataset_y, batch_size=32, epochs=200, validation_split=0.2)
 eval_result = model.evaluate(scaled_test_dataset_x, test_dataset_y, batch_size=32)
 

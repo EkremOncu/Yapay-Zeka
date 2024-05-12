@@ -8,7 +8,7 @@ from tensorflow.keras.models import load_model
 model = load_model('auto-mpg.h5')
 
 with open('auto-mpg.pickle', 'rb') as f:
-    ohe, ss = pickle.load(f)    
+    ohe_train, ss = pickle.load(f)    
 
 predict_df = pd.read_csv('predict.csv', header=None)
 
@@ -18,7 +18,7 @@ predict_df_2 = predict_df.iloc[:, [6]]
 predict_dataset_1 = predict_df_1.to_numpy()
 predict_dataset_2 = predict_df_2.to_numpy()
 
-predict_dataset_2  = ohe.transform(predict_dataset_2)
+predict_dataset_2  = ohe_train.transform(predict_dataset_2)
 
 predict_dataset = np.concatenate([predict_dataset_1, predict_dataset_2], axis=1)
 
