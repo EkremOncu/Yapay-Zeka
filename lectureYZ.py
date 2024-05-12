@@ -6573,6 +6573,47 @@ predict_result = model.predict(scaled_predict_dataset_x)
 
 for val in predict_result[:, 0]:
     print(val)
+
+---------------------------------------------------------------------------------
+
+---------------------------------------------------------------------------------
+One hot encoding işleminde Pandas'ın get_dummies fonksiyonunu kullanırken dikkat 
+ediniz. Bu fonksiyon one hot encoding yapılacak sütundaki kategorileri kendisi 
+belirlemektedir. (Yani bu fonksiyon one hot encoding yapılacak sütunda unique olan
+değerlerden hareketle kategorileri belirlemektedir.) Eğer predict yapacağınız CSV 
+dosyasındaki satırlar tüm kategorileri içermezse bu durum bir sorun yaratır. 
+scikit-learn içerisindeki OneHotEncoder sınıfı bu tür durumlarda "categories" 
+isimli parametreyle bizlere yardımcı olmaktadır. Maalesef get_dummies fonksiyonun 
+böyle bir parametresi yoktur. 
+
+OneHotEncoder sınfının __init__ metodunda categories isimli parametre ilgili 
+sütundaki kategorileri belirtmek için düşünülmüştür. Ancak biz mevcut kategorilerden 
+daha fazla kategori oluşturmak istiyorsak bu parametredeki listeye eklemeler 
+yapabiliriz. categories parametresi iki boyutlu bir liste olarak girilmelidir. 
+Çünkü birden fazla sütun one hot encoding işlemine sokulabilmektedir. Bu durumda 
+bu iki boyutlu listenin her elemanı sırasıyla sütunlardaki kategorileri belirtir. 
+Örneğin:
+
+ohe = OneHotEncoder(sparse=False, categories=[[0, 1, 2], ['elma', 'armut', 'kayısı']])
+
+Burada biz iki sütunlu bir veri tablosunun iki sütununu da one hot encoding yapmak 
+istemekteyiz. Bu veri tablosunun ilk sütunundaki kategoriler 0, 1, 2 biçiminde, 
+ikinci sütunundaki kategoriler 'elma', 'armut', 'kayısı' biçimindedir. Eğer bu 
+sütunlarda daha az kategori varsa burada belirtilen sayıda ve sırada sütun oluşturulur. 
+
+predict işlemi yapılırken uygulanan "one hot encoding" işlemindeki sütunların 
+eğitimdeki "one hot encoding" sütunlarıyla uyuşması gerekir. Aslında kütüphanelerde 
+one hot encoding işlemini yapan fonksiyonlar ve metotlar önce sütunlardaki unique 
+elemanları belirleyip sonra onları sıraya dizip sütunları bu sırada oluşturmaktadır. 
+Örneğin Pandas'daki get_dummies fonklsiyonu ve scikit-learn'deki OneHotEncoder 
+sınıfı böyle davranmaktadır. Fakat yine de tam uyuşma için one hot encoding 
+işlemlerini farklı sınıflarla yapmamaya çalışınız. Predict işlemindeki one hot 
+encoding sütunların eğitimde kullanılan one hot encoding sütunlarıyla uyuşmasını 
+sağlamak için eğitimde kullanılan sütunlardaki değerleri saklabilirsiniz. OneHotEncoder
+sınıfının categories_ örnek özniteliği zaten bu kategorileri bize vermektedir. 
+Tabii daha önce yaptığımız gibi pickle modülü ile bu OneHotEncoder nesnesini 
+bütünsel olarak saklayıp predict aşamasında kullanabiliriz.
+
 ---------------------------------------------------------------------------------
 """   
 
