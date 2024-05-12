@@ -6352,7 +6352,7 @@ durumda aktivasyon fonksiyonu "linear" alınmaktaydı.)
 """        
 
 
-# Lojistik olmayan regresyon modeli
+# Auto-MPG
 
 """
 ---------------------------------------------------------------------------------
@@ -6614,14 +6614,87 @@ sınıfının categories_ örnek özniteliği zaten bu kategorileri bize vermekt
 Tabii daha önce yaptığımız gibi pickle modülü ile bu OneHotEncoder nesnesini 
 bütünsel olarak saklayıp predict aşamasında kullanabiliriz.
 
+Bir veri kümesinde "one hot encoding" yapılacak birden fazla sütun varsa veri kümesini
+önce "one hot encoding" yapılacak kısım ile yapılmayacak kısmı iki parçaya ayırıp 
+one hot encoding işlemini tek hamlede birden fazla sütun için uygulayabilirsiniz. 
+Anımsanacağı gibi scikit-learn içerisindeki OneHotEncoder sınıfı zaten tek 
+hamlede birden fazla sütunu one hot encoding yapabiliyordu. 
+
 ---------------------------------------------------------------------------------
 """   
 
 
+# Boston Housing Prices (BHP)
+"""
+---------------------------------------------------------------------------------
+Regresyon problemlerinde çok kullanılan veri kümelerinden biri de "Boston Housing Prices (BHP)" 
+isimli veri kümesidir. Bu veri kümesi daha önce görümüş olduğumuz "Melbourne 
+Housing Snapshot (MHS)" veri kümesine benzemektedir. Bu veri kümesinde evlerin 
+çeşitli bilgileri sütunlar halinde kodlanmıştır. Amaç yine evin fiyatını tahmin 
+etmektir. Veriler 1070 yılında toplanmıştır. Veri kümesi aşağıdaki bağlantıdan 
+indirilebilir:
+
+https://www.kaggle.com/datasets/vikrishnan/boston-house-prices
+
+Buradan veri kümesi bir zip dosyası biçiminde indirilmektedir. Zip dosyası açıldığında 
+"housing.csv" isimli dosya elde edilmektedir. Veri kümesi aşağıdaki görünümdedir:
+
+    
+0.00632  18.00   2.310  0  0.5380  6.5750  65.20  4.0900   1  296.0  15.30 396.90   4.98  24.00
+0.02731   0.00   7.070  0  0.4690  6.4210  78.90  4.9671   2  242.0  17.80 396.90   9.14  21.60
+0.02729   0.00   7.070  0  0.4690  7.1850  61.10  4.9671   2  242.0  17.80 392.83   4.03  34.70
+0.03237   0.00   2.180  0  0.4580  6.9980  45.80  6.0622   3  222.0  18.70 394.63   2.94  33.40
+0.06905   0.00   2.180  0  0.4580  7.1470  54.20  6.0622   3  222.0  18.70 396.90   5.33  36.20
+0.02985   0.00   2.180  0  0.4580  6.4300  58.70  6.0622   3  222.0  18.70 394.12   5.21  28.70
+0.08829  12.50   7.870  0  0.5240  6.0120  66.60  5.5605   5  311.0  15.20 395.60  12.43  22.90
+0.14455  12.50   7.870  0  0.5240  6.1720  96.10  5.9505   5  311.0  15.20 396.90  19.15  27.10
+............
 
 
+Burada da görüldüğü gibi her ne kadar dosyasının uzantısı "csv" ise de aslında 
+sütunlar virgüllerle değil, SPACE karakterleriyle ayrıştırılmıştır. Tüm sütunlarda 
+zaten sayısal bilgiler olduğu için aslında dosya en kolay bir biçimde NumPy'ın 
+loadtxt fonksiyonuyla okunabilir. Örneğin:
 
+dataset = np.loadtxt('C:\\Users\\Lenovo\\Desktop\\GitHub\\YapayZeka\\Src\\6- BostonHousingPrices\\housing.csv')
 
+Ancak biz kursumuzda ilk aşamaları Pandas ile yaptığımızdan aynı süreçleri izlemek 
+için okumayı da yine Pandas'ın read_csv fonksiyonuyla yapacağız. Tabii read_csv 
+fonksiyonunda yine delimiter parametresi boşlukları belirten "düzenli ifade (regular
+expression)" biçiminde olmalıdır. Dosyada bir başlık kısmının olmadığına da 
+dikkat ediniz. Örneğin:
 
+df = pd.read_csv('housing.csv', header=None, delimiter=r'\s+')
+
+Veri kümesindeki sütunlar için İngilizce aşağıdaki açıklamalar yapılmıştır:
+
+1. CRIM: per capita crime rate by town
+2. ZN: proportion of residential land zoned for lots over 25,000 sq.ft.
+3. INDUS: proportion of non-retail business acres per town
+4. CHAS: Charles River dummy variable (= 1 if tract bounds river; 0 otherwise)
+5. NOX: nitric oxides concentration (parts per 10 million)
+6. RM: average number of rooms per dwelling
+7. AGE: proportion of owner-occupied units built prior to 1940
+8. DIS: weighted distances to ﬁve Boston employment centers
+9. RAD: index of accessibility to radial highways
+10. TAX: full-value property-tax rate per $10,000
+11. PTRATIO: pupil-teacher ratio by town 
+12. B: 1000(Bk−0.63)2 where Bk is the proportion of blacks by town 
+13. LSTAT: % lower status of the population
+14. MEDV: Median value of owner-occupied homes in $1000s
+
+Buradaki son sütun evin fiyatını 1000 dolar cinsinden belirtmektedir. Veri kümesinde 
+eksik veri yoktur. Veri kümesinin 4'üncü sütununda kategorik bir bilgi bulunmaktadır. 
+Ancak bu alanda yalnızca 0 ve 1 biçiminde iki değer vardır. İki değerli sütunlar 
+için "one hot encoding" işlemine gerek olmadığını anımsayınız. Ancak 9'uncu sütunda 
+ikiden daha fazla sınıf içeren kategorik bir bilgi bulunmaktadır. Dolayısıyla yine 
+onu "one hot encoding" yapabiliriz. Sütunlar arasında önemli basamaksal farklılıklar 
+göze çarpmaktadır. Yani veri kümesi üzerinde özellik ölçeklemesinin yapılması 
+gerekmektedir. Veri kümesinin sütunlarında aşırı uç değerler (outliars) de 
+bulunmamaktadır. Özellik ölçeklemesi için standart ölçekleme ya da min-max 
+ölçeklemesi kullanılabilir. 
+
+---------------------------------------------------------------------------------
+"""
 
 
