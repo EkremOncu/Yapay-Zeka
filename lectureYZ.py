@@ -6789,4 +6789,71 @@ for val in predict_result[:, 0]:
 ---------------------------------------------------------------------------------
 """
 
+"""
+---------------------------------------------------------------------------------
+Biz regresyon terimini daha çok "çıktının bir sınıf değil sayısal bir değer olduğu" 
+modeller için kullanıyorduk. Bu paragrafta daha genel bir terim olarak kullanacağız. 
+Regresyon çeşitli biçimlerde yani çeşitli yöntemlerle gerçekleştirilebilmektedir. 
+Aslında yapay sinir ağları da regresyon için bir yöntem grubunu oluşturmaktadır. 
 
+Regresyon en genel anlamda girdi ile çıktı arasında bir ilişki kurma sürecini 
+belirtmektedir. Matematiksel olarak regresyon y = f(x) biçiminde bir f fonksiyonunun 
+elde edilme süreci olarak da tanımlanabilir. Eğer biz böyle bir f fonksiyonu bulursak 
+x değerlerini fonksiyonda yerine koyarak y değerini elde edebiliriz. Tabi y = f(x) 
+fonksiyonunda x değişkeni aslında (x0, x1, x2, ..., xn) biçiminde birden fazla 
+değişkeni de temsil ediyor olabilir. Bu durumda f fonksiyonu f((x0, x1, x2, ..., xn)) 
+biçiminde çok değişkenli bir fonksiyon olacaktır. Benzer biçimde y = f(x) eşitliğinde 
+f fonksiyonu birden fazla değer de veriyor olabilir. Yani buradaki y değeri 
+(y0, y1, y2, ..., ym) biçiminde de olabilir. 
+
+---------------------------------------------------------------------------------
+ İstatistikte regresyon işlemleri tipik olarak aşağıdaki gibi sınıflandırılmaktadır:
+
+- Eğer bağımsız değişken (x değişkeni) bir tane ise buna genellikle "basit regresyon 
+(simple regression)" denilmektedir. 
+
+
+- Eğer bağımsız değişken (x değişkeni) birden fazla ise buna da genellikle 
+"çoklu regresyon (mulptiple regression)" denilmektedir. 
+
+
+- Eğer girdiyle çıktı arasında doğrusal bir ilişki kurulmak isteniyorsa (yani regresyon 
+işleminden doğrusal bir fonksiyon elde edilmek isteniyorsa) bu tür regresyonlara 
+"doğrusal regresyon (linear regression)" denilmektedir. Doğrusal regresyon da 
+bağımsız değişken bir tane ise "basit doğrusal regresyon (simple linear regression)", 
+bağımsız değişken birden fazla ise "çoklu doğrusal regresyon (multiple linear 
+regression)" biçiminde ikiye ayrılabilmektedir. 
+   
+
+- Bağımsız değişken ile bağımlı değişken arasında polinomsal ilişki kurulmaya 
+çalışılabilir. (Yani regresyon sonucunda bir polinom elde edilmeye çalışılabilir). 
+Buna da "polinomsal regresyon (polynomial regression)" denilmektedir. Bu da yine 
+basit ya da çoklu olabilir. Aslında işin matematiksel tarafında polinomsal regresyon 
+bir transformasyonla doğrusal regresyon haline dönüştürülebilmektedir. Dolayısıyla 
+doğrusal regresyonla polinomsal regresyon arasında aslında işlem bakımından önemli 
+bir fark yoktur.
+
+
+- Girdiyle çıktı arasında doğrusal olmayan bir ilişki de kurulmak istenebilir. 
+(Yani doğrusal olmayan bir fonksiyon da oluşturulmak istenebilir). Bu tür regresyonlara 
+"doğrusal olmayan regresyon (nonlinear regressions)" denilmektedir. Yukarıda da 
+belirttiğimiz gibi her ne kadar polinomlar doğrusal fonksiyonlar olmasa da bunlar 
+transformasyonla doğrusal hale getirilebildikleri için doğrusal olmayan regresyon 
+denildiğinde genel olarak polinomsal regresyonlar kastedilmemektedir. Örneğin 
+logatirmik, üstel regresyonlar doğrusal olmayan regresyonlara örnektir. 
+
+
+- Bir regresyonda çıktı da birden fazla olabilir. Genellikle (her zaman değil) 
+bu tür regresyonlara "çok değişkenli (multivariate)" regresyonlar denilmektedir. 
+Örneğin:
+
+(y1, y2) = f((x1, x2, x3, x4, x5))
+
+Regresyon terminolojisinde "çok değişkenli" sözcüğü bağımsız değişkenin birden 
+fazla olmasını değil (buna "çoklu" denilmektedir) bağımlı değişkenin birden fazla 
+olmasını anlatan bir terimdir. İngilizce bu bağlamda "çok değişkenli" terimi 
+"multivariate" biçiminde ifade edilmektedir. 
+
+
+---------------------------------------------------------------------------------
+"""
