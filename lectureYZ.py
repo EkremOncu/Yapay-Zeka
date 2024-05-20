@@ -6855,5 +6855,62 @@ olmasını anlatan bir terimdir. İngilizce bu bağlamda "çok değişkenli" ter
 "multivariate" biçiminde ifade edilmektedir. 
 
 
+- Eğer regresyonun çıktısı kategorik değerler ise yani f fonksiyonu kategorik bir 
+değer üretiyorsa buna "lojistik regresyon (logictic regression)" ya da "logit 
+regresyonu" denilmektedir. Lojistk regresyonda çıktı iki sınıftan oluşuyorsa 
+(hasta-sağlıklı gibi, olumlu-olumsuz gibi, doğru-yanlış gibi) böyle lojistik 
+regresyonlara "iki sınıflı lojistik regresyon (binary logistic regression)" denilmektedir. 
+Eğer çıktı ikiden fazla sınıftan oluşuyorsa böyle lojistik regresyonlara da 
+"çok sınıflı lojistik regresyon (multi-class/multinomial logistic regression)" 
+denilmektedir. Tabii aslında makine öğrenmesinde ve sinir sinir ağlarında 
+"lojistik regresyon" terimi yerine "sınıflandırma (classification)" terimi tercih 
+edilmektedir. Bizim de genellikle (ancak her zaman değil) kategorik kestirim modellerine 
+"lojistik regresyon modelleri" yerine "sınıflandırma problemleri" dediğimizi 
+anımsayınız.
+   
+
+- Sınıflandırma problemlerinde bir de "etiket (label)" kavramı sıklıkla karşımıza 
+çıkmaktadır. Etiket genellikle çok değişkenli (multivariate) sınıflandırma problemlerinde 
+(yani çıktının birden fazla olduğu ve kategorik olduğu problemlerde) her çıktı 
+için kullanılan bir terimdir. 
+
+Örneğin biz bir sinir ağından üç bilgi elde etmek isteyebiliriz: "kişinin hasta olup 
+olmadığı", "kişinin obez olup olmadığı", "kişinin mutlu olup olmadığı". Burada 
+üç tane etiket vardır. Sınıf kavramının belli bir etiketteki kategorileri belirtmek 
+için kullanıldığına dikkat ediniz. Etiketlerin sayısına göre lojistik regresyon 
+modelleri (yani "multivariate lojistik regresyon" modelleri) genellikle aşağıdaki 
+gibi sınıflandırılmaktadır:
+
+* Tek Etiketli İki Sınıflı Sınıflandırma (Single Label Binary Classification) Modelleri: 
+
+Bu modellerde çıktı yani etiket bir tanedir. Etiket de iki sınıftan oluşmaktadır. 
+Örneğin bir tümörün iyi huylu mu kötü huylu mu olduğunu kestirimeye çalışan model 
+tek etiketli iki sınıflı modeldir.
+
+
+* Tek Etiketli Çok Sınıflı Sınıflandırma (Single Label Multiclass) Modelleri: 
+    
+Burada bir tane çıktı vardır. Ancak çıktı ikiden fazla sınıftan oluşmaktadır. 
+Örneğin bir resmin "elma mı, armut mu, kayısı mı" olduğunu anlamaya çalışan 
+sınıflandırma problemi tek etiketli çok sınıflı bir modeldir. 
+
+
+* Çok Etiketli İki Sınıflı Sınıflandırma (Multilabel Binary Classification) Modelleri: 
+    
+Çok etiketli modeller denildiğinde zaten default olarak iki sınıflı çok etiketli 
+modeller anlaşılmaktadır. Örneğin bir yazının içeriğine göre yazıyı tag'lamak 
+istediğimizde her tag ayrı bir etikettir. O tag'ın olması ya da olmaması da iki 
+sınıflı bir çıktı belirtmektedir. 
+
+
+* Çok Etiketli Çok Sınıflı Sınıflandırma (Multilabel Multiclass / Multidimentional Classification) Modelleri: 
+
+Bu tür modellere genellikle "çok boyutlu (multidimentional)" modeller denilmektedir. 
+Yani çıktı birden fazladır. Her çıktıda ikiden fazla sınıfa ilişkin olabilmektedir. 
+Bu modelleri çok etiketli sınıflandırma modellerinin genel biçimi olarak düşünebilirsiniz.
+  
 ---------------------------------------------------------------------------------
 """
+
+
+
