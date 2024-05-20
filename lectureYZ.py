@@ -6624,7 +6624,7 @@ hamlede birden fazla sütunu one hot encoding yapabiliyordu.
 """   
 
 
-# Boston Housing Prices (BHP)
+# Boston Housing Prices (BHP) --- lojistik olmayan regresyon problemi
 """
 ---------------------------------------------------------------------------------
 Regresyon problemlerinde çok kullanılan veri kümelerinden biri de "Boston Housing Prices (BHP)" 
@@ -6912,5 +6912,19 @@ Bu modelleri çok etiketli sınıflandırma modellerinin genel biçimi olarak d�
 ---------------------------------------------------------------------------------
 """
 
+
+
+# iris (zambak) --- çok sınıflı sınıflandırma(lojistik regresyon) problemi
+
+"""
+---------------------------------------------------------------------------------
+
+
+
+
+
+
+---------------------------------------------------------------------------------
+"""
 
 
