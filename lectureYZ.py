@@ -6918,11 +6918,102 @@ Bu modelleri çok etiketli sınıflandırma modellerinin genel biçimi olarak d�
 
 """
 ---------------------------------------------------------------------------------
+Şimdi de tek etiketli çok sınıflı bir sınıflandırma problemine örnek verelim. 
+Örneğimizde "iris (zambak)" isimli bir veri kümesini kullanacağız. Bu veri kümesi 
+bu tür uygulamalarda örnek veri kümesi olarak çok sık kullanılmaktadır. Veri 
+kümesi aşağıdaki bağlantıdan indirilebilir:
+
+https://www.kaggle.com/datasets/uciml/iris?resource=download
+
+Yukarıdaki bağlantıdan Iris veri kümesi ibir zip dosyası biçiminde indirilmektedir. 
+Bu zip dosyası açıldığında "Iris.csv" dosyası elde edilecektir.
+
+Veri kümesi aşağıdaki görünümdedir:
+
+Id,SepalLengthCm,SepalWidthCm,PetalLengthCm,PetalWidthCm,Species
+1,5.1,3.5,1.4,0.2,Iris-setosa
+2,4.9,3.0,1.4,0.2,Iris-setosa
+3,4.7,3.2,1.3,0.2,Iris-setosa
+4,4.6,3.1,1.5,0.2,Iris-setosa
+5,5.0,3.6,1.4,0.2,Iris-setosa
+6,5.4,3.9,1.7,0.4,Iris-setosa
+7,4.6,3.4,1.4,0.3,Iris-setosa
+8,5.0,3.4,1.5,0.2,Iris-setosa
+9,4.4,2.9,1.4,0.2,Iris-setosa
+......
+
+Veri kümesinde üç grup zambak vardır: "Iris-setosa", "Iris-versicolor" ve 
+"Iris-virginica". x verileri ise çanak (sepal) yaprakların ve taç (petal) yaprakların 
+genişlik ve yüksekliklerine ilişkin dört değerden oluşmaktadır. Veri kümesi 
+içerisinde "Id" isimli ilk sütun sıra numarası belirtir. Dolayısıyla kestirim 
+sürecinde bu sütunun bir faydası yoktur.
+ 
+!!!
+Çok sınıflı sınıflandırma (multiclass lojistik regresyon) problemlerinde çıktıların 
+(yani y verilerinin) "one-hot encoding" işlemine sokulması gerekir. 
+!!!
+
+Çıktı sütunu one-hot encoding yapıldığında uygulamacının hangi sütunların hangi 
+sınıfları belirttiğini biliyor olması gerekir. (Anımsanacağı gibi Pandas'ın 
+get_dummies fonksiyonu aslında unique fonksiyonunu ile elde ettiği unique değerleri 
+sort ettikten sonra "one-hot encoding" işlemi yapmaktadır. (Dolayısıyla aslında 
+get_dummies fonksiyonu sütunları kategorik değerleri küçükten büyüğe sıraya dizerek 
+oluşturmaktadır. Scikit-learn içerisindeki OneHotEncoder sınıfı zaten kendi 
+içerisinde categories_ özniteliği le bu sütunların neler olduğunu bize vermektedir. 
+Tabii aslında OneHotEncoder sınıfı da kendi içerisinde unique işlemini uygulamaktadır. 
+NumPy'ın unique fonksiyonunun aynı zamanda sıraya dizmeyi de yaptığını anımsayınız. 
+Yani aslında categories_ özniteliğindeki kategoriler de leksikografik olarak sıraya 
+dizilmiş biçimdedir.)
+
+Veri kümesini aşağıdaki gibi okuyabiliriz:
+
+df = pd.read_csv('Iris.csv')
+
+x verilerini aşağıdaki gibi ayrıştırabiliriz:
+
+dataset_x = df.iloc[:, 1:-1].to_numpy(dtype='float32')
+
+y verilerini aşağıdaki gibi onet hot encoding yaparak ayrıştırabiliriz:
+
+ohe = OneHotEncoder(sparse= False)
+dataset_y = ohe.fit_transform(df.iloc[:, -1].to_numpy().reshape(-1, 1))
 
 
+Anımsanacağı gibi çok sınıflı sınıflandırma problemlerindeki loss fonksiyonu 
+"categorical_crossentropy", çıktı katmanındaki aktivasyon fonksiyonu "softmax" 
+olmalıdır. Metrik değer olarak "binary_accuracy" yerine "categorical_accuracy" 
+kullanılmalıdır.(Keras metrik değer olarak "accuracy" girildiğinde zaten problemin 
+türüne göre onu "binary_accuracy" ya da "categorical_accuracy" biçiminde ele 
+alabilmektedir.) Veri kümesi yine özellik ölçeklemesine sokulmalıdır. Bunun için 
+standart ölçekleme kullanılabilir. Sinir ağı modelini şöyle oluşturulabiliriz:
+
+    
+model = Sequential(name='Iris')
+
+model.add(Input((training_dataset_x.shape[1], ), name='Input'))
+model.add(Dense(64, activation='relu', name='Hidden-1'))
+model.add(Dense(64, activation='relu', name='Hidden-2'))
+
+model.add(Dense(dataset_y.shape[1], activation='softmax', name='Output'))
+model.summary()
 
 
+Çok sınıflı modellerin çıktı katmanında sınıf sayısı kadar nöron olması gerektiğini 
+belirtmiştik. Çıktı katmanında aktivasyon fonksiyonu olarak softmax alındığı için 
+çıktı değerlerinin toplamı 1 olmak zorundadır. Bu durumda biz kestirim işlemi 
+yaparken çıktıdaki en büyük değerli nöronu tespit etmemiz gerekir. 
 
+Tabii aslında bizim en büyük çıktıya sahip olan nöronun çıktı değerinden ziyade 
+onun çıktıdaki kaçıncı nöron olduğunu tespit etmemiz gerekmektedir. Bu işlem tipik 
+olarak NumPy kütüphanesindeki argmax fonksiyonu ile yapılabilir. Pekiyi varsayalım 
+ki ilki 0 olmak üzere 2 numaralı nöronun değeri en yüksek olmuş olsun. Bu 2 
+numaralı nöron hangi sınıfı temsil etmektedir? 
+
+İşte bu 2 numaralı nöron aslında eğitimdeki dataset_y sütununun one hot encoding 
+sonucundaki 2 numaralı sütununu temsil eder. O halde bizim dataset_y değerlerini 
+one-hot encoding yaparken hangi sütunun hangi sınıfa karşı geldiğini biliyor 
+olmamız gerekir. Zaten OneHotEncoder sınıfının bu bilgiyi categories_ örnek 
+özniteliğinde sakladığını anımsayınız.
 
 ---------------------------------------------------------------------------------
 """
