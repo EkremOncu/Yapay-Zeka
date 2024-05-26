@@ -6864,9 +6864,9 @@ Eğer çıktı ikiden fazla sınıftan oluşuyorsa böyle lojistik regresyonlara
 "çok sınıflı lojistik regresyon (multi-class/multinomial logistic regression)" 
 denilmektedir. Tabii aslında makine öğrenmesinde ve sinir sinir ağlarında 
 "lojistik regresyon" terimi yerine "sınıflandırma (classification)" terimi tercih 
-edilmektedir. Bizim de genellikle (ancak her zaman değil) kategorik kestirim modellerine 
-"lojistik regresyon modelleri" yerine "sınıflandırma problemleri" dediğimizi 
-anımsayınız.
+edilmektedir. Bizim de genellikle (ancak her zaman değil) kategorik kestirim 
+modellerine "lojistik regresyon modelleri" yerine "sınıflandırma problemleri" 
+dediğimizi anımsayınız.
    
 
 - Sınıflandırma problemlerinde bir de "etiket (label)" kavramı sıklıkla karşımıza 
@@ -7093,3 +7093,51 @@ for pi in predict_indexes:
 """
 
 
+
+"""
+---------------------------------------------------------------------------------
+Yapay zeka ve makine öğrenmesinin en önemli uygulama alanlarından biri de "doğal 
+dil işleme (natuaral lanuage processing)" alanıdır. Doğal dil işleme denildiğinde 
+Türkçe, İngilizce gibi konuşma dilleri üzerindeki her türlü işlemler kastedilmektedir. 
+Bugün doğal dil işlemede artık ağırlıklı olarak makine öğrenmesi teknikleri 
+kullanılmaktadır. Örneğin makine çevirisi (machine translation) süreci aslında 
+ana konu olarak doğal dil işlemenin bir konusudur. Ancak bugün artık makine çevirileri 
+artık neredeyse  tamamen makine öğrenmesi teknikleriyle  yapılmaktadır. Doğal dil 
+işleme alanı ile ilişkili olan diğer bir alanda "metin madenciliği (text mining)" 
+denilen alandır. Metin madenciliği metinler içerisinden faydalı bilgilerin çekilip 
+alınması ve onlardan faydalanılması ile ilgili süreçleri belirtmektedir. Bugün 
+veri madenciliğinde de yine veri bilimi ve makine öğrenmesi teknikleri yoğun 
+olarak kullanılmaktadır. 
+
+Metinler üzerinde makine öğrenmesi teknikleri uygulanırken metinlerin ön işlemlere 
+sokularak sayısal biçime dönüştürülmesi gerekir. Çünkü makine öğrenmesi tekniklerinde 
+yazılar üzerinde değil sayılar üzerinde işlemler yapılmaktadır. Bu nedenle makine 
+öğrenmesinde yazılar üzerinde çalışılırken doğal dil işleme ve metin madenciliği 
+alanlarında daha önceden elde edilmiş bilgiler ve deneyimler kullanılmaktadır. 
+Örneğin bir film hakkında aşağıdaki gibi bir yazı olsun:
+
+"Filmi pek beğenmedim. Oyuncular iyi oynayamamışlar. Filmde pek çok abartılı 
+sahneler de vardı. Neticede filmin iyi mi kötü mü olduğu konusunda kafam karışık. 
+Size tavsiyem filme gidip boşuna para harcamayın!"
+
+Bu yazıyı sayısal hale dönüştürmedne önce yazı üzerinde bazı ön işlemlerin 
+yapılması gerekebilmektedir. Tipk önişlemler şunlardır:
+
+- Yazıyı sözcüklere ayırma ve noktalama işaretlerini atma (tokenizing)
+- Sözükleri küçük harfe ya da büyük harfe dönüştürmek (transformation)
+- Kendi başına anlamı olyaman edatlar gibi, soru ekleri gibi sözcüklerin atılması 
+(bunlara İngilizce "stop words") denilmektedir. 
+- Sözcüklerin köklerini elde edilmesi ve köklerinin kullanılması (stemming)
+- Bağlam içerisinde farklı sözcüklerin aynı sözcükle yer değiştirmesi (lemmatization)
+
+Yukarıdaki işlemleri yapabilen çeşitli kütüphaneler de bulunmaktadır. Bunlardan 
+Python'da en çok kullanılanlardan biri NLTK isimli kütüphanedir. 
+
+Sözcükleri birbirinden bağımsız sayılar biçiminde ele alarak denetimli ya da 
+denetimsiz modeller oluşturulabilmektedir. Ancak son 20 yılda yazılardaki 
+sözcüklerin bir bağlam içerisinde ele alınabilmesine yönelik sinir ağları 
+geliştirilmiştir. Bunun için sözcüklerin sırası dikkate alınır ve sinir ağına 
+bir hafıza kazandırılır.
+
+---------------------------------------------------------------------------------
+"""
