@@ -12,7 +12,7 @@ ohe_result_test = ohe.transform(test_dataset_x[:, 8].reshape(-1, 1))
 import numpy as np
 
 training_dataset_x = np.delete(training_dataset_x, 8, axis=1)
-test_dataset_x = np.delete(test_dataset_x, 8, axis=1)
+test_dataset_x = np.delete(test_dataset_x, 8, axis=1)   
 
 training_dataset_x = np.insert(training_dataset_x, [8], ohe_result_training, axis=1)
 test_dataset_x = np.insert(test_dataset_x, [8], ohe_result_test, axis=1)
