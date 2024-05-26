@@ -7141,3 +7141,60 @@ bir hafıza kazandırılır.
 
 ---------------------------------------------------------------------------------
 """
+
+
+# Sentiment Analysis
+
+"""
+---------------------------------------------------------------------------------
+Sınıflandırma problemlerinde üzerinde çalışılan problem gruplarından biri de 
+"sentiment analysis" denilen gruptur. Bu grup problemlerde kişiler bir olgu hakkında 
+kanılarını belirten yazılar yazarlar. Buradaki kanılar tipik olarak "olumlu", 
+"olumsuz" biçiminde iki sınıflıdır. Ancak çok sınıflı kanılar da söz konusu 
+olabilmektedir. Sentiment analysis için oluşturulmuş çeşitli örnek veri kümeleri 
+vardır. Bunlardan en çok kullanılanlarından biri "IMDB (Internet Movie Database)" 
+veri kümesidir. Bu veri kümesinde kişiler bir film hakkında yorum yazısı yazmışlardır. 
+Bu yorum yazısı "positive" ya da "negative" olarak sınıflandırılmaktadır. Böylece 
+birisinin yazdığı yazının olumlu ya da olumsuz yargı içerdiği otomatik olarak 
+tespit edilebilmektedir. 
+
+Bu problemde girdiler (yani dataset_x) tipik olarak yazılardan oluşmaktadır. Çıktı 
+ise tipik olarak ikili bir çıktıdır. IMDB veri kümesini aşağıdaki bağlantıdan 
+indirebilirsiniz:
+
+https://www.kaggle.com/datasets/lakshmi25npathi/imdb-dataset-of-50k-movie-reviews
+
+Buradan veri kümesi zip dosyası olarak indirilir. Açıldığında "IMDB Dataset.csv" 
+isimli CSV dosyası elde edilmektedir. Bu CSV dosaysında "review" ve "sentiment" 
+isimli iki sütun vardır. "review" sütunu film hakkındaki yorum yazısını "sentiment" 
+sütunu ise "positive" ya da "negative" yazısını içermektedir. Buradaki model 
+"ikili sınflandırma" problemi biçimindedir. 
+
+Bu tarz problemlerde girdiler birer yazı olduğu için işlemlere doğrudan sokulamazlar. 
+Önce onların bir biçimde sayısal hale dönüştürülmeleri gerekir. Yazıların sayısal 
+hale dönüştürülmesi için tipikm olarak iki yöntem kullanılmaktadır:
+
+1) Vektörizasyon (vectorization) yöntemi
+2) Sözcük Gömme (Word Embedding) yöntemi
+
+
+Her iki yöntemde de önce yazılar sözcüklere ayrılır ve gerekli görülen ön işlemlerden 
+geçirilir. Böylece bir yazı bir sözcük grubu haline getirilir. Biz burada en basit 
+yöntem olan "vektörizasyon" yöntemi üzerinde duracağız. Sözcük gömme yöntemi 
+sonraki paragraflarda ele alınacaktır. Vektörizasyon şöyle bir yöntemdir:
+
+- Tüm yorumlardaki tüm sözcüklerin kümesine "kelime haznesi (vocabulary)" denilmektedir. 
+Örneğin IMDB veri kümesinde tek olan tüm sözcüklerin sayısı 50000 ise kelime 
+haznesi bu 50000 sözcükten oluşmaktadır. 
+
+- Veri kümesindeki x verileri yorum sayısı kadar satırdan, sözcük haznesindeki 
+sözcük sayısı kadar sütundan oluşan iki boyutlu bir matris biçiminde oluşturulur. 
+Örneğin sözcük haznesindeki sözcük sayısı 50000 ise ve toplamda veri kümesinde 
+10000 yorum varsa x veri kümesi 10000x50000 büyüklüğünde bir matris biçimindedir. 
+Bir yorum bu matriste bir satır ile temsil edilmektedir. Yoruma ilişkin satırda 
+eğer sözcük haznesindeki bir sözcük kullanılmışsa o sözcüğe ilişkin sütun 1, 
+kullanılmamışsa 0 yapılmaktadır. Böylece yorum yazıları 0'lardan ve 1'lerden 
+oluşmuş olan eşit uzunluklu sayı dizilerine dönüştürülmüş olur.                                                                    
+
+---------------------------------------------------------------------------------
+"""
