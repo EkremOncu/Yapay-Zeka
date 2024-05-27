@@ -7120,12 +7120,12 @@ alanlarında daha önceden elde edilmiş bilgiler ve deneyimler kullanılmaktad�
 sahneler de vardı. Neticede filmin iyi mi kötü mü olduğu konusunda kafam karışık. 
 Size tavsiyem filme gidip boşuna para harcamayın!"
 
-Bu yazıyı sayısal hale dönüştürmedne önce yazı üzerinde bazı ön işlemlerin 
-yapılması gerekebilmektedir. Tipk önişlemler şunlardır:
+Bu yazıyı sayısal hale dönüştürmeden önce yazı üzerinde bazı ön işlemlerin 
+yapılması gerekebilmektedir. Tipik ön işlemler şunlardır:
 
 - Yazıyı sözcüklere ayırma ve noktalama işaretlerini atma (tokenizing)
 - Sözükleri küçük harfe ya da büyük harfe dönüştürmek (transformation)
-- Kendi başına anlamı olyaman edatlar gibi, soru ekleri gibi sözcüklerin atılması 
+- Kendi başına anlamı olmayan, edatlar gibi soru ekleri gibi sözcüklerin atılması 
 (bunlara İngilizce "stop words") denilmektedir. 
 - Sözcüklerin köklerini elde edilmesi ve köklerinin kullanılması (stemming)
 - Bağlam içerisinde farklı sözcüklerin aynı sözcükle yer değiştirmesi (lemmatization)
@@ -7172,7 +7172,7 @@ sütunu ise "positive" ya da "negative" yazısını içermektedir. Buradaki mode
 
 Bu tarz problemlerde girdiler birer yazı olduğu için işlemlere doğrudan sokulamazlar. 
 Önce onların bir biçimde sayısal hale dönüştürülmeleri gerekir. Yazıların sayısal 
-hale dönüştürülmesi için tipikm olarak iki yöntem kullanılmaktadır:
+hale dönüştürülmesi için tipik olarak iki yöntem kullanılmaktadır:
 
 1) Vektörizasyon (vectorization) yöntemi
 2) Sözcük Gömme (Word Embedding) yöntemi
@@ -7181,7 +7181,10 @@ hale dönüştürülmesi için tipikm olarak iki yöntem kullanılmaktadır:
 Her iki yöntemde de önce yazılar sözcüklere ayrılır ve gerekli görülen ön işlemlerden 
 geçirilir. Böylece bir yazı bir sözcük grubu haline getirilir. Biz burada en basit 
 yöntem olan "vektörizasyon" yöntemi üzerinde duracağız. Sözcük gömme yöntemi 
-sonraki paragraflarda ele alınacaktır. Vektörizasyon şöyle bir yöntemdir:
+sonraki paragraflarda ele alınacaktır. 
+
+---------------------------------------------------------------------------------
+Vektörizasyon şöyle bir yöntemdir:
 
 - Tüm yorumlardaki tüm sözcüklerin kümesine "kelime haznesi (vocabulary)" denilmektedir. 
 Örneğin IMDB veri kümesinde tek olan tüm sözcüklerin sayısı 50000 ise kelime 
