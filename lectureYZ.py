@@ -7199,5 +7199,96 @@ eğer sözcük haznesindeki bir sözcük kullanılmışsa o sözcüğe ilişkin 
 kullanılmamışsa 0 yapılmaktadır. Böylece yorum yazıları 0'lardan ve 1'lerden 
 oluşmuş olan eşit uzunluklu sayı dizilerine dönüştürülmüş olur.                                                                    
 
+
+Bu vektörizasyon yöntemi fazlaca bellek kullanma eğilimindedir. Veri yapıları 
+dünyasında çok büyük kısmı 0 olan, az kısmı farklı değerde bulunan matrislere 
+"sparse (seyrek)" matris denilmektedir. Buradaki vektörler seyrek durumda olacaktır. 
+Eğer sözcük haznesi çok büyükse gerçekten de tüm girdilerin yukarıda belirtildiği 
+gibi bir matris içerisinde toplanması zor ve hatta imkansız olabilmektedir. 
+Çünkü fit metodu bizden training_dataset_x ve training_dataset_y yi bir bütün 
+olarak istemektedir. 
+
+Yukarıdaki gibi vektörizasyon işleminde sözcükler arasında sırasal bir ilişkinin 
+ortadan kaldırıldığına dikkat ediniz. Böyle bir vektörizasyon sözcükleri bağlamı 
+içerisinde değerlendirmede fayda sağlamayacaktır. Ayrıca yukarıdaki vektörizasyon
+ikili (binary) biçimdedir. Ancak istenirse vektör ikili olmaktan çıkartılıp 
+sözcüklerin frekanslarıyla da oluşturulabilir. Örneğin "film" sözcüğü yazı içerisinde 
+10 kere geçmişse vektörde ona karşılık gelen eleman 1 yapılmak yerine 10 yapılabilir.
+
+---------------------------------------------------------------------------------
+Şimdi de IMDB örneğinde yukarıda açıkladığımız ikili vektörüzasyon işlemini programlama 
+yoluyla yapalım. Önce veri kümesini okuyalım:
+
+df = pd.read_csv('IMDB Dataset.csv')
+
+Şimdi tüm yorumlardaki farklı olan tüm sözcüklerden bir sözcük haznesi (vocabulary) 
+oluşturalım:
+
+
+import re
+
+vocab =  set()
+for text in df['review']:
+    words = re.findall('[a-zA-Z0-9]+', text.lower())
+    vocab.update(words)
+
+
+Burada Python'daki "düzenli ifade (regular expression)" kütüphanesinden faydalanılmıştır. 
+
+Şimdi de sözcük haznesindeki her bir sözcüğüe bir numara verelim. Sözcüğe göre 
+arama yapılacağı için bir sözlük nesnesinin kullanılması uygun olacaktır. Bu 
+işlem sözlük içlemi ile tek hamlede gereçekleştirilebilir:
+
+vocab_dict = {word: index for index, word in enumerate(vocab)}
+
+Aslında burada yapılan aşağıdakiile aynı şeydir:
+
+vocab_dict = {} 
+
+for index, word in enumerate(vocab):
+    vocab_dict[word] = index
+
+
+Şimdi artık x verileri oluşturalım. Bunun için önce içi sıfırlarla dolu bir matris 
+oluşturalım. Bu matrisin satır sayısı len(df) kadar (yani yorum sayısı kadar) sütun 
+sayısı ise sözcük haznesi kadar (yani len(vocab) kadar) olmalıdır:
+
+dataset_x = np.zeros((len(df), len(vocab)), dtype='uint8')  
+
+Şimdi yeniden tüm yorumları tek tek sözcüklere ayırıp onları sayısallaştırıp 
+dataset_x matrisinin ilgili staırının ilgili sütunlarını 1 yapalım:
+
+for row, text in enumerate(df['review']):
+    words = re.findall('[a-zA-Z0-9]+', text.lower())
+    word_numbers = [vocab_dict[word] for word in words]
+    dataset_x[row, word_numbers] = 1
+
+
+y değerlerini de "positive" için 1, "negatif" için 0 biçiminde oluşturabiliriz:
+
+dataset_y = (df['sentiment'] == 'positive').to_numpy(dtype='uint8') 
+
+
+Artık dataset_x ve dataset_y hazırlanmıştır. Bundan sonra ikili sınıflandırma 
+problemi için daha önce yaptığımız sinir ağı işlemleri yapılabilir. Veri kümsini 
+eğitim ve test biçiminde ikiye ayırabiliriz:
+
+training_dataset_x, test_dataset_x, training_dataset_y, test_dataset_y = train_test_split(dataset_x, dataset_y, test_size=0.2)
+
+Yapay sinir ağımızı oluşturabiliriz. Girdi katmanında çok fazla nöron olduğu için 
+katmanlardaki nöron sayılarını yükseltebiliriz.
+
+
+model = Sequential(name='IMDB')
+
+model.add(Input((training_dataset_x.shape[1],)))
+model.add(Dense(128, activation='relu', name='Hidden-1'))
+model.add(Dense(128, activation='relu', name='Hidden-2'))
+model.add(Dense(1, activation='sigmoid', name='Output'))
+model.summary()
+
+model.compile(optimizer='rmsprop', loss='binary_crossentropy', metrics=['binary_accuracy'])
+hist = model.fit(training_dataset_x, training_dataset_y, batch_size=32, epochs=5, validation_split=0.2)
+
 ---------------------------------------------------------------------------------
 """
