@@ -7216,8 +7216,8 @@ sözcüklerin frekanslarıyla da oluşturulabilir. Örneğin "film" sözcüğü 
 10 kere geçmişse vektörde ona karşılık gelen eleman 1 yapılmak yerine 10 yapılabilir.
 
 ---------------------------------------------------------------------------------
-Şimdi de IMDB örneğinde yukarıda açıkladığımız ikili vektörüzasyon işlemini programlama 
-yoluyla yapalım. Önce veri kümesini okuyalım:
+Şimdi de IMDB örneğinde yukarıda açıkladığımız ikili vektörüzasyon işlemini 
+programlama yoluyla yapalım. Önce veri kümesini okuyalım:
 
 df = pd.read_csv('IMDB Dataset.csv')
 
@@ -7291,4 +7291,26 @@ model.compile(optimizer='rmsprop', loss='binary_crossentropy', metrics=['binary_
 hist = model.fit(training_dataset_x, training_dataset_y, batch_size=32, epochs=5, validation_split=0.2)
 
 ---------------------------------------------------------------------------------
+Yukarıdaki gibi yazıların vektörizasyon işlemiyle binary bir vektöre dönüştürülmesi 
+işleminin görünen dezavantajları şunlardır:
+
+- Aynı sözcükten birden fazla kez yazı içerisinde kullanılmışsa bunun eğitimde bir 
+anlamı kalmamaktadır. Oysa gerçek hayattaki yazılarda örneğin "mükemmel" gibi bir 
+sözcük çokça tekrarlanıyorsa bu durum onun olumlu yorumlanma olasılığını artırmaktadır.
+
+- Vektörizasyon işlemi bir bağlam oluşturamamaktadır. Şöyle ki: Biz bir yazıda 
+"çok kötü" dersek buradaki "çok" aslında "kötüyü" nitelemektedir. Ancak bunu bizim 
+ağımız anlayamaz. Başka bir deyişle biz yorumdaki sözcüklerin sırasını değiştirsek 
+de elde ettiğimiz vektör değişmeyecektir. 
+
+- Vektörizasyon işlemi çok yer kaplama potansiyelinde olan bir işlemdir. Bu durumda 
+ağı parçalı olarak eğitmek zorunda kalabiliriz. Parçalı eğitimler ileride ele alınacaktır.
+
+- Biz işlemden önce tüm sözcükleri küçük harfe dönüştürdük. Bazı özel karakterleri 
+sözcüğün parçası olmaktan çıkardık. Halbuki bu gibi bazı küçük ayrıntılar yazının 
+daha iyi anlamlandırılmasına katkı sağlayabilir. Tabi bu durumda vocabulary büyür 
+bu da eğitimin zorlaşması anlamına gelir. 
+
+---------------------------------------------------------------------------------
 """
+
