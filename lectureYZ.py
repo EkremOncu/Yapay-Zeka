@@ -7313,5 +7313,71 @@ daha iyi anlamlandırılmasına katkı sağlayabilir. Tabi bu durumda vocabulary
 bu da eğitimin zorlaşması anlamına gelir. 
 
 ---------------------------------------------------------------------------------
+
+---------------------------------------------------------------------------------
+
+# CountVectorizer
+
+1) Önce CountVectorizer sınıfı türünden bir nesne yaratılır. Nesne yaratılırken 
+sınıfın __init__ metodunda bazı önemli belirlemeler yapılabilmektedir. Örneğin 
+dtype parametresi elde edilecek vektörün elemanlarının türünü belirtmektedir. Bu 
+parametreyi elde edilecek matrisin kaplayacğı yeri azaltmak için 'uint8' gibi 
+küçük bir tür olarak geçmek istebilirsiniz. Default durumda bu dtype parametresi 
+'float64' biçimindedir. 
+
+Sınıf yine default durumda tüm sözcükleri küçük harfe dönüştürmektedir. Ancak 
+metodun lowercase parametresi False geçilirse bu dönüştürme yapılmamaktadır. Metodun 
+diğer önemli parametreleri de vardır. 
+
+Örneğin metodun stop_words parametresi "stop word" denilen anlamsız sözcükleri 
+atmak için kullanılabilir. Bu parametreye stop words'lerden oluşan bir liste ya 
+da NumPy dizisi girilirse bu sözcükler sözcük haznesinden atılmaktadır. Başka bir 
+deyişle yokmuş gibi ele alınmaktadır. 
+
+Metodun binary parametresi default olarak False biçimdedir. Bu durumda bir yazı 
+içerisinde aynı sözcükten birden fazla kez geçerse vektörün ilgili elemanı 1 değil 
+o sözcüğün sayısı olacak biçimde set edilmektedir. Biz eğer yukarıdaki örneğimizde 
+olduğu gibi binary bir vektör oluşturmak istiyorsak bu parametreyi True yapabiliriz. 
+Metodun diğer parametreleri için scikit-learn dokümanlarına başvurabilirsiniz.
+
+Örneğin:
+
+cv = CountVectorizer(dtype='uint8', stop_words=['de', 'bir', 've', 'mu'], binary=True)
+
+
+2) Bundan sonra scikit-learn kütüphanesinin diğer sınıflarında olduğu gibi fit 
+ve trasform işlemleri yapılır. fit işleminde biz fit metoduna yazılardan oluşan 
+dolaşılabilir bir nesne veriririz. fit metoudu tüm yazılardan bir "sözlük haznesi 
+(vocabulary)" oluşturur. Biz de bu sözlük haznesini bir sözlük nesnesi biçiminde 
+nesnenin vocabulary_ özniteliğinden elde edebiliriz. Bu vocabulary_ tıpkı bizim 
+yukarıdaki örnekte yaptığımız gibi anahtarları sözcükler değerleri de sözcüklerin 
+indeksinden oluşan bir sözlük biçimindedir. Örneğin:
+
+
+texts = ["film güzeldi ve senaryo iyidi", "film berbattı, tam anlamıyla berbattı", 
+            "seyretmeye değmez", "oyuncular güzel oynamışlar", 
+            "senaryo berbattı, böyle senaryo olur mu?", "filme gidin de bir de siz görün"]
+
+cv = CountVectorizer(dtype='uint8', stop_words=['de', 'bir', 've', 'mu'], binary=True)
+cv.fit(texts)
+
+fit işlemi sonrasında elde edilen vocabulary_ sözlüğü şöyledir:
+
+{'film': 4, 'güzeldi': 9, 'senaryo': 14, 'iyidi': 10, 'berbattı': 1, 'tam': 17, 
+ 'anlamıyla': 0, 'seyretmeye': 15, 'değmez': 3, 'oyuncular': 13, 'güzel': 8, 
+ 'oynamışlar': 12, 'böyle': 2, 'olur': 11, 'filme': 5, 'gidin': 6, 'siz': 16, 
+ 'görün': 7}
+    
+fit medodunun yalnızca sözük haznesi oluşturduğuna dikkat ediniz. Asıl dönüştürmeyi 
+transform metodu yapmaktadır. Ancak tranform bize vektörel hale getirilmiş olan 
+yazıları "seyrek matris (sparse matrix)" biçiminde csr_matrix isimli bir sınıf 
+nesnesi olarak vermektedir. Bu sınııfn todense metodu ile biz bu seyrek matrisi 
+normal matrise dönüştürebiliriz. Örneğin:
+
+dataset_x = cv.transform(dataset).todense()
+
+Artık bu CountVectorizer nesnesi predict işleminde de aynı biçimde kullanılabilir. 
+
+---------------------------------------------------------------------------------
 """
 
