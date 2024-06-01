@@ -7256,7 +7256,7 @@ sayısı ise sözcük haznesi kadar (yani len(vocab) kadar) olmalıdır:
 dataset_x = np.zeros((len(df), len(vocab)), dtype='uint8')  
 
 Şimdi yeniden tüm yorumları tek tek sözcüklere ayırıp onları sayısallaştırıp 
-dataset_x matrisinin ilgili staırının ilgili sütunlarını 1 yapalım:
+dataset_x matrisinin ilgili satırının ilgili sütunlarını 1 yapalım:
 
 for row, text in enumerate(df['review']):
     words = re.findall('[a-zA-Z0-9]+', text.lower())
@@ -7304,7 +7304,8 @@ ağımız anlayamaz. Başka bir deyişle biz yorumdaki sözcüklerin sırasını
 de elde ettiğimiz vektör değişmeyecektir. 
 
 - Vektörizasyon işlemi çok yer kaplama potansiyelinde olan bir işlemdir. Bu durumda 
-ağı parçalı olarak eğitmek zorunda kalabiliriz. Parçalı eğitimler ileride ele alınacaktır.
+ağı parçalı olarak eğitmek zorunda kalabiliriz. Parçalı eğitimler ileride ele 
+alınacaktır.
 
 - Biz işlemden önce tüm sözcükleri küçük harfe dönüştürdük. Bazı özel karakterleri 
 sözcüğün parçası olmaktan çıkardık. Halbuki bu gibi bazı küçük ayrıntılar yazının 
