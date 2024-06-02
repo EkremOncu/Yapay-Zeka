@@ -7412,5 +7412,87 @@ kazanç sağlanmaya çalışılabilir.
 ---------------------------------------------------------------------------------
 
 ---------------------------------------------------------------------------------
+ Keras içerisinde tensorflow.keras.datasets modülünde IMDB veri kümesi de hazır 
+biçimde bulunmaktadır. Diğer hazır veri kümelerinde olduğu gibi bu IMDB veri 
+kümesi de modüldeki load_data fonksiyonu ile yüklenmektedir. Örneğin:
+
+from tensorflow.keras.datasets import imdb
+
+(training_dataset_x, training_dataset_y), (test_dataset_x, test_dataset_y) = imdb.load_data()
+
+Burada load_data fonksiyonunun num_words isimli parametresine eğer bir değer 
+girilirse bu değer toplam sözcük haznesinin sayısını belirtmektedir.  Örneğin:
+
+(training_dataset_x, training_dataset_y), (test_dataset_x, test_dataset_y) = 
+                                                imdb.load_data(num_words=1000)
+
+Burada artık yorumlar en sık kullanılan 1000 sözcükten hareketle oluşturulmaktadır. 
+Yani bu durumda vektörizasyon sonrasında vektörlerin sütun uzunlukları 1000 olacaktır. 
+Bu parametre girilmezse IMDB yorumlarındaki tüm sözükler dikkate alınmaktadır.
+
+Bize load_data fonksiyonu x verileri olarak vektörizasyon sonucundaki vektörleri 
+vermemektedir. Sözcüklerin indekslerine ilişkin vektörleri bir liste olarak 
+vermektedir. (Bunun nedeni uygulamacının vektörizasyon yerine başka işlemler 
+yapabilmesine olanak sağlamaktır.) load_data fonksiyonun verdiği index listeleri 
+için şöyle bir ayrıntı da vardır: Bu fonksiyon bize listelerdeki sözcük indekslerini 
+üç fazla vermektedir. Bu sözcük indekslerindeki 0, 1 ve 2 indeksleri özel anlam 
+ifade etmektedir. Dolayısıyla aslında örneğin bize verilen 1234 numaralı indeks 
+1231 numaralı indekstir. Bizim bu indekslerden 3 çıkartmamız gerekmektedir. 
+
+imdb modülündeki get_word_index fonksiyonu bize sözcük haznesini bir sözlük olarak 
+vermektedir. num_words ne olursa olsun bu sözlük her zaman tüm kelime haznesini 
+içermektedir. Başka bir deyişle buradaki get_word_index fonksiyonu bizim 
+kodlarımızdaki vocab_dict sözlüğünü vermektedir. Örneğin:
+
+vocab_dict = imdb.get_word_index()
+
+
+Bu durumda biz training_dataset_x ve test_dataset_x listelerini aşağıdaki gibi 
+binary vector haline getiren bir fonksiyon yazabiliriz:
+
+def vectorize(sequence, colsize):
+    dataset_x = np.zeros((len(sequence), colsize), dtype='uint8')
+    for index, vals in enumerate(sequence):
+        dataset_x[index, vals] = 1
+        
+    return dataset_x
+
+Burada vectorize fonksiyonu indekslerin bulunduğu liste listesini ve oluşturulacak 
+matrisin sütun uzunluğunu parametre olarak almıştır. Fonksiyon vektörize edilmiş 
+NumPy dizisi ile geri dönmektedir. Ancak biz bu fonksiyonu kullanırken colsize 
+parametresine get_word_index ile verilen sözlüğün eleman sayısından 3 fazla olan 
+değeri geçirmeliyiz. Çünkü bu indeks listelerinde 0, 1 ve 2 değerleri özel bazı 
+amaçlarla kullanılmıştır. Dolayısıyla buradaki sözcük indeksleri hep 3 fazladır. 
+Yapay sinir ağımızda bu indekslerin 3 fazla olmasının bir önemi yoktur. Ancak ters 
+dönüşüm uygulanacaksa tüm indeks değerleriden 3 çıkartılmalıdır. O halde 
+vektörizasonu şöyle yapabiliriz:
+
+training_dataset_x = vectorize(training_dataset_x, len(vocab_dict) + 3)
+test_dataset_x = vectorize(test_dataset_x, len(vocab_dict) + 3)
+
+Artık her şey tamadır. Yukarıda yaptığımız işlemleri yapabiliriz. 
+
+Kestirim işleminde de aynı duruma dikkat edilmesi gerekir. Biz eğitimi sözcük 
+indekslerinin 3 fazla olduğu duruma göre yaptık. O halde kestirim işleminde de 
+aynı şeyi yapmamız gerekir. Yani kestirim yapılacak yazıyı get_word_index sözlüğüne
+sokup onun numarasını elde ettikten sonra ona 3 toplamalıyız. Bu biçimde liste 
+listesi oluşturursak bunu yine yukarıda yazmış olduğumuz vectorize fonksiyonuna 
+sokabiliriz. 
+
+predict_df = pd.read_csv('predict-imdb.csv')
+
+predict_list = []
+for text in predict_df['review']:
+    index_list = []
+    words = re.findall('[A-Za-z0-9]+', text.lower())
+    for word in words:
+        index_list.append(vocab_dict[word] + 3)
+    predict_list.append(index_list)
+    
+predict_dataset_x = vectorize(predict_list, len(vocab_dict) + 3)
+
+predict_result = model.predict(predict_dataset_x)
+
+---------------------------------------------------------------------------------
 """
 
