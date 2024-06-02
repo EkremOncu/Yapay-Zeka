@@ -7291,6 +7291,27 @@ model.compile(optimizer='rmsprop', loss='binary_crossentropy', metrics=['binary_
 hist = model.fit(training_dataset_x, training_dataset_y, batch_size=32, epochs=5, validation_split=0.2)
 
 ---------------------------------------------------------------------------------
+Pekiyi biz binary vektör haline geitirilmiş yazıyı bu vektörden hareketle yeniden 
+orjinal haline getirebilir miyiz? Hayır getiremeyiz. Çünkü biz burada binary vector 
+oluşturduğumuz için sözcük sıklıklarını kaybetmiş durumdayız. Dahası bu vektörde 
+sözcüklerin sırası da kaybedilmiştir. Ancak yine de bu vektördü anlamsız olsa da 
+aşağıdaki gibi bir yazı haline getirebiliriz:
+
+rev_vocab_dict = {index: word for word, index in vocab_dict.items()}
+
+word_indices = np.argwhere(dataset_x[0] == 1).flatten()
+words = [rev_vocab_dict[index] for index in word_indices]
+text = ' '.join(words)
+print(text)
+
+NumPy'ın where ya da argwhere fonksiyonları belli koşulu sağlayan elemanların 
+indekslerini bize verebilmektedir. Buradaki argwhere fonksiyonu bize iki boyutlu 
+bir dizi vermektedir. Biz de onu flatten (ya da reshape ile) tek boyutlu dizi 
+haline getirdik. Sonra liste içlemiyle bu indekslere karşı gelen sözcükleri bir 
+liste biçiminde elde ettik. Sonra da bunların aralarına SPACE karakterleri koyarak 
+join metodu ile bunları tek bir yazı biçiminde oluşturduk.
+
+---------------------------------------------------------------------------------
 Yukarıdaki gibi yazıların vektörizasyon işlemiyle binary bir vektöre dönüştürülmesi 
 işleminin görünen dezavantajları şunlardır:
 
@@ -7371,12 +7392,24 @@ fit işlemi sonrasında elde edilen vocabulary_ sözlüğü şöyledir:
 fit medodunun yalnızca sözük haznesi oluşturduğuna dikkat ediniz. Asıl dönüştürmeyi 
 transform metodu yapmaktadır. Ancak tranform bize vektörel hale getirilmiş olan 
 yazıları "seyrek matris (sparse matrix)" biçiminde csr_matrix isimli bir sınıf 
-nesnesi olarak vermektedir. Bu sınııfn todense metodu ile biz bu seyrek matrisi 
+nesnesi olarak vermektedir. Bu sınıfın todense metodu ile biz bu seyrek matrisi 
 normal matrise dönüştürebiliriz. Örneğin:
 
 dataset_x = cv.transform(dataset).todense()
 
 Artık bu CountVectorizer nesnesi predict işleminde de aynı biçimde kullanılabilir. 
+
+---------------------------------------------------------------------------------
+Yukarıda da belirttiğimiz gibi CountVectorizer sınıfının __init__ metodunun binary 
+parametresi default olarak False durumdadır. Bu parametrenin False olması yazı 
+içerisinde belli bir sözcük n defa geçtiğinde o sözcüğe ilişkin sütun elemanın n 
+olacağı anlamına gelmektedir. Eğer bu parametre True yapılırsa bu durumda binary 
+bir vector elde edilir. Pekiyi biz vektörizasyon yaparken "binary" mi yoksa 
+frekanslı mı vektörizasyon yapmalıyız? Aslında frekanslı vektörizasyon yapmak 
+toplamda daha iyidir. Ancak binary bilgilerin tutulma biçiminden özel olarak bir 
+kazanç sağlanmaya çalışılabilir.  
+
+---------------------------------------------------------------------------------
 
 ---------------------------------------------------------------------------------
 """
