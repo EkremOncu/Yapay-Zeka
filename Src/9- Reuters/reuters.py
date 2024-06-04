@@ -57,6 +57,7 @@ for row, text in enumerate(test_texts):
     word_numbers = [vocab_dict[word] for word in words]
     test_dataset_x[row, word_numbers] = 1
 
+
 import numpy as np
 from sklearn.preprocessing import OneHotEncoder
 
@@ -65,6 +66,7 @@ ohe.fit(np.array(list(cats)).reshape(-1, 1))
 
 training_dataset_y = ohe.transform(np.array(training_y).reshape(-1, 1))
 test_dataset_y = ohe.transform(np.array(test_y).reshape(-1, 1))
+
 
 from tensorflow.keras import Sequential
 from tensorflow.keras.layers import Input, Dense
@@ -77,8 +79,11 @@ model.add(Dense(128, activation='relu', name='Hidden-2'))
 model.add(Dense(len(cats), activation='softmax', name='Output'))
 model.summary()
             
-model.compile(optimizer='rmsprop', loss='categorical_crossentropy', metrics=['categorical_accuracy'])
-hist = model.fit(training_dataset_x, training_dataset_y, batch_size=32, epochs=10, validation_split=0.2)
+model.compile(optimizer='rmsprop', loss='categorical_crossentropy', 
+              metrics=['categorical_accuracy'])
+
+hist = model.fit(training_dataset_x, training_dataset_y, batch_size=32, 
+                 epochs=10, validation_split=0.2)
 
 import matplotlib.pyplot as plt
 
