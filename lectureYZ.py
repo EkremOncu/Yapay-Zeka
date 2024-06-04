@@ -7147,6 +7147,8 @@ bir hafıza kazandırılır.
 
 """
 ---------------------------------------------------------------------------------
+# IMDB
+
 Sınıflandırma problemlerinde üzerinde çalışılan problem gruplarından biri de 
 "sentiment analysis" denilen gruptur. Bu grup problemlerde kişiler bir olgu hakkında 
 kanılarını belirten yazılar yazarlar. Buradaki kanılar tipik olarak "olumlu", 
@@ -7496,3 +7498,214 @@ predict_result = model.predict(predict_dataset_x)
 ---------------------------------------------------------------------------------
 """
 
+"""
+---------------------------------------------------------------------------------
+# Reuters veri kümesi (çok sınıflı sınıflandırma problemi)
+
+Yazıların sınıflandırılması için çok kullanılan diğer bir veri kümesi de "Reuters" 
+isimli veri kümesidir. Bu veri kümesi 80'lerin başlarında Reuters haber ajansının 
+haber yazılarından oluşmaktadır. Bu haber yazıları birtakım konulara ilişkindir. 
+Dolayısıyla bu veri kümesi "çok sınıflı sınıflandırma" problemleri için örnek amacıyla 
+kullanılmaktadır. 
+
+Haberler toplam 46 farklı konuya ilişkindir. Veri kümesinin orijinali "çok etiketli 
+(multilabel)" biçimdedir. Yani veri kümesindeki bazı yazılara birden fazla etiket 
+iliştirilmiştir. Ancak biz burada bir yazıya birden fazla etiket iliştirilmişse 
+onun yalnızca ilk etiketini alacağız. Böylece veri kümesini "çok etiketli (multilabel)" 
+olmaktan çıkartıp "çok sınıflı (multiclass)" biçimde kullanacağız
+
+Reuters veri kümesinin orijinali ".SGM" uzantılı dosyalar biçiminde "SGML" formatındadır. 
+Dolayısıyla bu verilerin kullanıma hazır hale getirilmesi biraz yorucudur. Ancak 
+aşağıdaki bağlantıda Reuters veri kümesindeki her yazı bir dosya biçiminde 
+kaydedilmiş biçimde sunulmaktadır:
+
+https://www.kaggle.com/datasets/nltkdata/reuters
+
+Buradaki dosya indirilip açıldığında aşağıdaki gibi bir dizin yapısı oluşacaktır:
+
+training    <DIR>
+test        <DIR>
+cats.txt
+stopwords
+
+Ancak veri kümesini açtığınızda iç içe bazı dizinlerin olduğunu göreceksiniz. Bu 
+dizinlerden yalnızca bir tanesini alıp diğerlerini atabilirsiniz. 
+
+Buradaki "cats.txt" dosyası tüm yazıların kategorilerinin belirtildiği bir dosyadır. 
+training dizininde ve test dizininide her bir yazı bir text dosya biçiminde 
+oluşturulmuştur. Buradaki text dosyaları okumak için "latin-1" encoding'ini 
+kullanmalısınız. Biz yukarıdaki dizin yapısını çalışma dizininde "ReutersData" 
+isimli bir dizine çektik. Yani veri kümesinin dizin yapısı şu hale getirilmiştir:
+
+ReutersData
+    training    <DIR>
+    test        <DIR>
+    cats.txt
+    stopwords
+
+Burada veri kümesi "eğitim" ve "test" biçiminde zaten ikiye ayrılmış durumdadır. 
+Dolayısıyla bizim veri kümesini ayrıca "eğitim" ve "test" biçiminde ayırmamıza 
+gerek yoktur. Buradaki "cats.txt" dosyasının içeriği aşağıdaki gibidir:
+
+test/14826 trade
+test/14828 grain
+test/14829 nat-gas crude
+test/14832 rubber tin sugar corn rice grain trade
+test/14833 palm-oil veg-oil
+test/14839 ship
+test/14840 rubber coffee lumber palm-oil veg-oil
+...
+training/5793 nat-gas
+training/5796 crude
+training/5797 money-supply
+training/5798 money-supply
+training/5800 grain
+training/5803 gnp
+training/5804 gnp
+training/5805 gnp
+training/5807 gnp
+training/5808 acq
+training/5810 trade
+training/5811 money-fx
+training/5812 carcass livestock
+...
+
+Reuters veri kümesinde ayrıca "stopwords" isimli bir dosya içersinde stop word'lerin 
+listesi de verilmiştir. Bu sözcüklerin sözcük haznesinden çıkartılması (yani stop 
+word'lerin atılması) daha iyi bir sonucun elde edilmesine yol açabilecektir. 
+
+Biz burada vektörizasyon işlemini önce manuel bir biçimde yapıp sonra CountVectorizer 
+sınıfını kullanacağız. 
+
+---------------------------------------------------------------------------------
+Önce "cats.txt" dosyasını açıp buradaki bilgilerden training_dict ve test_dict 
+isimli iki sözlük nesnesi oluşturalım. Bu sözlük nesnelerinin anahtarları dosya 
+isimleri değerleri ise o dosyadaki yazının sınıfını belirtiyor olsun:
+
+training_dict = {}
+test_dict = {}
+cats = set()
+
+with open('ReutersData/cats.txt') as f:
+    for line in f:
+        toklist = line.split()
+        ttype, fname = toklist[0].split('/')
+        if ttype == 'training':
+            training_dict[fname] = toklist[1]
+        else:
+            if ttype == 'test':
+                test_dict[fname] = toklist[1]
+        cats.add(toklist[1])
+    
+vocab =  set()
+training_texts = []
+training_y = []
+                
+for fname in os.listdir('ReutersData/training'):
+    with open('ReutersData/training/' + fname, encoding='latin-1') as f:
+        text = f.read()
+        training_texts.append(text)
+        words = re.findall('[a-zA-Z0-9]+', text.lower())
+        vocab.update(words)
+        training_y.append(training_dict[fname])
+        
+test_texts = []
+test_y = []
+for fname in os.listdir('ReutersData/test'):
+    with open('ReutersData/test/' + fname, encoding='latin-1') as f:
+        text = f.read()
+        test_texts.append(text)
+        words = re.findall('[a-zA-Z0-9]+', text.lower())
+        vocab.update(words)
+        test_y.append(test_dict[fname])
+        
+Burada tüm sözcük haznesinin vocab isimli bir kümede tüm kategorilerin de cats 
+isimli bir kümede toplandığına dikkat ediniz. Hazır dosyaları açmışken dosyalar 
+içerisindeki yazıları da training_texts ve test_texts isimli listelerde topladık. 
+Ayrıca her yazının kategorilerini de training_y ve test_y listelerinde topladığımıza 
+dikkat ediniz. Artık sözcüklere numaralar verebiliriz:
+
+
+vocab_dict = {word: index for index, word in enumerate(vocab)}
+
+
+Şimdi manuel olarak binary vektörizasyon uygulayalım:
+
+training_dataset_x = np.zeros((len(training_texts), len(vocab)), dtype='uint8')  
+test_dataset_x = np.zeros((len(test_texts), len(vocab)), dtype='uint8')  
+
+for row, text in enumerate(training_texts):
+    words = re.findall('[a-zA-Z0-9]+', text.lower())
+    word_numbers = [vocab_dict[word] for word in words]
+    training_dataset_x[row, word_numbers] = 1
+    
+for row, text in enumerate(test_texts):
+    words = re.findall('[a-zA-Z0-9]+', text.lower())
+    word_numbers = [vocab_dict[word] for word in words]
+    test_dataset_x[row, word_numbers] = 1
+
+
+Problem çok sınıflı bir sınıflandırma problemidir. Bunun için y değerlerini
+değerleri üzerinde one-hot encoding dönüştürmesi uygulayabiliriz:
+
+
+ohe = OneHotEncoder(sparse_output=False, dtype='uint8')
+ohe.fit(np.array(list(cats)).reshape(-1, 1))
+
+training_dataset_y = ohe.transform(np.array(training_y).reshape(-1, 1))
+test_dataset_y = ohe.transform(np.array(test_y).reshape(-1, 1))
+
+
+Artık modelimizi kurup eğitebiliriz:
+
+model.add(Input((training_dataset_x.shape[1],)))
+model.add(Dense(128, activation='relu', name='Hidden-1'))
+model.add(Dense(128, activation='relu', name='Hidden-2'))
+model.add(Dense(len(cats), activation='softmax', name='Output'))
+model.summary()
+            
+model.compile(optimizer='rmsprop', loss='categorical_crossentropy', 
+              metrics=['categorical_accuracy'])
+
+hist = model.fit(training_dataset_x, training_dataset_y, batch_size=32, epochs=10, 
+                 validation_split=0.2)
+
+
+Kestirim işlemi için eğitimdeki veri kümesine benzer bir veri kümesi oluşturulabilir. 
+Biz örneğimizde kestirim için "PredictData" isimli bir dizin oluşturup o dizine 
+yazılardan oluşan dosyalar yerleştirdik. O dosyaların da olması gereken etiketlerini 
+dosya ismine ek yaptık. PredictData dizinindeki dosya isimleri şöyledir:
+
+14829-nat-gas
+14841-wheat
+14849-interest
+14854-ipi
+14860-earn
+14862-bop
+14876-earn
+21394-acq
+
+Kestirim kodu şöyle oluşturulabilir:
+
+word_numbers_list = []
+fnames = []
+for fname in os.listdir('PredictData'):
+    with open('PredictData/' + fname, encoding='latin-1') as f:
+        text = f.read()
+        words = re.findall('[a-zA-Z0-9]+', text.lower())
+        word_numbers = [vocab_dict[word] for word in words]
+        word_numbers_list.append(word_numbers)
+        fnames.append(fname)
+    
+predict_dataset_x = np.zeros((len(word_numbers_list), len(vocab)), dtype='uint8')
+for row, word_numbers in enumerate(word_numbers_list):
+    predict_dataset_x[row, word_numbers] = 1
+    
+predict_result = model.predict(predict_dataset_x)
+predict_indexes = np.argmax(predict_result, axis=1)
+
+for index, pi in enumerate(predict_indexes):
+    print(f'{fnames[index]} => {ohe.categories_[0][pi]}')
+
+---------------------------------------------------------------------------------
+"""
