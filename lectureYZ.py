@@ -7408,7 +7408,7 @@ içerisinde belli bir sözcük n defa geçtiğinde o sözcüğe ilişkin sütun 
 olacağı anlamına gelmektedir. Eğer bu parametre True yapılırsa bu durumda binary 
 bir vector elde edilir. Pekiyi biz vektörizasyon yaparken "binary" mi yoksa 
 frekanslı mı vektörizasyon yapmalıyız? Aslında frekanslı vektörizasyon yapmak 
-toplamda daha iyidir. Ancak binary bilgilerin tutulma biçiminden özel olarak bir 
+toplamda daha iyidir. Ancak binaryx" bilgilerin tutulma biçiminden özel olarak bir 
 kazanç sağlanmaya çalışılabilir.  
 
 ---------------------------------------------------------------------------------
@@ -7706,6 +7706,43 @@ predict_indexes = np.argmax(predict_result, axis=1)
 
 for index, pi in enumerate(predict_indexes):
     print(f'{fnames[index]} => {ohe.categories_[0][pi]}')
+
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Şimdi de Reuters örneğini CountVectorizer sınıfını kullanılarak gerçekleştirelim. 
+Anımsanacağı gibi CountVectorizer sınıfı zaten vektörizasyon işlemini kendisi 
+yapmaktaydı. O halde biz Reuters yazılarını bir listede topladıktan sonra CountVectorizer
+sınıfı ile fit işlemini yapabiliriz. Orijinal Reuters veri kümesinde ayrıca 
+"stopwords" dosyası içerisinde "stop word'ler" satır satır sözcükler biçiminde 
+verilmiştir. Anımsanacağı gibi CountVectorizer sınıfında biz stop word'leri de 
+ayrıca belirtebiliyorduk. Reuters veri kümesinde verilen stop word'ler aşağıdaki 
+gibi bir Python listesi biçiminde elde edilebilir:
+
+import pandas as pd
+
+df_sw = pd.read_csv('ReutersData/stopwords', header=None)
+sw = df_sw.iloc[:, 0].to_list()
+
+CountVectorizer sınıfı önce yazıları sözcüklere ayırıp (tokenizing) sonra stop 
+word'leri atmaktadır. Ancak sınıfın sözcüklere ayırmada default kullandığı düzenli 
+ifade kalıbı tek tırnaklı sözcüklerdeki tırnaklardan da ayrıştırma yapmaktadır. 
+(Ancak tırnaktan sonraki kısmı da atmaktadır.) Orijinal veri kümesinde verilen 
+stop word'ler tek tırnaklı yazı içerdiği için burada bir uyumsuzluk durumu 
+ortaya çıkmaktadır.
+
+O halde biz ya sınıfın kullandığı sözcüklere ayırma düzenli ifadesini 
+(token_pattern parametresi) tırnakları kapsayacak biçimde değiştirmeliyiz ya da 
+bu tırnaklı stop word'lerdeki tırnakları silmeliyiz. Dosyanın orijinalini bozmamak 
+için uyarıda sözü edilen sözcükleri de listeye ekleyerek problemi pratik bir 
+biçimde çözebiliriz:
+
+sw +=  ['ain', 'aren', 'couldn', 'didn', 'doesn', 'don', 'hadn', 'hasn', 'haven', 
+        'isn', 'll', 'mon', 'shouldn', 've', 'wasn', 'weren', 'won', 'wouldn']
+
+Ayrıca CountVectorizer sınıfının stop_words parametresine 'english' girilirse 
+scikit-learn içerisindeki İngilizce için oluşturulmuş default stop word listesi 
+kullanılmaktadır. Tabii veri kümesindeki orijinal listenin kullanılması daha 
+uygun olacaktır.
 
 ---------------------------------------------------------------------------------
 """
