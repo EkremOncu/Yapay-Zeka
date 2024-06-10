@@ -7746,3 +7746,38 @@ uygun olacaktır.
 
 ---------------------------------------------------------------------------------
 """
+
+
+
+# Keras'ta Parçalı Eğitim
+
+"""
+---------------------------------------------------------------------------------
+Çok büyük verilerle eğitim, test hatta predict işlemi sorunlu bir kondur. Çünkü 
+örneğin fit işleminde büyük miktarda  veri kümeleriyle eğitim ve test yapılırken 
+bu veri kümeleri bir bütün olarak metotlara verilmektedir. Ancak büyük veri kümeleri 
+eldeki belleğe sığmayabilir. (Her ne kadar 64 bit Windows ve Linux sistemlerinde 
+prosesin sanal bellek alanı çok büyükse de bu teorik sanal bellek alanını 
+kullanabilmek için swap alanlarının büyütülmesi gerekmektedir.) Örneğin IMDB ya 
+da Reuters örneklerinde vektörizasyon işlemi sonucunda çok büyük matrisler 
+oluşmaktadır. Gerçi bu matrislerin çok büyük kısmı 0'lardan oluştuğu için "seyrek 
+(sparse)" durumdadır. Ancak fit, evaluate ve predict metotları seyrek matrislerle 
+çalışmamaktadır. İşte bu nedenden dolayı Keras'ta modeller parçalı verilerle 
+eğitilip test ve predict edilebilmektedir. Parçalı eğitim, test ve predict 
+işlemlerinde eğitim, test ve predict sırasında her batch işleminde fit, evaluate 
+ve predict metotları o anda bizden bir batch'lik verileri istemekte ve eğitim 
+batch-bacth verilere tedarik edilerek yapılabilmektedir. 
+
+
+Parçalı eğitim ve test işlemi için fit, evaluate ve predict metotlarının birinci 
+parametrelerinde x verileri yerine bir "üretici fonksiyon (generator)" ya da 
+"Sequence sınıfından türetilmiş olan bir sınıf nesnesi" girilir. Biz burada önce 
+üretici fonksiyon yoluyla sonra da Sequence sınıfından türetilmiş olan sınıf yoluyla 
+parçalı işlemlerin nasıl yapılacağını göreceğiz. Eskiden Keras'ta normal fit, 
+evaluate ve predict metotlarının ayrı fit_generator, evalute_generator ve 
+predict_generator biçiminde parçalı eğitim için kullanılan biçimleri vardı. Ancak 
+bu metotlar daha sonra kaldırıldı. Artık fit, evaluate ve predcit metotları hem 
+bütünsel hem de parçalı işlemler yapabilmektedir.
+
+---------------------------------------------------------------------------------
+"""
