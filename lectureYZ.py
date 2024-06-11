@@ -7780,4 +7780,114 @@ bu metotlar daha sonra kaldırıldı. Artık fit, evaluate ve predcit metotları
 bütünsel hem de parçalı işlemler yapabilmektedir.
 
 ---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Üretici fonksiyon yoluyla parçalı eğitim yaparken fit metodunun birinci parametresine 
+bir üretici fonksiyon nesnesi girilir. Artık fit metodunun batch_size ve 
+validation_split parametrelerinin bir önemi kalmaz. Çünkü batch miktarı zaten üretici 
+fonksiyonden elde  edilen verilerle yapılmaktadır. Kaldı ki bu yöntemde aslında 
+her batch işleminde aynı miktarda verinin kullanılması da zorunlu değildir. Yine 
+bu biçimde eğitim yapılırken fit metodunun validation_split parametresinin de bir 
+anlamı yoktur. Çünkü sınama işlemi de yine parçalı verilerle yapılmaktadır. 
+Dolayısıyla sınama verilerinin parçalı olarak verilmesi de yine uygulamacının 
+sorumluluğundadır. Ancak bu yöntemde programcının iki parametreyi yine açıkça 
+belirlemesi gerekir. Birincisi steps_per_epoch parametresidir. Bu parametre bir 
+epoch işleminin kaç batch işleminden oluşacağını belirtir. İkinci parametre ise 
+epochs parametresidir. Bu da yine toplam epoch sayısını belirtir. (epoch 
+parametresinin default değerinin 1 olduğunu anımsayınız.) Bu durumda programcının 
+üretici fonksiyon içerisinde epochs * steps_per_epoch kadar yield uygulaması gerekir. 
+Çünkü toplam batch sayısı bu kadardır. fit metodu aslında epochs * steps_per_epoch 
+kadar işlemden sonra son kez bir daha next işlemi yaparak üretici fonksiyonun 
+bitmesine yol açmaktadır.
+
+Aşağıdaki toplam 100 epoch'tan oluşan her epoch'ta 20 tane batch işlemi yapılan 
+ikili sınıflandırma örneği verilmiştir. Ancak bu örnekte x ve y verileri üretici 
+fonksiyonlardan elde edilmiştir. Üretici fonksiyon içerisinde toplam epochs * steps_per_epoch  
+kadar yield işlemi yapılmıştır. Ancak bu örnekte bir sınama işlemi yapılmamıştır. 
+Biz bu örneği rastgele verilerle yalnızca mekanizmayı açıklamak için veriyoruz. 
+(Rastgele verilerde rastgele sayı üreticisi uygun bir biçimde oluşturulmuşsa bir 
+kalıp söz konusu olmayacağı için "binary_accuracy" metrik değerinin 0.50 civarında 
+olması beklenir.)
+
+---------------------------------------------------------------------------------
+import numpy as np
+from tensorflow.keras import Sequential
+from tensorflow.keras.layers import Input, Dense
+
+EPOCHS = 100
+NFEATURES = 10
+STEPS_PER_EPOCH = 20
+BATCH_SIZE = 32
+
+def data_generator():
+    for _ in range(EPOCHS):
+        for _ in range(STEPS_PER_EPOCH):
+            x = np.random.random((BATCH_SIZE, NFEATURES))
+            y = np.random.randint(0, 2, BATCH_SIZE)
+            yield x, y
+
+model = Sequential(name='Diabetes')
+
+model.add(Input(shape=(NFEATURES,)))
+model.add(Dense(16, activation='relu', name='Hidden-1'))
+model.add(Dense(16, activation='relu', name='Hidden-2'))
+model.add(Dense(1, activation='sigmoid', name='Output'))
+model.summary()
+
+model.compile(optimizer='rmsprop', loss='binary_crossentropy', metrics=['binary_accuracy'])
+model.fit(data_generator(), epochs=EPOCHS, steps_per_epoch=STEPS_PER_EPOCH)
+
+---------------------------------------------------------------------------------
+Yukarıdaki örnekte bir sınama işlemi yapılmamamıştır. İşte sınama işlemleri için 
+veriler de tek hamlede değil parça parça verilebilmektedir. Bunun için yine fit 
+metodunun validation_data parametresine bir üretici fonksiyon nesnesi girilir. fit 
+metodu da her epcoh sonrasında validation_steps parametresinde belirtilen miktarda 
+bu üretici fonksiyon üzerinde iterasyon yaparak bizden sınama verilerini almaktadır. 
+Böylece biz her epoch sonrasında kullanılacak sınama verilerini fit metoduna 
+üretici fonksiyon nesnesi yoluyla parça parça vermiş oluruz. Sınama verilerinin 
+parçalı oluşturulması sırasında üretici fonksiyonlarda her epoch için validation_steps 
+parametresi kadar değil bundan 1 fazla yield işlemi yapılmalıdır. Bu fit metodunun 
+içsel tasarımıyla ilgilidir. 
+
+Aşağıda sınama verilerinin parçalı bir biçimde nasıl verildiğine ilişkin bir 
+örnek verilmiştir.
+
+---------------------------------------------------------------------------------
+import numpy as np
+from tensorflow.keras import Sequential
+from tensorflow.keras.layers import Input, Dense
+
+EPOCHS = 100
+NFEATURES = 10
+STEPS_PER_EPOCH = 20
+BATCH_SIZE = 32
+VALIDATION_STEPS = 10
+
+def data_generator():
+    for _ in range(EPOCHS):
+        for _ in range(STEPS_PER_EPOCH):
+            x = np.random.random((BATCH_SIZE, NFEATURES))
+            y = np.random.randint(0, 2, BATCH_SIZE)
+            yield x, y   
+
+def validation_generator():
+    x = np.random.random((BATCH_SIZE, NFEATURES))
+    y = np.random.randint(0, 2, BATCH_SIZE)
+    for _ in range(EPOCHS):
+        for _ in range(VALIDATION_STEPS + 1):
+            yield x, y
+
+model = Sequential(name='Diabetes')
+
+model.add(Input(shape= (NFEATURES, )))
+model.add(Dense(16, activation='relu', name='Hidden-1'))
+model.add(Dense(16, activation='relu', name='Hidden-2'))
+model.add(Dense(1, activation='sigmoid', name='Output'))
+model.summary()
+
+model.compile(optimizer='rmsprop', loss='binary_crossentropy', metrics=['binary_accuracy'])
+
+model.fit(data_generator(), epochs=EPOCHS, steps_per_epoch=STEPS_PER_EPOCH, 
+        validation_data=validation_generator(), validation_steps=VALIDATION_STEPS)
+
+---------------------------------------------------------------------------------
 """
