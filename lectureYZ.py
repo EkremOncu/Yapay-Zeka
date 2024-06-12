@@ -7745,6 +7745,56 @@ kullanılmaktadır. Tabii veri kümesindeki orijinal listenin kullanılması dah
 uygun olacaktır.
 
 ---------------------------------------------------------------------------------
+
+---------------------------------------------------------------------------------
+Aslında vektörizasyon işlemi daha sonraları Keras'a eklenmiş olan TextVectorization 
+isimli katman sınıfı yoluyla da yapılabilmektedir. Uygulamacı Input katmanından 
+sonra bu katman nesnesini modele ekler daha sonra da diğer katmanları modele ekler. 
+Böylece alınan girdiler önce TextVectorization katmanı yoluyla vektörel hale 
+getirilip diğer katmanlara iletilir. Tabii bu durumda bizim ağa girdi olarak 
+vektörleri değil yazıları vermemiz gerekir. Çünkü bu katmanın kendisi zaten 
+yazıları vektörel hale getirmektedir. Örneğin:
+
+tv = TextVectorization(...)
+...
+model = Sequential(name='IMDB')
+
+model.add(Input((1, )))
+model.add(tv)
+model.add(Dense(128, activation='relu', name='Hidden-1'))
+model.add(Dense(128, activation='relu', name='Hidden-2'))
+model.add(Dense(1, activation='sigmoid', name='Output'))
+model.summary()
+
+Burada ağın girdi katmanında tek sütunlu bir veri kümesi olduğuna dikkat ediniz. 
+Çünkü biz ağa artık yazıları girdi olarak vereceğiz. Bu yazılar TextVectorization 
+katmanına sokulacak ancak bu katmandan sözcük hanzesi kadar çıktı elde edilecektir. 
+Bu çıktılarda sonraki Dense katmana verilmiştir.
+
+TextVectorization sınıfı diğer katman nesnelerinde olduğu gibi tensorflow.keras.layers 
+modülü içerisinde bulunmaktadır. Sınıfın __init__ metodunun parametrik yapısı 
+şöyledir:
+
+tf.keras.layers.TextVectorization(
+    max_tokens=None,
+    standardize='lower_and_strip_punctuation',
+    split='whitespace',
+    ngrams=None,
+    output_mode='int',
+    output_sequence_length=None,
+    pad_to_max_tokens=False,
+    vocabulary=None,
+    idf_weights=None,
+    sparse=False,
+    ragged=False,
+    encoding='utf-8',
+    name=None,
+    **kwargs
+)
+
+Görüldüğü gibi bu parametrelerin hepsine default değer girilebilmektedir. 
+
+---------------------------------------------------------------------------------
 """
 
 
@@ -7838,15 +7888,16 @@ model.fit(data_generator(), epochs=EPOCHS, steps_per_epoch=STEPS_PER_EPOCH)
 
 ---------------------------------------------------------------------------------
 Yukarıdaki örnekte bir sınama işlemi yapılmamamıştır. İşte sınama işlemleri için 
-veriler de tek hamlede değil parça parça verilebilmektedir. Bunun için yine fit 
-metodunun validation_data parametresine bir üretici fonksiyon nesnesi girilir. fit 
-metodu da her epcoh sonrasında validation_steps parametresinde belirtilen miktarda 
-bu üretici fonksiyon üzerinde iterasyon yaparak bizden sınama verilerini almaktadır. 
-Böylece biz her epoch sonrasında kullanılacak sınama verilerini fit metoduna 
-üretici fonksiyon nesnesi yoluyla parça parça vermiş oluruz. Sınama verilerinin 
-parçalı oluşturulması sırasında üretici fonksiyonlarda her epoch için validation_steps 
-parametresi kadar değil bundan 1 fazla yield işlemi yapılmalıdır. Bu fit metodunun 
-içsel tasarımıyla ilgilidir. 
+veriler de tek hamlede değil parça parça verilebilmektedir. 
+
+Bunun için yine fit metodunun validation_data parametresine bir üretici fonksiyon 
+nesnesi girilir. fit metodu da her epoch sonrasında validation_steps parametresinde 
+belirtilen miktarda bu üretici fonksiyon üzerinde iterasyon yaparak bizden sınama 
+verilerini almaktadır. Böylece biz her epoch sonrasında kullanılacak sınama 
+verilerini fit metoduna üretici fonksiyon nesnesi yoluyla parça parça vermiş oluruz. 
+Sınama verilerinin parçalı oluşturulması sırasında üretici fonksiyonlarda her 
+epoch için validation_steps parametresi kadar değil bundan 1 fazla yield işlemi 
+yapılmalıdır. Bu fit metodunun içsel tasarımıyla ilgilidir. 
 
 Aşağıda sınama verilerinin parçalı bir biçimde nasıl verildiğine ilişkin bir 
 örnek verilmiştir.
@@ -7872,6 +7923,7 @@ def data_generator():
 def validation_generator():
     x = np.random.random((BATCH_SIZE, NFEATURES))
     y = np.random.randint(0, 2, BATCH_SIZE)
+    
     for _ in range(EPOCHS):
         for _ in range(VALIDATION_STEPS + 1):
             yield x, y
@@ -7884,7 +7936,8 @@ model.add(Dense(16, activation='relu', name='Hidden-2'))
 model.add(Dense(1, activation='sigmoid', name='Output'))
 model.summary()
 
-model.compile(optimizer='rmsprop', loss='binary_crossentropy', metrics=['binary_accuracy'])
+model.compile(optimizer='rmsprop', loss='binary_crossentropy', 
+              metrics=['binary_accuracy'])
 
 model.fit(data_generator(), epochs=EPOCHS, steps_per_epoch=STEPS_PER_EPOCH, 
         validation_data=validation_generator(), validation_steps=VALIDATION_STEPS)
@@ -7937,7 +7990,7 @@ def prediction_generator():
 
 model = Sequential(name='Diabetes')
 
-model.add(Input(NFEATURES, ))
+model.add(Input(shape= (NFEATURES, )))
 model.add(Dense(16, activation='relu', name='Hidden-1'))
 model.add(Dense(16, activation='relu', name='Hidden-2'))
 model.add(Dense(1, activation='sigmoid', name='Output'))
