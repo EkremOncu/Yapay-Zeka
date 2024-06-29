@@ -7709,6 +7709,7 @@ for index, pi in enumerate(predict_indexes):
 
 ---------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------
+34
 Şimdi de Reuters örneğini CountVectorizer sınıfını kullanılarak gerçekleştirelim. 
 Anımsanacağı gibi CountVectorizer sınıfı zaten vektörizasyon işlemini kendisi 
 yapmaktaydı. O halde biz Reuters yazılarını bir listede topladıktan sonra CountVectorizer
@@ -7726,7 +7727,7 @@ sw = df_sw.iloc[:, 0].to_list()
 CountVectorizer sınıfı önce yazıları sözcüklere ayırıp (tokenizing) sonra stop 
 word'leri atmaktadır. Ancak sınıfın sözcüklere ayırmada default kullandığı düzenli 
 ifade kalıbı tek tırnaklı sözcüklerdeki tırnaklardan da ayrıştırma yapmaktadır. 
-(Ancak tırnaktan sonraki kısmı da atmaktadır.) Orijinal veri kümesinde verilen 
+(Ancak tırnaktan sonraki kısmı da atmaktadır.) Orjinal veri kümesinde verilen 
 stop word'ler tek tırnaklı yazı içerdiği için burada bir uyumsuzluk durumu 
 ortaya çıkmaktadır.
 
@@ -7747,6 +7748,9 @@ uygun olacaktır.
 ---------------------------------------------------------------------------------
 
 ---------------------------------------------------------------------------------
+
+# TextVectorization
+
 Aslında vektörizasyon işlemi daha sonraları Keras'a eklenmiş olan TextVectorization 
 isimli katman sınıfı yoluyla da yapılabilmektedir. Uygulamacı Input katmanından 
 sonra bu katman nesnesini modele ekler daha sonra da diğer katmanları modele ekler. 
@@ -7792,7 +7796,50 @@ tf.keras.layers.TextVectorization(
     **kwargs
 )
 
-Görüldüğü gibi bu parametrelerin hepsine default değer girilebilmektedir. 
+Görüldüğü gibi bu parametrelerin hepsi default değer almıştır. 
+
+max_tokens parametresi --> en fazla yinelenen belli sayıda sözcüğün vektörel hale 
+                        getirilmesi için kullanılmaktadır. Yani adeta sözcük haznesi 
+                        burada belirtilen miktarda sözcük içeriyor gibi olmaktadır. 
+
+standardize parametresi --> yazılardaki sözcüklerin elde edildikten sonra nasıl ön 
+                        işleme sokulacağını belirtmektedir. Bu parametrenin default 
+                        değerinin 'lower_and_strip_punctuation' biçiminde olduğuna 
+                        dikkat ediniz. Bu durumda yazılardaki sözcükler küçük 
+                        harflere dönüştürülecek ve sözcüklerin içerisindeki noktalama 
+                        işaretleri atılacaktır. (Yani örneğin yazıdaki "Dikkat!" 
+                        sözcüğü "dikkat" olarak ele alınacaktır.) Bu parametre 
+                        için "çağrılabilir (callable)" bir nesne de girilebilmektedir. 
+                        Bu fonksiyon eğitim sırasında çağrılıp buradan elde 
+                        edilen yazılar vektörizasyon işlemine sokulmaktadır.
+
+split parametresi --> sözcüklerin nasıl birbirinden ayrılacağını belirtmektedir. 
+                    Default durumda sözcükler boşluk karakterleriyle birbirinden 
+                    ayrılmaktadır. 
+                    
+output_mode  --> default değeri int biçimindedir. Bu durumda yazıdaki sözcükler 
+                sözcük haznesindeki numaralar biçiminde verilecektir. Bu parametrenin 
+                "count" biçiminde girilmesi uygundur. Eğer bu parametre "count" 
+                biçiminde girilirse bu durumda yazı bizim istediğimiz gibi 
+                frekanslardan oluşan vektör biçimine dönüştürülecektir. vocabulary 
+                parametresi doğrudan sözcük haznesinin programcı tarafından metoda 
+                verilmesini sağlamak için buludurulmuştur. Bu durumda adapt işleminde 
+                sözcük haznesi adapt tarafından oluşturulmaz, burada verilen 
+                sözcük haznesi kullamılır.
+
+
+TextVectorization sınıfının get_vocabulary metodu adapt işleminin sonucunda 
+oluşturulmuş olan sözcük haznesini bize vermektedir. 
+
+set_vocabulary metodu ise sözcük haznesini set etmek için kullanılmaktadır.
+
+TextVectorization nesnesi yaratıldıktan sonra sözcük haznesinin ve dönüştürmede 
+kullanılacak sözcük nesnesinin oluşturulması için sınıfın adapt metodu çağrılmalıdır. 
+Örneğin:
+
+tv = TextVectorization(output_mode='count')
+tv.adapt(texts)
+ 
 
 ---------------------------------------------------------------------------------
 """
