@@ -7798,11 +7798,13 @@ tf.keras.layers.TextVectorization(
 
 Görüldüğü gibi bu parametrelerin hepsi default değer almıştır. 
 
-max_tokens parametresi --> en fazla yinelenen belli sayıda sözcüğün vektörel hale 
+max_tokens parametresi --> En fazla yinelenen belli sayıda sözcüğün vektörel hale 
                         getirilmesi için kullanılmaktadır. Yani adeta sözcük haznesi 
                         burada belirtilen miktarda sözcük içeriyor gibi olmaktadır. 
+                        Örneğin; 1000 tane farklı sözcük var en çok tekrarlanan 300
+                        tanesini al denilebilir.
 
-standardize parametresi --> yazılardaki sözcüklerin elde edildikten sonra nasıl ön 
+standardize parametresi --> Yazılardaki sözcüklerin elde edildikten sonra nasıl ön 
                         işleme sokulacağını belirtmektedir. Bu parametrenin default 
                         değerinin 'lower_and_strip_punctuation' biçiminde olduğuna 
                         dikkat ediniz. Bu durumda yazılardaki sözcükler küçük 
@@ -7813,11 +7815,11 @@ standardize parametresi --> yazılardaki sözcüklerin elde edildikten sonra nas
                         Bu fonksiyon eğitim sırasında çağrılıp buradan elde 
                         edilen yazılar vektörizasyon işlemine sokulmaktadır.
 
-split parametresi --> sözcüklerin nasıl birbirinden ayrılacağını belirtmektedir. 
+split parametresi --> Sözcüklerin nasıl birbirinden ayrılacağını belirtmektedir. 
                     Default durumda sözcükler boşluk karakterleriyle birbirinden 
                     ayrılmaktadır. 
                     
-output_mode  --> default değeri int biçimindedir. Bu durumda yazıdaki sözcükler 
+output_mode  --> Default değeri int biçimindedir. Bu durumda yazıdaki sözcükler 
                 sözcük haznesindeki numaralar biçiminde verilecektir. Bu parametrenin 
                 "count" biçiminde girilmesi uygundur. Eğer bu parametre "count" 
                 biçiminde girilirse bu durumda yazı bizim istediğimiz gibi 
