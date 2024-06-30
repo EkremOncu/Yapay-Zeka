@@ -7399,6 +7399,18 @@ normal matrise dönüştürebiliriz. Örneğin:
 
 dataset_x = cv.transform(dataset).todense()
 
+
+Aslında fit metodu herhangi bir dolaşılabilir nesneyi parametre olarak kabul etmektedir. 
+Örneğin yazılar satır satır bulunuyorsa biz doğrudan dosya nesnesini bu fit metoduna 
+verebiliriz. Bu durumda !!!! tüm yazıları belleğe okumak zorunda kalmayız. !!!! 
+Örneğin:
+
+from sklearn.feature_extraction.text import CountVectorizer
+
+f = open('text.csv')
+cv = CountVectorizer()
+cv.fit(f)
+
 Artık bu CountVectorizer nesnesi predict işleminde de aynı biçimde kullanılabilir. 
 
 ---------------------------------------------------------------------------------
@@ -7852,7 +7864,7 @@ tv.adapt(texts)
 
 """
 ---------------------------------------------------------------------------------
-Çok büyük verilerle eğitim, test hatta predict işlemi sorunlu bir kondur. Çünkü 
+Çok büyük verilerle eğitim, test hatta predict işlemi sorunlu bir konudur. Çünkü 
 örneğin fit işleminde büyük miktarda  veri kümeleriyle eğitim ve test yapılırken 
 bu veri kümeleri bir bütün olarak metotlara verilmektedir. Ancak büyük veri kümeleri 
 eldeki belleğe sığmayabilir. (Her ne kadar 64 bit Windows ve Linux sistemlerinde 
@@ -7865,8 +7877,7 @@ oluşmaktadır. Gerçi bu matrislerin çok büyük kısmı 0'lardan oluştuğu i
 eğitilip test ve predict edilebilmektedir. Parçalı eğitim, test ve predict 
 işlemlerinde eğitim, test ve predict sırasında her batch işleminde fit, evaluate 
 ve predict metotları o anda bizden bir batch'lik verileri istemekte ve eğitim 
-batch-bacth verilere tedarik edilerek yapılabilmektedir. 
-
+batch-batch verilere tedarik edilerek yapılabilmektedir. 
 
 Parçalı eğitim ve test işlemi için fit, evaluate ve predict metotlarının birinci 
 parametrelerinde x verileri yerine bir "üretici fonksiyon (generator)" ya da 
@@ -8054,6 +8065,35 @@ model.fit(data_generator(), epochs=EPOCHS, steps_per_epoch=STEPS_PER_EPOCH,
 eval_result = model.evaluate(evaluation_generator(), steps=EVALUATION_STEPS)
 predict_result = model.predict(prediction_generator(), steps=PREDICTION_STEPS)
 
+
+---------------------------------------------------------------------------------
+
+---------------------------------------------------------------------------------
+Şimdi de gerçekten bellekte büyük bir yer kaplayan vektörizasyon işlemi gerektiren 
+bir örneği parçalı bir biçimde eğitelim ve test edelim. Bu örnek için IMDB veri 
+kümesini kullanalım. Burada karşılaşacağımız önemli bir sorun "karıştırma (shuffling)"
+işleminin nasıl yapılacağına ilişkindir. 
+
+Bilindiği gibi fit işlemi sırasında her epoch işleminden sonra eğitim veri kümesi
+karıştırılmaktadır. (Aslında epoch sonrasında veri kümesinin karıştırılıp 
+karıştırılmayacağı fit metodundaki shuffle parametresi ile belirlenebilmektedir. 
+Bu paramerenin default değeri True biçimindedir.) Parçalı eğitim yapılırken fit 
+metodunun shuffle parametresinin bir etkisi yoktur. Dolayısıyla veri kümesinin 
+epoch sonrasında karıştırılması programcı tarafından üretici fonksiyon içeisinde 
+yapılmalıdır. Pekiyi programcı bu karıştırmayı nasıl yapabilir? CSV dosyasının 
+dosya üzerinde karıştırılması uygun bir yöntem değildir. Bu durumda birkaç yöntem 
+izlenebilir:
+
+1) Veri kümesi yine read_csv fonksiyonu ile tek hamlede belleğe okutulabilir. Her 
+batch işleminde bellekteki ilgili batch'lik kısım verilebilir. Karıştırma da bellek 
+üzerinde yapılabilir. Ancak veri kümesini belleğe okumak yapılmak istenen şeye 
+bir tezat oluşturmaktadır. Ancak yine de text işlemlerinde asıl bellekte yer 
+kaplayan unsur vektörizasyon işleminden elde edilen matris olduğu için bu yöntem 
+kullanılabilir. 
+
+2) Veri kümesi bir kez okunup dosyadaki kaydın offset numaraları bir dizide saklanabilir. 
+Sonra bu dizi karıştırılıp dizinin elemanlarına ilişkin kayıtlar okunabilir. Eğer 
+veritabanı üzerinde doğrudan çalışılıyorsa da işlemler benzer biçimde yürütülebilir. 
 
 ---------------------------------------------------------------------------------
 """
