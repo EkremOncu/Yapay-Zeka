@@ -8095,5 +8095,35 @@ kullanılabilir.
 Sonra bu dizi karıştırılıp dizinin elemanlarına ilişkin kayıtlar okunabilir. Eğer 
 veritabanı üzerinde doğrudan çalışılıyorsa da işlemler benzer biçimde yürütülebilir. 
 
+
+Pekiyi biz vektörizasyon işlemini TextVectorization sınıfı türünden katman nesnesiyle 
+yapmaya çalışırken tüm verileri yine belleğe çekmek zorunda değil miyiz? Aslında 
+TextVectorization sınıfının adapt metodu henüz görmediğimiz Tensorflow kütüphanesindeki 
+Dataset nesnesini de parametre olarak alabilmektedir. Bu sayede biz bir Dataset 
+nesnesi oluşturarak adapt metodunun da verileri parçalı bir biçimde almasını 
+sağlayabiliriz. 
+
+Scikit-learn kütüphanesindeki CountVectorizer sınıfının fit metodu da aslında 
+dolaşılabilir nesneyi parametre olarak alabilmektedir. Dolayısıyla CountVectorizer 
+kullanılırken yine üretici fonksiyonlar yoluyla biz verileri fit metoduna parça 
+parça verebilmekteyiz. Dosya nesneslerinin de dolaşılabilir nesneler olduğunu 
+anımsayınız.
+
+---------------------------------------------------------------------------------
+Peki parçalı verilerle eğitim yapılırken sınama, test ve kestirim işlemlerini de 
+parçalı bir biçimde yapabilir miyiz? Evet bu işlemlerin hepsi parçalı bir biçimde 
+yapılabilmektedir. fit metodunda validation_data parametresi bir üretici nesne 
+olarak (ya da bir PyDataset nesnesi olarak) girilirse bu durumda her epoch'tan 
+sonra sınama verileri bu üretici fonksiyondan (ya da PyDataset nesnesinden) elde 
+edilecektir. Ancak bu durumda fit metodunun validation_steps parametresinde kaç 
+dolaşımla (yield işlemi ile) sınama verilerinin elde edileceği de girilmelidir.
+Örneğin:
+
+model.fit(..., validation_data=validation_generator(), validation_steps=32)
+
+Burada sınama verilerinin elde edilmesi için toplma 32 kez dolaşım (yield işlemi) 
+yapılacaktır. Her epoch sonrasındaki sınamada sınama veri kümesinin karıştırılmasına 
+gerek yoktur. 
+
 ---------------------------------------------------------------------------------
 """
