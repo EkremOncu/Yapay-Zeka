@@ -8125,5 +8125,21 @@ Burada sınama verilerinin elde edilmesi için toplma 32 kez dolaşım (yield i�
 yapılacaktır. Her epoch sonrasındaki sınamada sınama veri kümesinin karıştırılmasına 
 gerek yoktur. 
 
+Test işlemi de benzer biçimde parçalı olarak yapılabilir. Bunun için Sequential 
+sınıfının x parametresine bir üretici nesne (ya da bir Sequential nesnesi) girilir. 
+Test işlemi yapılırken kaç kere dolaşım uygulanacağı da steps parametresiyle
+belirtilmektedir. Örneğin:
+
+eval_result = model.evalute(test_generator(), steps=32)
+
+
+Kestirim işleminde parçalı veri kullanılmasına genellikle gereksinim duyulmuyor 
+olsa da kestirim işlemi yine parçalı verilerle yapılabilir. Bunun için Sequential 
+sınıfının predict metdounda x parametresine bir üretici nesne (ya da PyDataset nesnesi) 
+nesne gerilir. Yine metodun steps parametresi sınama verileri için kaç kez dolaşım 
+uygulanacağını (yani yield yapılacağını) beelirtir. Örneğin:
+
+predict_result = model.predict(predict_generator(), steps=32)
+
 ---------------------------------------------------------------------------------
 """
