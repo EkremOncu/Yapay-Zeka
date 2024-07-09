@@ -8143,3 +8143,62 @@ predict_result = model.predict(predict_generator(), steps=32)
 
 ---------------------------------------------------------------------------------
 """
+"""
+---------------------------------------------------------------------------------
+Parçalı biçimde eğitim, test ve kestirim işlemi üretici fonksiyon yerine sınıfsal 
+bir biçimde de yapılabilmektedir. Bunun için tensorflow.keras.utils modülü içerisindeki 
+PyDataset sınıfından türetilmiş sınıflar kullanılmaktadır. (Aslında bir süre öncesine 
+kadar bu amaçla Sequence isimli bir sınıftan türetme yapılıyordu. Ancak Keras 
+ekibi bunun yerine TenserFlow kütüphanesi içerisindeki Dataset sınıfını Keras'tan 
+kullanılabilir hale getirdi. Dokümantasyondan da Sequence sınıfını kaldırıldı.) 
+
+Programcı türetmiş sınıf içerisinde __len__ ve __getiitem__ metotlarını yazar. 
+fit metodu bir epoch'un kaç tane batch içerdiğini tespit etmek için sınıfın __len__ 
+metodunu çağırmaktadır. Daha sonra fit metodu eğitim sırasında her batch bilgiyi 
+elde etmek için sınıfın __getitem__ metodunu çağırır. Bu metodu çağırırken batch 
+numarasını metoda parametre olarak geçirir. Bu metottan programcı batch büyüklüğü 
+kadar x ve y verisinden oluşan bir demetle geri dönmelidir. Tabii aslında metodun 
+geri döndürdüğü x ve Y değerleri her defasında aynı uzunlukta olmak zorunda da 
+değildir. Sonra programcı fit metodunun training_dataset_x parametresine bu sınıf 
+türünden bir nesne yaratarak o nesneyi girer. Örneğin:
+
+class DataGenerator(PyDataset):
+    def __init__(self):
+        super().__init__()
+        pass
+
+    def __len__(self):
+        pass
+    
+    def __getitem__(self, batch_no):
+        pass
+...
+model.fit(DataGenrator(...), epochs=100)
+
+Tabii artık bu yöntemde fit metodunun steps_per_epoch parametresi kullanılmamaktadır. 
+Metodun bath_size parametresinin de bu yöntemde bir anlamı yoktur. Ancak epochs 
+parametresi kaç epoch uygulanacağını belirtmek içn kullanılmaktadır.
+
+Sınama işlemi yine benzer bir biçimde yapılmaktadır. Yani programcı yine PyDataset 
+sınıfından sınıf türetip __len__ ve __getitem__ metotlarını yazar. Tabii bu durumda 
+her epoch sonrasında bu sınama verileri __getitem__ metodu yoluyla elde edilecektir. 
+Programcı yine bunun için validation_data parametresine PyDataset sınıfından 
+türettiği sınıf türünden bir nesne girer. Örneğin:
+
+model.fit(DataGenrator(...), epochs=100, validation_data=DataGenerator(....))
+
+Ayrıca PyDataset sınıfından türetilmiş olan sınıfta on_epoch_end isimli bir metot 
+da yazılabilmektedir. Eğitim sırasında her epoch bittiğinde fit tarafından bu metot 
+çağrılmaktadır. Programcı da tipik olarak bu metotta eğitim veri kümesini karıştırır.  
+Bu biçimdeki parçalı eğitimde artık fit metodunun steps_per_epoch gibi bir 
+parametresi kullanılmamaktadır. Zaten bu bilgi metot tarafından __len__ metodu 
+çağrılarak elde edilmektedir. Benzer biçimde evaluate işleminde de yine Sequence 
+sınıfından sınıf türetilerek test edilecek veriler parçalı bir biçimde evalaute 
+metoduna verilebilmektedir. 
+
+Uygulamada parçalı verilerle eğitim işleminde aslında üretici fonksiyonlardan 
+ziyade bu sınıfsal yöntem daha çok tercih edilmektedir. Bu yöntemi uygulamak daha 
+kolaydır. Ayrıca toplamda bu yöntem daha hızlı olma eğilimindedir. 
+
+---------------------------------------------------------------------------------
+"""
