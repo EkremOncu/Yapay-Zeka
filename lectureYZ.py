@@ -8065,7 +8065,6 @@ model.fit(data_generator(), epochs=EPOCHS, steps_per_epoch=STEPS_PER_EPOCH,
 eval_result = model.evaluate(evaluation_generator(), steps=EVALUATION_STEPS)
 predict_result = model.predict(prediction_generator(), steps=PREDICTION_STEPS)
 
-
 ---------------------------------------------------------------------------------
 
 ---------------------------------------------------------------------------------
@@ -8131,7 +8130,6 @@ Test işlemi yapılırken kaç kere dolaşım uygulanacağı da steps parametres
 belirtilmektedir. Örneğin:
 
 eval_result = model.evalute(test_generator(), steps=32)
-
 
 Kestirim işleminde parçalı veri kullanılmasına genellikle gereksinim duyulmuyor 
 olsa da kestirim işlemi yine parçalı verilerle yapılabilir. Bunun için Sequential 
