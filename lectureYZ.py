@@ -8263,7 +8263,39 @@ olarak kullanacak olsaydık zaten yine işlemleri bu biçimde iki döngü yoluyl
 yapmak durumunda kalacaktık. Genellikle uygulamacılar her batch işleminde elde 
 edilen değerlerin bir ortalamasını epoch değeri olarak kullanmaktadır. 
 
+Bu yöntemde epoch sonrasındaki sınama işlemlerinin de programcı tarafından manuel 
+olarak yapılması gerekmektedir. Yani programcı sınama veri kümesini kendisi oluşturmalı 
+ve sınamayı kendisi yapmalıdır. Aslında evaulate metodu test amaçlı kullanılsa 
+da sınama amaçlı da kullanılabilir. Bu durumda sınama işlemi şöyle yapılabilir:
 
+for epoch in range(EPOCHS):
+    <eğitim veri kümesi karıştırılıyor>
+    for batch_no in range(NBATCHES):
+        <bir batch'lik x ve y elde ediliyor>
+        rd = model.train_on_batch(x, y, return_dict=True)
+    val_result = model.evaluata(validation_x, validation_y)
+
+
+Tabii burada evaluate işlemini de parça parça yapmak isteyebilirsiniz. Bu durumda 
+yine bir döngü oluşturup test_on_batch fonksiyonunu kullanabilirsiniz. test_on_batch 
+metodunun parametrik yapısı şöyledir
+
+test_on_batch(x, y=None, sample_weight=None, return_dict=False)
+
+
+Kullanım tamamen train_batch metodu gibidir. 
+
+Test işlemi de tüm epoch'lar bittiğinde yine parçalı bir biçimde test_on_batch 
+metoduyla yapılabilir. Kestirim işlemi de yine benzer bir biçimde predcit_on_batch 
+metoduyla yapılmaktadır. Metodun parametrik yapısı şöyledir:
+
+predict_on_batch(x)
+
+Metot kestirim değerleriyle geri dönmektedir. Örneğin:
+
+for batch_no in range(NBATCHES):
+    <bir batch'lik x elde ediliyor>
+    predict_result = model.predict_on_batch(predict_x)
 
 ---------------------------------------------------------------------------------
 """
