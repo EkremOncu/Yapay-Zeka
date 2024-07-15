@@ -8205,14 +8205,15 @@ kolaydır. Ayrıca toplamda bu yöntem daha hızlı olma eğilimindedir.
 ---------------------------------------------------------------------------------
 Pekiyi biz parçalı eğitimi fit metodunu birden fazla kez çağırarak yapamaz mıyız? 
 Keras'ın orijinal dokümanlarında bu konuda çok açık örnekler verilmemiştir. Ancak 
-kaynak kodlar incelendiğinde fit işleminin artırımlı bir biçimde yapıldığı görülmektedir. 
-Yani birden fazla kez fit metodu çağrıldığında eğitim kalınan yerden devam ettirilmektedir. 
-Bu nedenle biz eğitimi farklı zamanlarda fit işlemlerini birden fazla kez yaparak 
-devam ettirebiliriz. Ancak fit metodunun bu biçimde birden fazla kez çağrılması 
-işleminde dikkat edilmesi gereken bazı noktalar da olabilmektedir. Keras ekibi bu 
-tür  parçalı eğitimler için daha aşağı seviyeli xxx_on_bath isimli metotlar bulundurmuştur. 
-Programcının birden fazla kez fit metodu çağırmak yerine bu metotları kullanması 
-daha uygundur. Parçalı işlem için Sequential sınıfının şu metotları bulundurulmuştur:
+kaynak kodlar incelendiğinde fit işleminin artırımlı bir biçimde yapıldığı 
+görülmektedir. Yani birden fazla kez fit metodu çağrıldığında eğitim kalınan yerden 
+devam ettirilmektedir. Bu nedenle biz eğitimi farklı zamanlarda fit işlemlerini 
+birden fazla kez yaparak devam ettirebiliriz. Ancak fit metodunun bu biçimde birden 
+fazla kez çağrılması işleminde dikkat edilmesi gereken bazı noktalar da olabilmektedir. 
+Keras ekibi bu tür  parçalı eğitimler için daha aşağı seviyeli xxx_on_bath isimli 
+metotlar bulundurmuştur. Programcının birden fazla kez fit metodu çağırmak yerine 
+bu metotları kullanması daha uygundur. Parçalı işlem için Sequential sınıfının 
+şu metotları bulundurulmuştur:
 
 train_on_batch
 test_on_batch
@@ -8227,10 +8228,11 @@ train_on_batch metodunun parametrik yapısı şöyledir:
 train_on_batch(x, y=None, sample_weight=None, class_weight=None, return_dict=False)
 
 
-Burada x ve y parametreleri parçalı eğitimde kullanılacak x ve y değerlerini almaktadır. 
-sample_weight ve class_weight parametreleri ağırlıklandırmak için kullanılmaktadır. 
-return_dict parametresi True geçilirse metot bize geri dönüş değeri olarak loss 
-değerini ve metrik değerleri bir sözlük nesnesi biçiminde vermektedir. 
+Burada x ve y parametreleri parçalı eğitimde kullanılacak x ve y değerlerini 
+almaktadır. sample_weight ve class_weight parametreleri ağırlıklandırmak için 
+kullanılmaktadır. return_dict parametresi True geçilirse metot bize geri dönüş 
+değeri olarak loss değerini ve metrik değerleri bir sözlük nesnesi biçiminde 
+vermektedir. 
 
 train_on_batch metodu ile parçalı eğitim biraz daha düşük seviyeli olarak yapılmaktadır. 
 Bu biçimde parçalı eğitimde epoch döngüsünü ve batch döngüsünü programcı kendisi 
@@ -8246,9 +8248,10 @@ Tabii yukarıda da belirttiğimiz gibi bu biçimde çalışma aşağı seviyelid
 bazı şeyleri programcının kendisinin yapması gerekmektedir. Örneğin fit metodu 
 bize bir History sınıfı türünden bir callback nesnesi veriyordu. Bu nesnenin 
 içerisinden de biz tüm epoch'lara ilişkin değerleri elde edebiliyorduk. train_on_batch 
-işlemleriyle eğitimde bu işelmlerin bizim tarafımızdan yapılması gerekmektedir. 
+işlemleriyle eğitimde bu işlemlerin bizim tarafımızdan yapılması gerekmektedir. 
 train_on_batch metodunun return_dict parametresi True geçilirse batch işlemi 
-sonucundaki loss ve metik değerler bize bir sözlük biçiminde verilmektedir. Örneğin:
+sonucundaki loss ve metik değerler bize bir sözlük biçiminde verilmektedir. 
+Örneğin:
 
 for epoch in range(EPOCHS):
     <eğitim veri kümesi karıştırılıyor>
@@ -8264,9 +8267,10 @@ yapmak durumunda kalacaktık. Genellikle uygulamacılar her batch işleminde eld
 edilen değerlerin bir ortalamasını epoch değeri olarak kullanmaktadır. 
 
 Bu yöntemde epoch sonrasındaki sınama işlemlerinin de programcı tarafından manuel 
-olarak yapılması gerekmektedir. Yani programcı sınama veri kümesini kendisi oluşturmalı 
-ve sınamayı kendisi yapmalıdır. Aslında evaulate metodu test amaçlı kullanılsa 
-da sınama amaçlı da kullanılabilir. Bu durumda sınama işlemi şöyle yapılabilir:
+olarak yapılması gerekmektedir. Yani programcı sınama veri kümesini kendisi 
+oluşturmalı ve sınamayı kendisi yapmalıdır. Aslında evaulate metodu test amaçlı 
+kullanılsa da sınama amaçlı da kullanılabilir. Bu durumda sınama işlemi şöyle 
+yapılabilir:
 
 for epoch in range(EPOCHS):
     <eğitim veri kümesi karıştırılıyor>
