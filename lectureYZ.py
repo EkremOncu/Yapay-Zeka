@@ -8303,3 +8303,50 @@ for batch_no in range(NBATCHES):
 
 ---------------------------------------------------------------------------------
 """
+
+
+
+# Seyrek(Sparce) Matrisler
+
+"""
+---------------------------------------------------------------------------------
+Elemanlarının çok büyük kısmı 0 olan matrislere "seyrek matrisler (sparse matrices)" 
+denilmektedir. Seyreklik (sparsity) 0 olan elemanların tüm elemanlara oranıyla 
+belirlenmektedir. Bir matirisin seyrek olarak ele alınması için herkes tarafından
+kabul edilen bir seyreklik oranı yoktur. Seyreklik oranı ne kadar yüksek olursa 
+onların alternatif veri yapılarıyla ifade edilmeleri o kadar verimli olmaktadır. 
+Makine öğrenmesinde seyrek matrisle sıkça karşılaşılmaktadır. Örneğin bir grup 
+yazıyı vektörel hale getirdiğimizde aslında bir seyrek matris oluşmaktadır. Benzer 
+biçimde one-hot encoding dönüştürmesi de bir seyrek matris oluşturmaktadır. 
+scikit-learn kütüphanesindeki 
+
+OneHotEncoder sınıfının ve CountVectorizer sınıfının çıktı olarak seyrek matris 
+verdiğini anımsayınız.
+
+Seyrek matrislerin daha az yer kaplayacak biçimde tutulmasındaki temel yaklaşım 
+matrisin yalnızca sıfırdan farklı elemanlarının ve onların yerlerinin tutulmasıdır. 
+Örneğin bir milyon elemana sahip bir seyrek matriste yalnızca 100 eleman sıfırdan 
+faklıysa biz bu 100 elemanın değerini ve matristeki yerini tutarsak önemli bir 
+yer kazancı sağlayabiliriz.
+
+---------------------------------------------------------------------------------
+Seyrek matrisleri ifade etmek için alternatif birkaç veri yapısı kullanılmaktadır. 
+Bunlardan biri DOK (Dictionary Of Keys) denilen veri yapısıdır. Bu veri yapısında 
+matrisin yalnızca 0'dan farklı olan elemanları bir sözlükte tutulur. Sözlüğün 
+biçimi aşağıdaki gibidir:
+
+{(34674,17000): 1, (542001, 170): 4, ...}
+
+Burada anahtar satır ve sütun numarasını belirten demettir. Değer ise o elemandaki 
+değeri belirtir. Örneğin aşağıdaki gibi bir matris söz konusu olsun:
+
+0 0 5
+3 0 0 
+0 6 0
+
+Buradaki dok sözlüğü şöyle olacaktır:
+
+{(0, 2): 5, (1, 0): 3, (2, 1): 6}
+
+---------------------------------------------------------------------------------
+"""
