@@ -8350,3 +8350,54 @@ Buradaki dok sözlüğü şöyle olacaktır:
 
 ---------------------------------------------------------------------------------
 """
+"""
+---------------------------------------------------------------------------------
+NumPy ---> Vektörel işlemler yapan C'de yazılmış taban bir kütüphanedir. Pek çok 
+        proje NumPy kütüphanesini kendi içerisinde kullanmaktadır.
+
+
+Pandas ---> Bu kütüphane sütunlu veri yapılarını (yani istatistiksel veri tablolarını) 
+        ifade etmek için kullanılmaktadır. Kütüphanenin en önemli özelliği farklı 
+        türlere ilişkin sütunsal bilgilerin DataFrame isimli bir veri yapısı ile 
+        temsil edilmesidir. Bu kütüphane de NumPy kullanılarak yazılmıştır.
+
+
+scikit-learn ---> Bir makine öğrennesi kütüphanesidir. Ancak yapay sinir ağlarıyla 
+            ilgili özellikler yoktur (minimal düzeydedir). Yani bu kütüphane yapay 
+            sinir ağlarının dışındaki makine öğrenmesi için kullanılmaktadır. 
+            scikit-learn kendi içerisinde NumPy, Pandas ve SciPy kütüphanelerini 
+            kullanmaktadır.
+
+
+SciPy ---> Genel amaçlı matematik ve nümerik analiz kütüphanesidir. Bu kütüphanenin 
+        doğrudan makine öğrenmesiyle bir ilgisi yoktur. Ancak matematiğin çeşitli 
+        alanlarına ilişkin nümeraik analiz işlemleri yapan geniş bir taban kütüphanedir. 
+        Bu kütüphane de kendi içerisinde NumPy ve Pandas kullanılarak yazılmıştır. 
+
+
+TensorFlow ---> Google tarafından yapay sinir ağları ve makine öğrenmesi için 
+        oluşturulmuş taban bir kütüphanedir. Bu kütüphane scikit-learn kütüphanesinden 
+        farkı olarak Tensor adı altında biren fazla CPU ya da çekirdek kullanacak 
+        biçimde özellikle yapay sinir ağları için oluşturulmuş taban bir kütüphanedir. 
+        Kütüphane Google tarafından geliştirilmiştir.
+
+
+Keras ---> Yapay sinir ağı işlemlerini kolaylaştırmak için oluşturulmuş olan yüksek 
+        seviyeli bir kütüphanedir. Eskiden bu kütüphane "backend" olarak farklı 
+        kütüphaneleri kullanbiliyordu. Eski hali devam ettirilse de kütüphane 
+        tamamen TensorFlow içerisine dahil edilmiştir ve TensorFlow kütüphanesinin 
+        yüksek seviyeli bir katmanı haline getirilmiştir.
+
+
+PyTorch ---> Tamamen TensorFlow kütüphanesinde hedeflenen işlemleri yapan taban 
+        bir yapay sinir ağı ve makine öğrenmesi kütüphanesidir. Facebook (Meta) 
+        tarafından geliştirilmiştir. 
+
+
+Theano --> TensorFlow, PyTorch SciPy benzeri bir taban kütüphanedir. Akademik 
+        çevreler tarafından geliştirilmiştir.
+
+
+---------------------------------------------------------------------------------
+"""
+
