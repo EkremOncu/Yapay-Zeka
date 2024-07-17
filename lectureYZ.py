@@ -8397,7 +8397,76 @@ PyTorch ---> Tamamen TensorFlow kütüphanesinde hedeflenen işlemleri yapan tab
 Theano --> TensorFlow, PyTorch SciPy benzeri bir taban kütüphanedir. Akademik 
         çevreler tarafından geliştirilmiştir.
 
-
 ---------------------------------------------------------------------------------
 """
 
+"""
+---------------------------------------------------------------------------------
+NumPy kütüphanesi içerisinde seyrek matrislerle işlem yapan sınıflar ya da fonksiyonlar 
+bulunmamaktadır. Ancak SciPy kütüphanesi içerisinde seyrek matrislerle ilgili 
+işlemler yapan sınıflar ve fonksiyonlar vardır. scikit_learn kütüphanesi doğrudan 
+SciPy kütüphanesinin seyrek matris sınıflarını kullanmaktadır.
+
+---------------------------------------------------------------------------------
+DOK biçimindeki seyrek matrisler SciPy kütüphanesinde scipy.sparse modülü içerisindeki 
+dok_matrix sınıfıyla temsil edilmiştir. Biz bir dok_matrix sınıfı türünden nesneyi 
+yalnızca boyut belirterek yaratabiliriz. Daha sonra bu nesneyi sanki bir NumPy 
+dizisiymiş gibi onu kullanabiliriz. Seyrek matrisi normal bir Numpy dizisine 
+dönüştürmek için sınıfın todense ya da toarray metotları kullanılmaktadır. 
+Örneğin:
+    
+from scipy.sparse import dok_matrix
+
+dok = dok_matrix((10, 10), dtype='int32')
+dok[1, 3] = 10
+dok[3, 5] = 20
+
+a = dok.todense()
+print(dok)
+print('-' * 20)
+print(a)
+
+
+dok_matrix sınıfının minimum, maximum, sum, mean gibi birtakım faydalı metotları 
+bulunmaktadır. nonzero metodu sıfır dışındaki elemanların indekslerini vermektedir. 
+
+---------------------------------------------------------------------------------
+ Bir seyrek matris nesnesi ile biz NumPy dizileri üzerinde yaptığımız işlemlerin 
+benzerlerini yapabiliriz. Örneğin bir seyrek matrisi dilimleyebiliriz. Bu durumda 
+yine bir seyrek matris elde ederiz. dok_matrix sınıfının keys metodu yalnızca 
+anahtarları, values metodu ise yalnızca değerleri vermektedir. 
+
+Biz seyrek matrislerin karşılıklı elemanları üzerinde işlemler yapabiliriz. Ancak 
+her türlü işlem değişik veri yapılarına sahip seyrek matrislerde aynı verimlilikte 
+yapılamamaktadır. Örneğin iki dok_matrix nesnesini toplayabiliriz ya da çarpabiliriz. 
+Ancak bu işlemler yavaş olma eğilimindedir. Örneğin:
+
+    
+from scipy.sparse import dok_matrix
+
+dok1 = dok_matrix((5, 5), dtype='int32')
+dok1[1, 2] = 10
+dok1[0, 1] = 20
+
+print(dok1.keys())
+print(dok1.values())
+
+dok2 = dok_matrix((5, 5), dtype='int32')
+dok2[3, 2] = 10
+dok2[4, 1] = 20
+dok2[1, 2] = 20
+
+---------------------------------------------------------------------------------   
+from scipy.sparse import dok_matrix
+import numpy as np
+
+a = np.random.randint(0, 2, (10, 10))
+b = np.random.randint(0, 2, (10, 10))
+
+dok1 = dok_matrix(a, dtype='float32')
+dok2 = dok_matrix(b, dtype='float32')
+
+dok3 = dok1 + dok2
+
+---------------------------------------------------------------------------------
+"""
