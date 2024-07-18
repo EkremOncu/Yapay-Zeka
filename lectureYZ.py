@@ -8469,4 +8469,87 @@ dok2 = dok_matrix(b, dtype='float32')
 dok3 = dok1 + dok2
 
 ---------------------------------------------------------------------------------
+
+---------------------------------------------------------------------------------
+Diğer bir seyrek matris veri yapısı da "LIL (List of Lists)" denilen veri yapısıdır. 
+Bu veri yapısında matrisin satır satır 0 olmayan elemanları ayrı listelerde tutulur. 
+Başka bir listede de bu sıfır olmayan elemanların sütunlarının indeksi tutulmaktadır. 
+LIL matrisler SciPy kütüphanesinde scipy.sparse modülündeki lil_matrix sınıfyla 
+temsil edilmektedir. Bu sınıfın genel kullanımı dok_matrix sınıfında olduğu gibidir.  
+Sınıfın data ve rows örnek öznitelikleri bize bu bilgileri vermektedir. Örneğin 
+aşağıdaki gibi bir matrisi lil_matrix yapmış olalım:
+
+[[ 0  0 10 20  0]
+ [15  0  0  0 40]
+ [12  0 51  0 16]
+ [42  0 18  0 16]
+ [ 0  0  0  0  0]]
+
+Buradaki data listesi şöyle olacaktır:
+
+array([list([10, 20]), list([15, 40]), list([12, 51, 16]), list([42, 18, 16]), list([])], dtype=object)
+
+rows listesi de şöyle olacaktır:
+
+array([list([2, 3]), list([0, 4]), list([0, 2, 4]), list([0, 2, 4]), list([])], dtype=object)
+
+LIL matrisler de artimetik işlemlerde yavaştır. Dilimleme işlemleri de bu matrisler 
+de nispeten yavaş yapılmaktadır.
+
+---------------------------------------------------------------------------------
+"""
+
+"""
+---------------------------------------------------------------------------------
+Aslında uygulamada DOK ve LIL matrisler seyrek kullanılmaktadır. Daha çok CSR ve 
+CSC veri yapıları tercih edilmektedir. CSR (Compressed Sparse Row), ve CSC 
+(Compressed Sparse Column) matrisleri genel veri yapısı olarak birbirlerine çok 
+benzemektedir. Bunlar adeta birbirlerinin tersi durumundadır. 
+
+Bu veri yapıları seyrek matrislerin karşılıklı elemanlarının işleme sokulması 
+durumunda DOK ve LIL veri yapılarına göre daha avantajlıdır. CSR satır dilimlemesini 
+CSC ise sütun dilimlemesi hızlı yapabilmektedir. Ancak bu matrislerde sparse bir 
+matrisin 0 olmayan bir elemanına atama yapmak nispeten yavaş bir işlemdir. 
+
+---------------------------------------------------------------------------------
+CSR veri yapısı da SciPy kütüphanesinde scipy.sparse modülünde csr_matrix sınıfıyla 
+temsil edilmektedir. CSR matrislerde sıfırdan farklı elemanlar üç dizi (liste) 
+halinde tutulmaktadır:
+
+----- > data, indices, indptr. 
+
+Bu diziler sınıfın aynı isimli örnek özniteliklerinden elde edilebilmektedir. 
+data dizisi sıfır olmayan elemanların tutulduğu tek boyutlu dizidir. indices dizisi 
+data dizisindeki elemanların kendi satırlarının hangi sütunlarında bulunduğunu 
+belirtmektedir. indptr dizisi ise sıfır olmayan elemanların hangi satırlarda olduğuna 
+ilişkin ilk ve son indeks (ilk indeks dahil, son indeks dahil değil) değerlerinden 
+oluşmaktadır. indptr dizisi hep yan yana iki eleman olarak değerlendirilmelidir. 
+Soldaki eleman ilk indeksi, sağdaki eleman ise son indeksi belirtir. 
+
+Örneğin:
+
+0, 0, 9, 0, 5
+8, 0, 3, 0, 7
+0, 0, 0, 0, 0
+0, 0, 5, 0, 9
+0, 0, 0, 0, 0
+
+Burada söz konusu üç dizi şöyledir:
+
+data: [9, 5, 8, 3, 7, 5, 9]
+indices: [2, 4, 0, 2, 4, 2, 4]
+indptr: [0, 2, 5, 5, 7, 7]
+
+csr_matrix sınıfının genel kullanımı diğer seyrek matris sınıflarındaki gibidir. 
+Ancak CSR ce CSC matrislerde sıfır olan bir elemana atama yapmak yavaş bir işlemdir. 
+Çünkü bu işlemler yukarıda belirtilen üç dizide kaydırmalara yol açmaktadır. Bu 
+tür durumlarda DOK ya da LIL matrisler daha hızlı işleme yol açarlar. Bu nedenle 
+bu matrisler kullanılırken sıfır olmayan bir elemana atama yapıldığında bir uyarı 
+mesajıyla karşılaşabilirsiniz. O halde CSR ve CSC matrisleri işin başında oluşturulmalı 
+ve sonra da onların elemanları bir daha değiştirilmemelidir.
+
+CSR matrislerinde satırsal, CSC matrislerinde sütunsal dilimlemeler hızlıdır. Aynı 
+zamanda bu iki matrisin karşılıklı elemanları üzerinde hızlı işlemler yapılabilmektedir. 
+
+---------------------------------------------------------------------------------
 """
