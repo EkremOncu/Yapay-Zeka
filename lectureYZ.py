@@ -8684,4 +8684,24 @@ print()
 print(result.todense())
 
 ---------------------------------------------------------------------------------
+
+---------------------------------------------------------------------------------
+Seyrek matris sınıfları büyük kısmı sıfır olan matrislerin bellekte daha az yer 
+kaplamasını sağlamak için kullanılmaktadır. Aslında seyrek matrislerle işlemler 
+normal (dense) matrislerle işlemlerden her zaman daha yavaştır. Pekiyi bizim 
+elimizde bir seyrek matris varsa biz bunu Keras'ta nasıl kullanabiliriz? Örneğin 
+CountVectorizer işleminden büyük bir seyrek matris elde etmiş olalım ve Keras'ın 
+TextVectorization katmanını kullanmıyor olalım. Bu durumda bu seyrek matrisi sinir 
+ağlarında nasıl kullanabiliriz? 
+
+Seyrek matrislerin Keras sinir ağlarında kullanılmasının temelde iki yöntemi vardır:
+
+1) Parçalı eğitim uygulanırken seyrek matrisin ilgili batch'lik kısımları o anda 
+   yoğun matrise dönüştürüp verilebilir.
+
+2) Tensorflow kütüphanesinin Input katmanına sonradan bir sparse parametresi 
+   eklenmiştir. Bu parametre True yapılarak artık doğrudan dataset_x değerleri 
+   SciPy sparse matrisi olarak verilebilmektedir. 
+
+---------------------------------------------------------------------------------
 """
