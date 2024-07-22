@@ -8474,7 +8474,7 @@ dok3 = dok1 + dok2
 Diğer bir seyrek matris veri yapısı da "LIL (List of Lists)" denilen veri yapısıdır. 
 Bu veri yapısında matrisin satır satır 0 olmayan elemanları ayrı listelerde tutulur. 
 Başka bir listede de bu sıfır olmayan elemanların sütunlarının indeksi tutulmaktadır. 
-LIL matrisler SciPy kütüphanesinde scipy.sparse modülündeki lil_matrix sınıfyla 
+LIL matrisler SciPy kütüphanesinde scipy.sparse modülündeki lil_matrix sınıfıyla 
 temsil edilmektedir. Bu sınıfın genel kullanımı dok_matrix sınıfında olduğu gibidir.  
 Sınıfın data ve rows örnek öznitelikleri bize bu bilgileri vermektedir. Örneğin 
 aşağıdaki gibi bir matrisi lil_matrix yapmış olalım:
@@ -8545,11 +8545,143 @@ Ancak CSR ce CSC matrislerde sıfır olan bir elemana atama yapmak yavaş bir i�
 Çünkü bu işlemler yukarıda belirtilen üç dizide kaydırmalara yol açmaktadır. Bu 
 tür durumlarda DOK ya da LIL matrisler daha hızlı işleme yol açarlar. Bu nedenle 
 bu matrisler kullanılırken sıfır olmayan bir elemana atama yapıldığında bir uyarı 
-mesajıyla karşılaşabilirsiniz. O halde CSR ve CSC matrisleri işin başında oluşturulmalı 
-ve sonra da onların elemanları bir daha değiştirilmemelidir.
+mesajıyla karşılaşabilirsiniz. O halde CSR ve CSC matrisleri işin başında 
+oluşturulmalı ve sonra da onların elemanları bir daha değiştirilmemelidir.
 
-CSR matrislerinde satırsal, CSC matrislerinde sütunsal dilimlemeler hızlıdır. Aynı 
-zamanda bu iki matrisin karşılıklı elemanları üzerinde hızlı işlemler yapılabilmektedir. 
+CSR matrislerinde satırsal, CSC matrislerinde sütunsal dilimlemeler hızlıdır. 
+Aynı zamanda bu iki matrisin karşılıklı elemanları üzerinde hızlı işlemler 
+yapılabilmektedir. 
+
+---------------------------------------------------------------------------------
+
+---------------------------------------------------------------------------------
+CSC formatı aslında CSR formatına çok benzerdir. CSR formatı adeta CSC formatının 
+sütunsal biçimidir. Yani iki format arasındaki tek fark CSR formatında satır 
+indeksleri tutulurken, CSC formatında sütun indekslerinin tutulmasıdır. Yani 
+yapılan işlemlerin hepsi satır-sütun temelinde terstir. Örneğin:
+
+    
+0, 0, 9, 0, 5
+8, 0, 3, 0, 7
+0, 0, 0, 0, 0
+0, 0, 5, 0, 9
+0, 0, 0, 0, 0
+
+data: [8, 9, 3, 5, 5, 7, 9]
+indices: [1, 0, 1, 3, 0, 1, 3] 
+indptr: [0, 1, 1, 4, 4, 7]
+
+---------------------------------------------------------------------------------
+from scipy.sparse import csc_matrix
+
+a = [[0, 0, 9, 0, 5], [8, 0, 3, 0, 7], [0, 0, 0, 0, 0], [0, 0, 5, 0, 9], [0, 0, 0, 0, 0]]
+csc = csc_matrix(a)
+
+print(csc.todense(), end='\n\n')
+print(f'data: {csc.data}')              # data: [8 9 3 5 5 7 9]
+print(f'indices: {csc.indices}')        # indices: [1 0 1 3 0 1 3]
+print(f'indptr: {csc.indptr}')          # indptr: [0 1 1 4 4 7]
+
+---------------------------------------------------------------------------------
+
+---------------------------------------------------------------------------------
+Seyrek bir matris train_test_split fonksiyonuyla ayrıştırılabilir. Çünkü zaten 
+train_test_split fonksiyonu dilimleme yoluyla işlemlerini yapmaktadır. Ancak 
+seyrek matrislere len fonksiyonu uygulanamaz. Fakat seyrek matrislerin boyutları 
+yine shape örnek özniteliği ile elde edilebilir. train_test_split fonksiyonu 
+seyrek matrisi de karıştırabilmektedir.
+
+---------------------------------------------------------------------------------
+import numpy as np
+from scipy.sparse import csr_matrix
+from sklearn.model_selection import train_test_split
+
+dense = np.zeros((10, 5))
+
+for i in range(len(dense)):
+    rcols = np.random.randint(0, 5, 2)
+    dense[i, rcols] = np.random.randint(0, 100, 2)
+    
+sparse_dataset_x = csr_matrix(dense)
+dataset_y = np.random.randint(0, 2, 10)
+
+training_dataset_x, test_dataset_x, training_dataset_y, test_dataset_y = train_test_split(sparse_dataset_x, 
+                                                                                dataset_y, test_size=0.2)
+
+print(training_dataset_x)
+print('-' * 20)
+print(training_dataset_y)
+print()
+print()
+
+print(test_dataset_x)
+print('-' * 20)
+print(test_dataset_y)
+
+---------------------------------------------------------------------------------
+
+---------------------------------------------------------------------------------
+Seyrek matrislerin birbirlerine göre avantaj ve dezavantajları şöyle özetlenebilir:
+
+- DOK matriste elemanlara okuma ya da yazma amaçlı erişim hızlı bir biçimde 
+gerçekleştirilmektedir. Ancak DOK matrisler matris işlemlerinde etkin değildir. 
+DOK matrisler dilimleme de de etkin değildir. 
+
+- LIL matrisler de okuma amaçlı eleman erişimlerinde ve satırsal dilimlemelerde 
+hızlıdırlar. Ancak sütunsal dilimlemelerde ve matris işlemlerinde yavaştırlar. 
+0 olan elemanlara yazma amaçlı erişimlerde çok hızlı olmasalar da yavaş değillerdir. 
+Bu matrislerin matris işlemleri için CSR ve CSC formatlarına dönüştürülmesi 
+uygundur ve bu dönüştürme hızlıdır. 
+
+- CSR matrisler satırsal dilimlemelerde CSC matrisler ise sütunsal dilimlemelerde 
+hızlıdırlar. Ancak CSR sütünsal dilimlemelerde, CSC de satırsal dilimlemelerde 
+yavaştır. Her iki matris de matris işlemlerinde hızlıdır. Bu matrislerde 
+elemanların değerlerini değiştirmek (özellikle 0 olan elemanların) yavaştır.     
+
+O halde biz eğer eleman değerleri değiştirilmeyecekse CSR ya da CSC matris 
+kullanabiliriz. Ancak eleman değerleri değiştirilecekse önce işlemlemlerimize DOK 
+ya da LIL matrisle başlayıp değişikler yapıldıktan sonra matris işlemlerine
+başlamadan önce matrisimizi CSR ya da SCS formatına dönüştürebiliriz.
+
+---------------------------------------------------------------------------------
+
+---------------------------------------------------------------------------------
+Aslında biz daha önce bazı konularda seyrek matris kavramıyla zaten karşılaşmıştık. 
+Örneğin scikit-learn içerisindeki OneHotEncoder sınıfının sparse_output parametresi 
+False geçilmezse bu sınıf bize transform işleminde SCiPy'ın CSR formatında seyrek 
+matrisini vermektedir. 
+
+---------------------------------------------------------------------------------
+from sklearn.preprocessing import OneHotEncoder
+import numpy as np
+
+a = np.array(['Mavi', 'Yeşil', 'Kırmızı', 'Mavi', 'Kırmızı', 'Mavi', 'Yeşil'])
+
+ohe = OneHotEncoder()
+result = ohe.fit_transform(a.reshape(-1, 1))
+
+print(result)
+print()
+print(type(result))
+print()
+print(result.todense())
+
+---------------------------------------------------------------------------------
+Benzer biçimde scikit-learn kütüphanesindeki CountVectorizer sınıfı da yine bize 
+SCiPy'ın CSR formatında seyrek matrisini vermektedir.
+
+
+from sklearn.feature_extraction.text import CountVectorizer
+
+texts = ['this film is very very good', 'I hate this film', 'It is good', 'I don\'t like it']
+
+cv = CountVectorizer()
+cv.fit(texts)
+result = cv.transform(texts)
+
+print(result)
+print()
+print(result.todense())
 
 ---------------------------------------------------------------------------------
 """
