@@ -8789,6 +8789,15 @@ basıldığında ön plan resmin bazı kısımlarının görüntülenmesi engell
 Örneğin PNG formatı bu biçimde transparanlık bilgisi de tutulmaktadır. Ancak 
 BMP formatında böyle bir transparanlık bilgisi tutulmamaktadır.
 
+Siyah beyaz demek her pixel'in yalnızca siyah ya da beyaz olabildiği resim demektir. 
+Böyle bir resimde bir pixel bir bit ile ifade edilebilir. Ancak siyah beyaz 
+resimlerde resim bir siluet gibi gözükmektedir. Gri tonlamalı (gray scale) resimlerde
+ise her pixel siyahın (grinin) bir tonu biçiminde renkledirilmektedir. Eski 
+siyah-beyaz fotoğraflar aslında gri tonlamalı fotoğraflardır. Gri tonlamalı 
+resimlerde aslında her pixelin RGB renkleri aynıdır. Yani R = G = B biçimindedir. 
+Gri tonlamalı resimlerde grinin 256 tonu görüntülenebilmektedir. Dolayısıyla gri 
+tonlamalı bir resimde her pixel bir byte ile ifade edilebilmektedir. 
+
 ---------------------------------------------------------------------------------
 """
 
