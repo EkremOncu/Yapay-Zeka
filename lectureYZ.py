@@ -8799,6 +8799,116 @@ Gri tonlamalı resimlerde grinin 256 tonu görüntülenebilmektedir. Dolayısıy
 tonlamalı bir resimde her pixel bir byte ile ifade edilebilmektedir. 
 
 ---------------------------------------------------------------------------------
+
+---------------------------------------------------------------------------------
+Matplotlib kütüphanesinde bir resmi resim dosyasından (JEPG, BMP, PNG vs.) okuyarak 
+onun pixel'lerini elde edip bize bir NumPy dizisi biçiminde veren imread isimli 
+bir fonksiyon vardır. Biz bir resim dosyasını imread ile okuduğumuzda artık o 
+resmin saf pixel değerlerini elde ederiz. Örneğin:
+
+import matplotlib.pyplot as plt
+
+image_data = plt.imread('C:\\Users\\Lenovo\\Desktop\\GitHub\\YapayZeka\\Src\\15- PictureOperations\\AbbeyRoad.jpg')
+
+
+Bu örnekte biz bir NumPy dizisi elde etmiş olduk. Söz konusu resim renkli ir resim 
+olduğu için elde edilen dizinin de shape demeti (100, 1500, 3) biçimindedir. Yani 
+söz konusu resim 1000x1500 pixel'lik bir resimdir, ancak resmin her pixel'i RGB 
+değerlerinden oluşmaktadır. Biz buarada image_data[i, j] biçiminde matrisin bir 
+elemanına erişmek istersek aslında resmin i'inci satır j'inci sütunundaki pixel'in 
+RGB renklerini bir NumPy dizisi olarak elde ederiz. 
+
+Matplotlib kütüphanesinin imshow isimli fonksiyonu pixel bilgilerini alarak resmi 
+görüntüler. Tabii imshow resmi orijinal boyutuyla görüntülememektedir. imshow 
+resmi ölçeklendirip figür büyüklüğünde görüntülemektedir. Örneğin:
+
+    
+image_data = plt.imread('C:\\Users\\Lenovo\\Desktop\\GitHub\\YapayZeka\\Src\\15- PictureOperations\\AbbeyRoad.jpg')
+plt.imshow(image_data)
+plt.show()
+
+---------------------------------------------------------------------------------
+Matplotlib bir resim üzerinde ondan parça almak, onu büyütmek, küçültmek gibi işlemler 
+için uygun değildir. Bu tür işlemler için Python programcıları başka kütüphanelerden 
+faydalamaktadır. Örneğin bu bağlamda en yaygın kullanılan kütüphane 
+"Python Image Library (PIL ya da Pillow diye kısaltılmaktadır)" isimli kütüphanedir. 
+Matplotlib yalnızca resim dosyalarını okuyup bize pixel'lerini verir ve pixel'leri 
+verilmiş resmi görüntüler. 
+
+---------------------------------------------------------------------------------
+import matplotlib.pyplot as plt
+
+image_data = plt.imread('C:\\Users\\Lenovo\\Desktop\\GitHub\\YapayZeka\\Src\\15- PictureOperations\\AbbeyRoad.jpg')
+plt.imshow(image_data)
+plt.show()
+
+print(image_data.shape)
+
+---------------------------------------------------------------------------------
+Örneğin biz bir resmi ters çevirmek için resmin tüm satırlarını ters yüz etmemiz 
+gerekir. Bu işlemi aslında NumPy'ın flip fonksiyonu pratik bir biçimde yapmaktadır. 
+Bir resmin pixel'leri üzerinde aşağı seviyeli çalışma yapmak için Matplotlib 
+ve NumPy iyi araçlardır.  Örneğin:
+
+    
+image_data = plt.imread('C:\\Users\\Lenovo\\Desktop\\GitHub\\YapayZeka\\Src\\15- PictureOperations\\AbbeyRoad.jpg')
+
+plt.imshow(image_data)
+plt.show()
+
+result_image = np.flip(image_data, axis=1)
+plt.imshow(result_image)
+plt.show()
+
+
+Burada pixel verileri yatay eksende döndürülmüştür.
+
+---------------------------------------------------------------------------------
+NumPy'da rot90 fonksiyonu resmim pixellerini 90 derece döndürmektedir. Fonksiyon 
+resmin pixel verileriyle saat yönününün tersinde kaç defa 90 derece döndürüleceğini 
+(default değeri 1) bizden istemektedir. Örneğin:
+
+    
+mage_data = plt.imread('C:\\Users\\Lenovo\\Desktop\\GitHub\\YapayZeka\\Src\\15- PictureOperations\\AbbeyRoad.jpg')
+
+plt.imshow(image_data)
+plt.show()
+
+result_image = np.rot90(image_data, 3)
+plt.imshow(result_image)
+plt.show()
+
+
+Burada resim 3 kere 90 derece döndürülmüştür.
+
+---------------------------------------------------------------------------------
+
+---------------------------------------------------------------------------------
+Renkli resimleri imread fonksiyonu ile okuduğumuzda "row x col x 3" boyutunda bir 
+matris elde ederiz. Gri tonlamalı resimleri aynı fonksiyonla okuduğumuzda ise 
+row x col x 1 boyutunda bir matris elde ederiz. Tabii aslında "row x col" biçiminde 
+iki boyutlu bir matrisin eleman sayısı ile "row x col x 1" biçiminde üç boyutlu 
+bir matrisin eleman sayısı arasında bir farklılık yoktur. Bazen gri tonlamalı 
+resimler "row x col x 1" yerine "row x col" biçiminde de karşımıza çıkabilmektedir. 
+
+---------------------------------------------------------------------------------
+Peki renkli bir resmi gri tonlamalı bir resim haline nasıl getirebiliriz? Bunun 
+için en basit yöntem her pixel'in RGB renklerinin ortalamasını almaktır. Bunu basit 
+bir biçimde np.mean fonksiyonunda axis=2 parametresini kullanarak sağlayabiliriz.
+Örneğin:
+
+    
+import numpy as np
+import matplotlib.pyplot as plt
+
+image_data = plt.imread('C:\\Users\\Lenovo\\Desktop\\GitHub\\YapayZeka\\Src\\15- PictureOperations\\AbbeyRoad.jpg')
+
+gray_scaled_image_data = np.mean(image_data, axis=2)
+
+plt.imshow(gray_scaled_image_data, cmap='gray')
+plt.show()
+
+---------------------------------------------------------------------------------
 """
 
 
