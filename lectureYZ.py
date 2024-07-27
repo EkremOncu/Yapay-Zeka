@@ -8705,3 +8705,92 @@ Seyrek matrislerin Keras sinir ağlarında kullanılmasının temelde iki yönte
 
 ---------------------------------------------------------------------------------
 """
+
+
+
+
+#  ------------------------------ Picture Operations ------------------------------ 
+
+"""
+---------------------------------------------------------------------------------
+Bilgisayar ekranını bir pixel matrisi olarak düşünebiliriz. Örneğin ekranımızın 
+çözünürlüğü 1920x1080 ise (ilk yazılan sütun ikinci yazılan satır) bu ekranımızın 
+her satırında 1920 tane pixel olduğu ve toplam 1080 tane satırın bulunduğu anlamına 
+gelmektedir. (Yani bu durumda ekranımızda 1920 * 1080 = 2073600 pixel vardır.)
+
+Bugün kullandığımız bilgisayarlarda her pixel (RGB)"kırmızı (red), yeşil (green), 
+mavinin (blue)" bir byte'lık tonal birleşimleriyle oluşturulmaktadır. Yani belli 
+bir renk kırmızının 0-255 arasındaki bir değeri, yeşilin 0-255 arasındaki bir 
+değeri ve mavinin 0-255 arasındaki bir değeri ile oluşturulmaktadır. Örneğin R=255, 
+G=0, B=0 ise bu tam kırmızı olan renktir. Kırmızı ile yeşil ışınsal olarak bir 
+araya getirilirse sarı renk elde edilmektedir. Bu biçimde bütün renkler aslında 
+bu üç ana rengin tonal birleşimleriyle elde edilmektedir. R, G ve B için toplam 
+256 farklı değer olduğuna göre elde edilebilecek toplam renk sayısı 256 * 256 * 256
+'dır. Bunu 2 ** 8 * 2 ** 8 * 2 ** 8 biçiminde de ifade edebiliriz. 2 ** 24 değeri 
+yaklaşık 16 milyon (16777216) civarındadır.
+
+Ekranda iki pixel arasında bir doğru çizdiğimizde bu doğru kırıklı gibi görünebilir. 
+Bunun nedeni doğrunun sınırlı sayıda pixel ile oluşturulmasıdır. Kartezyen 
+koordinat sisteminde sonsuz tane nokta vardır. Yani çözünürlük sonsuzdur. Ancak 
+ekran koordinat sisteminde sınırlı sayıda pixel vardır. Bu nedenle ekranda doğru 
+gibi, daire gibi en temel geometrik şekiller bile kırıklı gözükebilmektedir. 
+Şüphesiz çözünürlük artırıldığı zaman bu kırıklı görünüm azalacaktır. Ancak 
+çözünürlüğün çok artırılması da başka dezavantajlar doğurabilmektedir. Örneğin 
+notebook'larda ve mobil cihazlarda CPU dışındaki en önemli güç tüketimi LCD ekranda 
+oluşmaktadır. Çözünürlük artırıldıkça ekran kartları ve LCD birimleri daha fazla 
+güç harcar hale gelmektedir.
+
+Peki ekran boyutunu sabit tutup çözünürlüğü küçültürsek ne olur? Bu durumda pixel'ler 
+büyür ve görüntü daha büyür ancak netlik azalır. Çözünürlüğü sabit tutup ekranımızı 
+büyütürsek de benzer durum oluşacaktır. O halde göz için belli bir büyüklükte 
+ekran ve çözünürlük daha önemlidir. İşte buna DPI (Dot Per Inch) denilmektedir. 
+DPI bir inch'te kaç pixel olduğunu belirtmektedir. Çözünürlük sabit tutulup ekran 
+büyütülürse DPI düşer, ekran küçültülürse DPI yükselir. Bugün kullandığımız akıllı 
+cep telefonlarında DPI oldukça yüksektir. Buna "retinal çözünürlük" de denilmektedir. 
+Gözümüzün de donanımsal (fizyolojik) bir çöznürlüğü vardır. Belli bir DPI'dan 
+daha yüksek çözünürlük sağlamanın bizim için bir faydası kalmamaktadır. 
+
+Bilgisayar bilimlerinin sınırlı sayıda pixelle geometrik şekillerin ve resimlerin 
+nasıl oluşturulduğunu inceleyen ve bunlar üzerinde işlemlerin nasıl yapılabileceğini 
+araştıran bölümüne İngilizce "computer graphics" denilmektedir. 
+
+---------------------------------------------------------------------------------
+Bilgisayar ortamındaki en doğal resim formatları "bitmap (ya da raster)" formatlardır. 
+Örneğin BMP, GIF, TIF, PNG gibi formatlar bitmap formatlardır. Bitmap dosya 
+formatlarında resmin her bir pixel'inin rengi dosya içerisinde saklanır. Dolayısıyla 
+resmi görüntüleyecek kişinin tek yapacağı şey o pixel'leri o renklerde görüntülemektir. 
+Ancak bitmap formatlar çok yer kaplama eğilimindedir. Örneğin 100x100 pixellik 
+bir resim kabaca 100 * 100 * 3 byte yer kaplar. Bu yüzden resimler üzerinde kayıplı 
+sıkıştırma yöntemleri oluşturulmuştur. 
+
+Örneğin JPEG formatı aslında bitmap format üzerinde bir çeşit kayıplı sıkıştırmanın 
+uygulandığı bir formattır. Yani bir BMP dosyasını JPG dosyasına dönüştürdüğümüzde 
+resim çok bozulmaz. Ama aslında biraz bozulur. Sonra onu yeniden BMP dosyasına 
+dönüştürdüğümüzde orijinal resmi elde edemeyiz. Ancak JPEG gibi formatlar resimleri 
+çok az bozup çok iyi sıkıştırabilmektedir. O halde aslında doğal formatlar BMP 
+formatı ve benzerleridir. JPEG gibi formatlar doğal formatlar değildir. Sıkıştırılmış 
+formatlardır. Bitmap formatlardaki resimler orijinal boyutuyla görüntülenmektedir. 
+Çünkü bu resimlerin büyütülüp küçültülmesinde (scale edilmesinde) görüntü 
+bozulabilmektedir.
+
+Bugünkü bilgisayar sistemlerinde arka planda bir görüntü varken onun önüne bir 
+görüntü getrilip arkadaki görüntü adeta bir tül perdeden görünüyormuş gibi bir 
+etki yaratılabilmektedir. Bu etki aslında ön plandaki pixel ile arka plandaki 
+pixel'in bit operasyonuna sokulmasıyla sağlanmaktadır. Bu operasyon bugünkü grafik 
+kartlarında grafik kartının kendisi tarafından yapılmaktadır. Ancak bu saydamlılık 
+(transparency) özelliğinin de derecesi söz konusu olmaktadır. Programcı bu 
+saydamlılık derecesini grafik kartına RGB değerleriyle birlikte birlikte verebilmektedir. 
+RGB değerlerinin yanı sıra saydamlılılık belirten bu değere "alpha channel" 
+denilmetedir. 
+
+Bazı bitmap formatlar pixel renklerinin yanı sıra her pixel için saydamlılık 
+bilgilerini de tutmaktadır. Böylece dikdörtgensel resim başka bir resmin üztüne 
+basıldığında ön plan resmin bazı kısımlarının görüntülenmesi engellenebilmektedir. 
+Örneğin PNG formatı bu biçimde transparanlık bilgisi de tutulmaktadır. Ancak 
+BMP formatında böyle bir transparanlık bilgisi tutulmamaktadır.
+
+---------------------------------------------------------------------------------
+"""
+
+
+
