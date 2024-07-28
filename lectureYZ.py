@@ -8774,7 +8774,7 @@ formatlardır. Bitmap formatlardaki resimler orijinal boyutuyla görüntülenmek
 bozulabilmektedir.
 
 Bugünkü bilgisayar sistemlerinde arka planda bir görüntü varken onun önüne bir 
-görüntü getrilip arkadaki görüntü adeta bir tül perdeden görünüyormuş gibi bir 
+görüntü getirilip arkadaki görüntü adeta bir tül perdeden görünüyormuş gibi bir 
 etki yaratılabilmektedir. Bu etki aslında ön plandaki pixel ile arka plandaki 
 pixel'in bit operasyonuna sokulmasıyla sağlanmaktadır. Bu operasyon bugünkü grafik 
 kartlarında grafik kartının kendisi tarafından yapılmaktadır. Ancak bu saydamlılık 
@@ -8784,7 +8784,7 @@ RGB değerlerinin yanı sıra saydamlılılık belirten bu değere "alpha channe
 denilmetedir. 
 
 Bazı bitmap formatlar pixel renklerinin yanı sıra her pixel için saydamlılık 
-bilgilerini de tutmaktadır. Böylece dikdörtgensel resim başka bir resmin üztüne 
+bilgilerini de tutmaktadır. Böylece dikdörtgensel resim başka bir resmin üstüne 
 basıldığında ön plan resmin bazı kısımlarının görüntülenmesi engellenebilmektedir. 
 Örneğin PNG formatı bu biçimde transparanlık bilgisi de tutulmaktadır. Ancak 
 BMP formatında böyle bir transparanlık bilgisi tutulmamaktadır.
@@ -8812,7 +8812,7 @@ image_data = plt.imread('C:\\Users\\Lenovo\\Desktop\\GitHub\\YapayZeka\\Src\\15-
 
 
 Bu örnekte biz bir NumPy dizisi elde etmiş olduk. Söz konusu resim renkli ir resim 
-olduğu için elde edilen dizinin de shape demeti (100, 1500, 3) biçimindedir. Yani 
+olduğu için elde edilen dizinin de shape demeti (1000, 1500, 3) biçimindedir. Yani 
 söz konusu resim 1000x1500 pixel'lik bir resimdir, ancak resmin her pixel'i RGB 
 değerlerinden oluşmaktadır. Biz buarada image_data[i, j] biçiminde matrisin bir 
 elemanına erişmek istersek aslında resmin i'inci satır j'inci sütunundaki pixel'in 
@@ -8826,6 +8826,7 @@ resmi ölçeklendirip figür büyüklüğünde görüntülemektedir. Örneğin:
 image_data = plt.imread('C:\\Users\\Lenovo\\Desktop\\GitHub\\YapayZeka\\Src\\15- PictureOperations\\AbbeyRoad.jpg')
 plt.imshow(image_data)
 plt.show()
+print(image_data.shape)
 
 ---------------------------------------------------------------------------------
 Matplotlib bir resim üzerinde ondan parça almak, onu büyütmek, küçültmek gibi işlemler 
@@ -8836,21 +8837,12 @@ Matplotlib yalnızca resim dosyalarını okuyup bize pixel'lerini verir ve pixel
 verilmiş resmi görüntüler. 
 
 ---------------------------------------------------------------------------------
-import matplotlib.pyplot as plt
-
-image_data = plt.imread('C:\\Users\\Lenovo\\Desktop\\GitHub\\YapayZeka\\Src\\15- PictureOperations\\AbbeyRoad.jpg')
-plt.imshow(image_data)
-plt.show()
-
-print(image_data.shape)
-
----------------------------------------------------------------------------------
 Örneğin biz bir resmi ters çevirmek için resmin tüm satırlarını ters yüz etmemiz 
 gerekir. Bu işlemi aslında NumPy'ın flip fonksiyonu pratik bir biçimde yapmaktadır. 
 Bir resmin pixel'leri üzerinde aşağı seviyeli çalışma yapmak için Matplotlib 
 ve NumPy iyi araçlardır.  Örneğin:
 
-    
+import numpy as np    
 image_data = plt.imread('C:\\Users\\Lenovo\\Desktop\\GitHub\\YapayZeka\\Src\\15- PictureOperations\\AbbeyRoad.jpg')
 
 plt.imshow(image_data)
@@ -8897,7 +8889,7 @@ için en basit yöntem her pixel'in RGB renklerinin ortalamasını almaktır. Bu
 bir biçimde np.mean fonksiyonunda axis=2 parametresini kullanarak sağlayabiliriz.
 Örneğin:
 
-    
+ 
 import numpy as np
 import matplotlib.pyplot as plt
 
@@ -8913,3 +8905,33 @@ plt.show()
 
 
 
+# MNIST (Modified National Institute of Standards and Technology)
+
+"""
+---------------------------------------------------------------------------------
+Resim tanıma üzerinde en sık kullanılan popüler bir veri kümelerinden biri MNIST 
+denilen veri kümesidir. Bu veri kümesinde her biri 28x28 pixel'den oluşan gri 
+tonlamalı resimler vardır. Bu resimler çeşitli kişilerin 0 ile 9 arasındaki sayıları 
+elle çizmesiyle oluşturulmuştur. Veri kümesi "resmin üzerindeki sayının kestirilmesi"
+gibi resim tanıma uygulamalarında kullanılmaktadır. Veri kümesinde toplam 60000 
+tane resim bulunmaktadır. Veri kümesini zip'lenmiş CSV dosyaları biçiminde 
+aşağıdaki bağlantıdan indirebilrsiniz:
+
+https://www.kaggle.com/oddrationale/mnist-in-csv  
+
+Buradan minist_train.csv ve mnist_test.csv dosyaları elde edilmektedir. 
+
+MNIST verileri dosyadan okunmuş ve iki saklı katmanlı bir sinir ağı ile model 
+oluşturulmuştur. Model test edildiğinde %97 civarında bir başarı elde edilmektedir. 
+Daha sonra 28x28'lik kendi oluşturduğumuz bitmap resimlerle kestirim işlemi 
+yapılmıştır. Tabii kestirim işlemi eğitim verileriyle aynı biçimde oluşturulmuş 
+rakamlarla yapılmalıdır. Eğitim verilerinde "anti-aliasing" özelliği bulunmaktadır. 
+Biz de Microsoft Paint ile fırça kullanarak anti-aliasing eşliğinde kestirilecek 
+resimleri oluşturduk. Pixel verileri eğitime sokulmadan önce min-max ölçeklemesi 
+de yapılmıştır. Tabii [0, 255] arasındaki verilerde min-max ölçeklemesi aslında 
+bu pixel verilerinin 255'e bölümüyle oluşturulabilmektedir. Modele çok fazla epoch 
+uygulandığında "overfitting" problemi ortaya çıkmaktadır. Bu nedenle epoch sayısı 
+20 olarak belirlenmiştir.
+
+---------------------------------------------------------------------------------
+"""
