@@ -8935,3 +8935,177 @@ uygulandığında "overfitting" problemi ortaya çıkmaktadır. Bu nedenle epoch
 
 ---------------------------------------------------------------------------------
 """
+
+
+
+# ------------------------ Evrişim (convolution) ------------------------ 
+
+
+"""
+---------------------------------------------------------------------------------
+Evrişim (convolution) genel olarak "sayısal işaret işleme (digital signal processing)" 
+faaliyetlerinde kullanılan bir tekniktir. Bir verinin başka bir veriyle girişime  
+sokulması anlamına gelir. Evrişim en çok görüntü verileri üzerinde kullanılmaktadır. 
+Ancak görüntünün dışında işitsel (audio) ve hareketli görüntüler (video) verileri 
+üzerinde de sıkça uygulanmaktadır. Evrişim işlemleri ile oluşturulan yapay sinir 
+ağlarına Evrişimsel Sinir Ağları (Convolutional Neural Network)" denilmektedir 
+ve İngilizce CNN biçiminde kısaltılmaktadır. 
+
+Resimlerde evrişim işlemi pixel'lerin birbirleri ile ilişkili hale gelmesini 
+sağlamaktadır. Evrişim sayesinde pixel'ller bağımsız biribirinden kopuk durumdan 
+çıkıp komşu pixellerle ilişkili hale gelir. Aynı zamanda evrişim bir filtreleme 
+etkisi oluşturmaktadır. Görüntü işlemede filtreleme işlemleri evrişimlerle 
+sağlanmaktadır.
+
+Bir resmin evrişim işlemine sokulması için elimizde bir resim ve bir küçük matrisin 
+olması gerekir. Bu küçük matrise "filtre (filter)" ya da "kernel" denilmektedir. 
+Kernel herhangi bir boyutta olabilir. Kare bir matris biçiminde olması gerekmez. 
+Ancak uygulamada NxN'lik kare matrisler kullanılmaktadır ve genellikle buradaki 
+N değeri 3, 5, 7, 9 gibi tek sayı olmaktadır. Evrişim işlemi şöyle yapılmaktadır: 
+
+Kernel resmin sol üst köşesi ile çakıştırılır. Sonra resmin arkada kalan kısmıyla 
+dot-product işlemine sokulur. (Yani kernel'ın asıl resimle çakıştırıldığı pixel 
+değerleri birbiriyle çarpılıp toplanır.) Buradan bir değer elde edilir. Bu değer 
+yeni resmin kernel ile çakıştırılan orta noktasındaki pixel'i olur. Sonra kernel 
+resim üzerinde kaydırılır ve aynı işlem yine yapılır. Kaydırma sağa doğru ve sonra 
+da aşağıya doğru yapılır. Böylece evrişim işlemi sonucunda başka bir resim elde 
+edilmiştir. Örneğin aşağıdaki gibi 5x5'lik gri tonlamalı bir resim söz konusu olsun:
+
+---------------------------------------------------------------------------------
+a11 a12 a13 a14 a15
+a21 a22 a23 a24 a25
+a31 a32 a33 a34 a35
+a41 a42 a43 a44 a45
+a51 a52 a53 a54 a55
+
+Kullandığımız kernel da aşağıdaki gibi 3x3'lük olsun:
+
+b11 b12 b13
+b21 b22 b23
+b31 b32 b33
+
+Bu kernel resmin sol üst köşesi ile çakıştırılıp dot product uygulanırsa şöyle 
+bir değer elde edilir:
+
+c11 = b11 * a11 + b12 * a12 + b13 * a13 + b21 * a21 + b22 * a22 + b23 * a23 + b31 * a31 + b32 * a32 + b33 * a33
+
+Şimdi kernel'ı bir sağa kaydırıp aynı işlemi yapalım:
+
+c12 = b11 * a12 + b12 * a13 + b13 * a14 + b21 * a22 + b22 * a23 + b23 * a24 + b31 * a32 + b32 * a32 + b33 * a34
+
+Şimdi kernel'ı bir sağa daha kaydıralım:
+
+c13 = b11 * a13 + b12 * a14 + b13 * a15 + b21 * a23 + b22 * a24 + b23 * a25 + b31 * a33 + b32 * a34 + b33 * a35
+
+Şimdi kernel'ı aşağı kaydıralım:
+
+c21 = b11 * a21 + b12 * a22 + b13 * a23 + b21 * a31 + b22 * a32 + b23 * a33 + b31 * a41 + b32 * a42 + b33 * a43
+
+İşte bu biçimde işlemlere devam edersek aşağıdkai gibi bir C matrisi (resmi) elde ederiz:
+
+c11 c12 c13
+c21 c22 c23
+c31 c32 c33
+
+Eğer işlemler yukarıdaki gibi yapılırsa hedef olarak elde edilecek resmin 
+genişlik ve yüksekliği şöyle olur:
+
+Hedef Resmin Genişliği = Asıl Resmin Genişliği - Kernel Genişliği + 1
+Hedef Resmin Yüksekliği = Asıl Resmin Yüksekliği - Kernel Yüksekliği + 1
+
+Örneğin ana resim 5X5'lik ve kernel'da 3X3'lik ise evrişim işleminin sonucunda 
+elde edilecek resim 3X3'lük olacaktır. 
+
+---------------------------------------------------------------------------------
+Görüldüğü gibi hedef resim asıl resimden küçük olmaktadır. Eğer biz hedef resmin 
+asıl resimle aynı büyüklükte olmasını istersek asıl resmin soluna, sağına, yukarısına 
+ve aşağısına eklemeler yaparız. Bu eklemelere İngilizce "padding" denilmektedir. 
+Hedef resmin asıl resimle aynı büyüklükte olması için asıl resme (kernel genişliği 
+ya da yükseliği - 1) kadar padding uygulanmalıdır.
+
+Toplam Padding Genişliği = Kernel Genişliği - 1
+Toplam Padding Yüksekliği = Kernel Yüksekliği - 1
+
+Tabii bu toplam pading genişliği ve yüksekliği iki yöne eşit bir biçimde 
+yaydırılmalıdır. Yani başka bir deyişle asıl resim evrişim işlemine sokulmadan 
+önce dört taraftan büyütülmelidir. Örneğin 5x5'lik resme 3x3'lük kernel 
+uygulamak isteyelim:
+
+a11 a12 a13 a14 a15
+a21 a22 a23 a24 a25
+a31 a32 a33 a34 a35
+a41 a42 a43 a44 a45
+a51 a52 a53 a54 a55
+
+Asl resmin padding'li hali şu biçimde görünecektir:
+
+pad pad pad pad pad pad pad
+pad a11 a12 a13 a14 a15 pad 
+pad a21 a22 a23 a24 a25 pad 
+pad a31 a32 a33 a34 a35 pad      (7x7)
+pad a41 a42 a43 a44 a45 pad 
+pad a51 a52 a53 a54 a55 pad 
+pad pad pad pad pad pad pad 
+
+Pekiyi padding'ler asıl resme dahil olmadığına göre hangi içeriğe sahip olacaktır? 
+İşte tipik olarak iki yöntem kullanılmaktadır. Birincisi padding'leri 0 almak 
+ikincisi ise ilk ve son n tane satır ya da sütunu tekrarlamaktır. Genellikle bu 
+ikinci yöntem tercih edilmektedir.
+
+Evrişim işleminde kaydırma birer birer yapılmayabilir. Örneğin ikişer ikişer, üçer 
+üçer yapılabilir. Bu kaydırmaya "stride" denilmektedir. stride değeri artırılırsa 
+hedef resim padding de yapılmadıysa daha fazla küçülecektir. Hedef resmi küçültmek 
+için stride değeri artırılabilmektedir. 
+
+
+Evrişim işlemi ile ne elde edilmek istenmektedir? Resimlerde evrişim işlemi resmi 
+filtrelemek için kullanılır. Resim filtrelenince farklı bir hale gelmektedir. 
+Görüntü işlemede resmin bazı yönlerini açığa çıkartmak için amaca uygun çeşitli 
+filtreler kullanılabilmektedir. Örneğin biz bir filtre sayesinde resmi bulanık 
+(blurred) hale getirebiliriz. Başka bir filtre sayesinde resmin içerisindeki 
+nesnelerin sınır çizgilerini elde edebiliriz. Bu konu "sayısal görüntü işleme" 
+ile ilgildir. Detayları çeşitli kaynaklardan edinilebilir. 
+
+Evirişim işlemini padding uygulanmadan yapan basit bir fonksiyonu şöyle yazabiliriz:
+
+---------------------------------------------------------------------------------
+import numpy as np
+
+def conv(image, kernel):
+    image_height = image.shape[0]
+    image_width = image.shape[1]
+    kernel_height = kernel.shape[0]
+    kernel_width = kernel.shape[1]
+    
+    target = np.zeros((image_height - kernel_height + 1, image_width - kernel_width + 1), dtype='uint8')
+    
+    for row in range(image_height - kernel_height + 1):
+        for col in range(image_width - kernel_width + 1):
+            dotp = 0
+            for i in range(kernel_height):
+                for k in range(kernel_width):
+                    dotp += image[row + i, col + k] * kernel[i, k]
+            target[row, col] = np.clip(dotp, 0, 255)
+    return target
+
+
+Evrişim işleminin bu biçimde uygulanması yavaş bir yöntemdir. Bu tür işlemlerde 
+mümkün olduğunca NumPy içerisindeki fonksiyonlardan faydalanılmalıdır. Çünkü 
+NumPy'ın fonksiyonlarının önemli bir bölümü C'de yazılmıştır ve manuel Python
+kodlarına göre çok daha hızlı çalışmaktadır.
+
+---------------------------------------------------------------------------------
+"""
+
+
+
+
+
+
+
+
+
+
+
+
+
