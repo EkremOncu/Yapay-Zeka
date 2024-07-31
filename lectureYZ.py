@@ -9095,13 +9095,44 @@ NumPy'ın fonksiyonlarının önemli bir bölümü C'de yazılmıştır ve manue
 kodlarına göre çok daha hızlı çalışmaktadır.
 
 ---------------------------------------------------------------------------------
+Peki evrişim işleminin yapay sinir ağları için anlamı nedir? İşte burada işlemler 
+yukarıdaki filtreleme örneğin tersi olacak biçimde yürütülmektedir. Yani bir resmin 
+sınıfını belirlemek için onu filtreye sokabiliriz. Ancak bu filtrenin nasıl bir 
+filtre olacağını da ağın bulmasını sağlayabiliriz. O halde evrişimsel ağlarda biz 
+uygulayacağımız filtreyi bilmemekteyiz. 
+
+Biz kestirimin daha isabetli yapılması için resmin nasıl bir filtreden geçirilmesi 
+gerektiğini ağın bulmasını sağlarız. Yani ağ yalnızca filtreyi uygulamaz bizzat 
+filtrenin kendisini de bulmaya çalışır. Ancak resmin yalnızca filtreden geçirilmesi 
+yeterli değildir. Resim filtreden geçirildikten sonra yine Dense katmanlara sokulur. 
+Yani filtreleme genellikle ön katmanlarda yapılan bir işlemdir.  Filtreleme 
+katmanlarından sonra yine Dense katmanlar kullanılır. Tabii resmi filtrelerden 
+geçirmek ve bu filtreleri ağın kendisinin bulmasını sağlamak modeldeki eğitilebilir 
+parametrelerin sayısını artırmaktadır. 
+
+Aslında evrişim işlemi nöronlarla ifade edilebilir. Çünkü evrişim sırasında yapılan 
+dot-product işlemi aslında nöron girişlerinin ağırlık değerleriyle çarpılıp 
+toplanması işlemi ile aynıdır. Yani biz aslında evrişim işlemini sanki bir 
+katmanmış gibi ifade edebiliriz.
+
+---------------------------------------------------------------------------------
 """
 
+"""
+---------------------------------------------------------------------------------
+Biz yukarıda evrişim işleminin gri tonlamalı resimlerde nasıl yapıldığını açıkladık. 
+Peki evrişim işlemi RGB resimlerde nasıl yürütülmektedir? RGB resimler aslında 
+R, G ve B'lerden oluşan 3 farklı resim gibi ele alınmaktadır. Dolayısıyla üç farklı 
+kernel bu R, G ve B resimlere ayrı ayrı uygulanmaktadır. Görüntü işleme uygulamalarında 
+bu farklı kernel'ların her bir kanala uygulanması sonucunda ayrı bir değer elde 
+edilir. Bu da hedef pixel'in RGB değerleri olur. Ancak sinir ağlarında genel olarak 
+3 farklı kernel her bir kanala uygulandıktan sonra elde edilen değerler toplanarak 
+teke düşürülmektedir. Yani adeta biz evrişimsel ağlarda renkli resimleri evrişim 
+işlemine soktuktan sonra onlardan gri tonlamalı bir resim elde etmiş gibi oluruz. 
+Pekiyi bu işlemde kaç tane bias değeri kullanılacaktır?
 
-
-
-
-
+---------------------------------------------------------------------------------
+"""
 
 
 
