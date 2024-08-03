@@ -9123,13 +9123,47 @@ katmanmış gibi ifade edebiliriz.
 Biz yukarıda evrişim işleminin gri tonlamalı resimlerde nasıl yapıldığını açıkladık. 
 Peki evrişim işlemi RGB resimlerde nasıl yürütülmektedir? RGB resimler aslında 
 R, G ve B'lerden oluşan 3 farklı resim gibi ele alınmaktadır. Dolayısıyla üç farklı 
-kernel bu R, G ve B resimlere ayrı ayrı uygulanmaktadır. Görüntü işleme uygulamalarında 
-bu farklı kernel'ların her bir kanala uygulanması sonucunda ayrı bir değer elde 
-edilir. Bu da hedef pixel'in RGB değerleri olur. Ancak sinir ağlarında genel olarak 
-3 farklı kernel her bir kanala uygulandıktan sonra elde edilen değerler toplanarak 
-teke düşürülmektedir. Yani adeta biz evrişimsel ağlarda renkli resimleri evrişim 
-işlemine soktuktan sonra onlardan gri tonlamalı bir resim elde etmiş gibi oluruz. 
-Pekiyi bu işlemde kaç tane bias değeri kullanılacaktır?
+kernel bu R, G ve B resimlere ayrı ayrı uygulanmaktadır. Görüntü işleme 
+uygulamalarında bu farklı kernel'ların her bir kanala uygulanması sonucunda ayrı 
+bir değer elde edilir. Bu da hedef pixel'in RGB değerleri olur. Ancak sinir 
+ağlarında genel olarak 3 farklı kernel her bir kanala uygulandıktan sonra elde 
+edilen değerler toplanarak teke düşürülmektedir. Yani adeta biz evrişimsel ağlarda 
+renkli resimleri evrişim işlemine soktuktan sonra onlardan gri tonlamalı bir resim 
+elde etmiş gibi oluruz. Pekiyi bu işlemde kaç tane bias değeri kullanılacaktır?
+Her kanal (channel) için ayrı bir bias değeri kullanılmamaktadır. Bias değeri bu 
+kanallardan evrişim sonucunda elde edilen üç değerin toplanmasından sonra işleme 
+sokulmaktadır. Dolayısıyla bias değeri yalnızca bir tane olacaktır. 
+
+Örneğin biz 10x10'luk bir RGB resme evrişim uygulamak isteyelim. Kullanacağımız 
+filtre matrisi (kernel) 3x3'lük olsun. Burada her kanal için ayrı bir 3x3'lük 
+filtre matrisi kullanılacaktır. Bu durumda evrişim katmanında eğitilebilir 
+parametrelerin sayısı 3 * 3 * 3 + 1 = 28 tane olacaktır. Eğer biz bu örnekte padding 
+kullanmıyorsak ve stride değeri de 1 ise (yani kaydırma birer birer yapılıyorsa) 
+bu durumda elde edilen hedef resim 8x8x1'lik olacaktır. Uygulanan evrişim sonucunda 
+resmin RGB olmaktan çıkıp adreta gray scale hale getirildiğine dikkat ediniz.
+
+---------------------------------------------------------------------------------
+Aslında uygulamada resim tek bir filtreye de sokulmamaktadır. Birden fazla filtreye 
+sokulmaktadır. Örneğin biz bir resimde 3x3'lük 32 farklı filtre kullanabiliriz. 
+Bu durumda ağın bu 32 filtreyi de belirlemesini isteyebiliriz. Filtre sayısı 
+artırıldıkça her filtre resmin bir yönünü keşfedeceğinden resmin anlaşılması da 
+iyileştirilmektedir. Şimdi 10x10'luk resmi 3x3'lük filtre kullanarak padding 
+uygulamadan 32 farklı filtreye sokmuş olalım. Biz bu resmi tek bir filtreye 
+soktuğumuzda 8x8x1'lik bir hedef resim elde ediyorduk. İşte 32 farklı filtreye 
+soktuğumuzda her filtreden 8x8x1'lik bir resim elde edileceğinegöre toplamda 
+8x8x32'lik bir resim elde edilmiş olur. 
+
+Şimdi de 32 filtre kullandığımız durumda 10x10x3'lük RGB resim için eğitilebilir 
+parametrelerin sayısını hesaplayalım. Bir tane filtre için yukarıda toplam 
+eğitilebilir parametrelerin sayısını 3 * 3 * 3 + 1 olarak hesaplamıştık. Bu 
+filtrelerden 32 tane olduğuna göre toplam eğitilebilir parametrelerin sayısı 
+32 * (3 * 3 * 3 + 1) = 32 * 27 + 32 = 32 * 28 = 896 tane olacaktır. 
+
+Pekiyi 10x10'luk resmimiz gri tonlamalı olsaydı 32 filtre ve 3x3'lük kernel için 
+toplam eğitilebilir parametrelerin sayısı ne olurdu? Bu durumda 3x3'lük toplam 
+32 farklı filtre kullanılacağı için ve her filtrede bir tane bias değeri söz 
+konusu olacağı için toplam eğitilebilir parametrelerin sayısı da 
+32 * (3 * 3 + 1) = 32 * 10 = 320 tane olacaktır. 
 
 ---------------------------------------------------------------------------------
 """
