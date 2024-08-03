@@ -9157,13 +9157,84 @@ soktuğumuzda her filtreden 8x8x1'lik bir resim elde edileceğinegöre toplamda
 parametrelerin sayısını hesaplayalım. Bir tane filtre için yukarıda toplam 
 eğitilebilir parametrelerin sayısını 3 * 3 * 3 + 1 olarak hesaplamıştık. Bu 
 filtrelerden 32 tane olduğuna göre toplam eğitilebilir parametrelerin sayısı 
-32 * (3 * 3 * 3 + 1) = 32 * 27 + 32 = 32 * 28 = 896 tane olacaktır. 
+32 * (3 * 3 * 3 + 1) = 32 * 27 + 32 = 896 tane olacaktır. 
 
-Pekiyi 10x10'luk resmimiz gri tonlamalı olsaydı 32 filtre ve 3x3'lük kernel için 
+Peki 10x10'luk resmimiz gri tonlamalı olsaydı 32 filtre ve 3x3'lük kernel için 
 toplam eğitilebilir parametrelerin sayısı ne olurdu? Bu durumda 3x3'lük toplam 
 32 farklı filtre kullanılacağı için ve her filtrede bir tane bias değeri söz 
 konusu olacağı için toplam eğitilebilir parametrelerin sayısı da 
 32 * (3 * 3 + 1) = 32 * 10 = 320 tane olacaktır. 
+
+---------------------------------------------------------------------------------
+Peki evrişimsel sinir ağlarında tek bir evrişim katmanı mı bulunmalıdır? Aslında 
+evrişim işlemi komşu pixelleri birbirleriyle ilişkilendirmektedir. Yani onlara 
+bir bağlam kazandırmaktadır. Evrişim işlemiyle pixel'ler birbirinden bağımsız 
+değil komşu pixel'lerle ilişkili hale gelmektedir.
+
+Evrişimin çıktısının yeniden evrişime sokulması pixel'lerin daha uzak pixel'lerle 
+ilişkilendirilmesini sağlar. İşte bu nedenle genel olarak evrişim katmanları birden 
+fazla katman olarak bulundurulur. Bu da ağın derinleşmesine yol açmaktadır. 
+
+Anımsanacağı gibi ara katmanların sayısı 2'den fazla ise böyle ağlara "derin ağlar 
+(deep neural network)" denilmektedir. Bu durumda ağa evrişim katmanlarını 
+eklediğimizde artık derin ağlar yani derin öğrenme uygulaması yapmış oluruz. Pek 
+çok uygulamacı evrişim katmanlarındaki filtre sayısını önceki evrişimin iki katı 
+olacak biçimde artırmaktadır. Ancak uygulamacılar bu değerleri modelden modele 
+kalibre edebilmektedir.
+
+---------------------------------------------------------------------------------
+
+---------------------------------------------------------------------------------
+Şimdi de evrişimsel ağların Keras'ta nasıl oluşturulacağı üzerinde duralım. Keras'ta 
+evrişimsel ağların oluşturulması için tipik olarak Conv2D isimli bir sınıf 
+kullanılmaktadır. Conv2D sınıfı resim girdisini iki boyutla bizden ister. Zaten 
+2D son eki bu anlama gelmektedir. Aslında benzer işlemi yapan Conv1D isimli bir 
+sınıf da vardır. Tabii resimsel uygulamalarda resimler iki boyutlu olduğu için 
+Conv2D katmanı kullanılmaktadır. 
+
+Conv2D sınıfının __init__ metodunun parametrik yapısı şöyledir:
+
+tf.keras.layers.Conv2D(
+    filters,
+    kernel_size,
+    strides=(1, 1),
+    padding='valid',
+    data_format=None,
+    dilation_rate=(1, 1),
+    groups=1,
+    activation=None,
+    use_bias=True,
+    kernel_initializer='glorot_uniform',
+    bias_initializer='zeros',
+    kernel_regularizer=None,
+    bias_regularizer=None,
+    activity_regularizer=None,
+    kernel_constraint=None,
+    bias_constraint=None,
+    **kwargs
+)
+
+
+Metodun ilk 4 parametresi önemlidir. Bu 4 parametre sırasıyla uygulanacak filtrelerin 
+sayısını, kernel'ın genişlik ve yüksekliğini, stride miktarını ve padding yapılıp 
+yapılmayacağını belirtir. Örneğin:
+
+conv2 = Conv2D(32, (3, 3), padding='same', activation='linear')
+
+
+Burada toplam 32 filtre uygulanmıştır. Kernel (3, 3) olarak alınmıştır. 
+
+padding parametresi default "valid" durumdadır. Bu "valid" değeri "padding 
+yapılmayacağı" anlamına gelir. Bu parametre "same" geçilirse padding yapılır. Yani 
+hedef resim kaynak resimle aynı büyüklükte olur. Padding yapıldığı durumda padding 
+satırları ve sütunları tamamen sıfırlarla doldurmaktadır. 
+
+Biz burada strides parametresine bir şey girmedik. Bu parametrenin default değeri 
+(1, 1) biçimindedir. Yani kaydırma yatayda ve düşeyde birer birer yapılacaktır. 
+
+Evrişim katmanlarındaki aktivasyon fonksiyonları da Dense katmanlarda olduğu gibi 
+genellikle "relu" alınmaktadır. Eğer aktivasyon fonksiyonu hiç girilmezse sanki 
+"linear" girilmiş gibi bir işlem söz konusu olur. 
 
 ---------------------------------------------------------------------------------
 """
