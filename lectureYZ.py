@@ -9215,9 +9215,9 @@ tf.keras.layers.Conv2D(
 )
 
 
-Metodun ilk 4 parametresi önemlidir. Bu 4 parametre sırasıyla uygulanacak filtrelerin 
-sayısını, kernel'ın genişlik ve yüksekliğini, stride miktarını ve padding yapılıp 
-yapılmayacağını belirtir. Örneğin:
+Metodun ilk 4 parametresi önemlidir. Bu 4 parametre sırasıyla uygulanacak 
+filtrelerin sayısını, kernel'ın genişlik ve yüksekliğini, stride miktarını ve 
+padding yapılıp yapılmayacağını belirtir. Örneğin:
 
 conv2 = Conv2D(32, (3, 3), padding='same', activation='linear')
 
@@ -9225,7 +9225,7 @@ conv2 = Conv2D(32, (3, 3), padding='same', activation='linear')
 Burada toplam 32 filtre uygulanmıştır. Kernel (3, 3) olarak alınmıştır. 
 
 padding parametresi default "valid" durumdadır. Bu "valid" değeri "padding 
-yapılmayacağı" anlamına gelir. Bu parametre "same" geçilirse padding yapılır. Yani 
+yapılmayacağı" anlamına gelir. Bu parametre "same" geçilirse padding yapılır.Yani 
 hedef resim kaynak resimle aynı büyüklükte olur. Padding yapıldığı durumda padding 
 satırları ve sütunları tamamen sıfırlarla doldurmaktadır. 
 
@@ -9235,6 +9235,214 @@ Biz burada strides parametresine bir şey girmedik. Bu parametrenin default değ
 Evrişim katmanlarındaki aktivasyon fonksiyonları da Dense katmanlarda olduğu gibi 
 genellikle "relu" alınmaktadır. Eğer aktivasyon fonksiyonu hiç girilmezse sanki 
 "linear" girilmiş gibi bir işlem söz konusu olur. 
+
+---------------------------------------------------------------------------------
+Evrişim katmanlarından sonra modele genellikle yine Dense katmanlar eklenmektedir. 
+Ancak Conv2D katmanın çıktısı çok boyutlu olduğu için ve Dense katmanı da girdi 
+olarak tek boyut istediği için Conv2D çıktısının Dense katmana verilmedne önce 
+tek boyuta indirgenmesi gerekmektedir. Çok boyutlu girdileri tek boyuta indirgemek 
+için Keras'ta Flatten isimli bir katman bulundurulmuştur. Örneğin:
+
+model = Sequential(name='MNIST') 
+
+model.add(Input((28, 28, 1)))
+
+model.add(Conv2D(32, (3, 3), name='Conv2D-1', activation='relu'))
+
+model.add(Conv2D(64, (3, 3), name='Conv2D-2', activation='relu'))
+
+model.add(Flatten(name='Flatten'))
+
+model.add(Dense(256, activation='relu', name='Hidden-1'))
+model.add(Dense(128, activation='relu', name='Hidden-2'))
+model.add(Dense(10, activation='softmax', name='Output'))
+
+model.summary()
+
+Burada giri tonlamalı resim için tepik bir evirişim katmanının kullanım örneğini 
+görüyorsunuz. Modelin girdisi 28x28'lik gri tonlamalı resimlerden oluşmaktadır. 
+Sonra bu resimler üzerinde 3x3'lük filtreler uygulanmıştır. İlk Conv2D katmanında 
+32 filtre sonraki Conv2D katmanında ise 64 filtre kullanılmıştır. Daha sonra 
+Flatten katmanıyla çok boyutlu çıktının tek boyuta indirgendiğini görüyorsunuz. 
+
+Bu modelden şöyle bir özet elde edilmiştir:
+
+Model: "MNIST"
+┌─────────────────────────────────┬────────────────────────┬───────────────┐
+│ Layer (type)                    │ Output Shape           │       Param # │
+├─────────────────────────────────┼────────────────────────┼───────────────┤
+│ Conv2D-1 (Conv2D)               │ (None, 26, 26, 32)     │           320 │
+├─────────────────────────────────┼────────────────────────┼───────────────┤
+│ Conv2D-2 (Conv2D)               │ (None, 24, 24, 64)     │        18,496 │
+├─────────────────────────────────┼────────────────────────┼───────────────┤
+│ Flatten (Flatten)               │ (None, 36864)          │             0 │
+├─────────────────────────────────┼────────────────────────┼───────────────┤
+│ Hidden-1 (Dense)                │ (None, 128)            │     4,718,720 │
+├─────────────────────────────────┼────────────────────────┼───────────────┤
+│ Hidden-2 (Dense)                │ (None, 128)            │        16,512 │
+├─────────────────────────────────┼────────────────────────┼───────────────┤
+│ Output (Dense)                  │ (None, 10)             │         1,290 │
+└─────────────────────────────────┴────────────────────────┴───────────────┘
+Total params: 4,755,338 (18.14 MB)
+Trainable params: 4,755,338 (18.14 MB)
+Non-trainable params: 0 (0.00 B)
+
+---------------------------------------------------------------------------------
+"""
+
+"""
+---------------------------------------------------------------------------------
+# pooling
+
+Evrişimsel ağlarda evrişim katmanlarında çok fazla eğitilebilir parametre 
+oluşmaktadır. Yukarıdaki MNIST örneğinde toplam eğitilebilir parametrelerin sayısı 
+4.5 milyon civarındadır. Üstelik bu örnekteki resimler 28x28'lik gri tonlamalı 
+resimlerdir. Pratikte 28x28 gibi resimler çok küçük olduğundan kullanılmazlar. 
+Yani resimler pratikte 28x28'den çok daha büyük olma eğilimindedir. Ayrıca resimler 
+genellikle karşımıza renkli biçimde gelmektedir. Eğitilebilir parametrelerin 
+sayısının fazla olmasının şu dezavantajları vardır:
+
+- Eğitim için gereken zaman fazlalaşır. 
+- Çok nöron olmasından kaynaklanan overfitting durumları oluşabilir.
+- Eğitim sonucunda eğitim bilgilerinin saklanması için gerekli olan disk alanı 
+ büyür.
+    
+İşte bu tür resim tanıma işlemlerinde eğitilebilir parametrelerin sayısını düşürmek 
+için çeşitli teknikler kullanılmaktadır. Bunun için ilk akla gelecek yöntem evrişim 
+katmanlarındaki kaydırma değerlerini (strides) artırmaktır. Ancak kaydırma 
+değerlerinin artırılması resmin tanınması için dezavantaj da oluşturmaktadır. Nöron 
+sayılarını azaltmak için diğer bir yöntem ise "pooling" denilen yöntemdir. Bu 
+bağlamda genellikle pooling yöntemi tercih edilmektedir. 
+
+---------------------------------------------------------------------------------
+Pooling bir grup dikdörtgensel bölgedeki pixel'ler yerine onları temsil eden tek 
+bir pixel'in elde edilmesi yöntemidir. (Tabi aslında pooling yöntemi yalnızca 
+resimsel verilerde kullanılmamaktadır. Ancak biz burada pooling işlemiin resimler 
+üzerinde uyguladığımız için pixel terimini kullanıyoruz.) Pooling işleminin İki 
+önemli biçimi vardır: "Max Pooing" ve "Average Pooling".  
+
+"Max Pooling" yönteminde dikdörtgensel bölgedeki en büyük eleman alınır. Average 
+Pooling yönteminde ise dikdörtgensel bölgedeki elemanların ortalamaları alınmaktadır. 
+Uygulamada daha çok Max Pooling yöntemi tercih edilmektedir. MaxPooling yöntemi 
+ilgili dikdörtgensel bölgedeki en belirgin özelliğin elde edilmesine yol açmaktadır. 
+Örneğin 4x4'lük pixel'lerden oluşan gri tonlamalı resimdeki pixel değerleri 
+aşağıdaki gibi olsun:
+
+112     62      41      52
+200     15      217     21
+58      92      81      117
+0       21      45      89
+
+Pooling uygulayacağımız çerçevimiz 2x2'lik olsun. Bu 2x2'lik çerçeve resim üzerinde 
+sağdan iki aşağıdan olacak şekilde kaydırılır ve toplam 4 bölge elde edilir:
+
+112     62     
+200     15      
+
+41      52
+217     21
+
+58      92      
+0       21      
+
+81      117
+45      89
+
+Görüldüğü gibi pooling işleminde kaydırma (yani stride) genellikle 1 değil pooling 
+çerçevesi kadar yapılmaktadır. İşte Max Pooling yönteminde her çerçevenin en büyük 
+elemanı alınır ve aşağıdaki matris elde edilir:
+
+200     217 
+92      117
+
+Bu işlemin sonucunda elde edilen matrisin ilkinin karekökü kadar olduğuna dikkat 
+ediniz. Yani pooling çerçevesi resmi üstel olarak küçültmektedir. 
+
+Tabii pooling işlemleri üç boyutlu matrisler üzerinde de uygulanabilir. Örneğin 
+evrişim katmanının çıktısı birden fazla filtre kullanıldığı için genel olarak 
+N kanallı resim gibidir. Bu durumda her kanal için ayrı ayrı pooling uygulanacaktır. 
+Örneğin 26x26x32'lik bir matris üzerinde 2x2 çerçeveli pooling işlemi yapıldığında 
+hedef matris 13x13x32'lik olur.
+
+---------------------------------------------------------------------------------
+
+---------------------------------------------------------------------------------
+Resimsel verilerde pooling işlemleri Keras'ta tipik olarak MaxPooling2D ve AveragePooling2D 
+sınıflarıyla temsil edilmiştir. Sınıfların __init__ metotlarının parametrik 
+yapıları şöyledir:
+
+MaxPooling2D(pool_size=(2, 2), strides=None, padding='valid', data_format=None, 
+             **kwargs)
+
+AveragePooling2D(pool_size=(2, 2), strides=None, padding='valid', data_format=None, 
+                 **kwargs)
+
+Metotların pool_size parametreleri çerçevenin büyüklüğünü belirtmektedir. Default 
+olarak 2x2'lik çerçeve kullanılmaktadır. 2x2'lik çerçeve kullanımı tipiktir. 
+Metotların strides parametreleri yine kaydırma miktarını belirtir. Default durumda 
+kaydırma pools_size parametresiyle aynı değerdedir. Yani bu parametreye None 
+geçersek aslında stride değerinin pool_size ile aynı olmaktadır. padding parametresi 
+yine "valid" ya da "same" olabilir. "valid" padding yapılmayacağı, "same" ise 
+padding yapılacağı anlamına gelmektedir.
+
+Tipik olarak Pooling katmanları her evrişim katmanından sonra uygulanmaktadır. 
+Yani tipik olarak her Conv2D katmanından sonra bir tane de MaxPooling2D ya da 
+AveragePooling2D katmanı bulundurulur. Örneğin:
+
+    
+model = Sequential(name='MNIST')
+
+model.add(Input((28, 28, 1), name='Input'))
+
+model.add(Conv2D(32, (3, 3), activation='relu', name='Conv2D-1'))
+model.add(MaxPooling2D(name='MaxPooling2D-1'))
+
+model.add(Conv2D(64, (3, 3), activation='relu', name='Conv2D-2'))
+model.add(MaxPooling2D(name='MaxPooling2D-2'))
+
+model.add(Flatten(name='Flatten'))    
+
+model.add(Dense(128, activation='relu', name='Hidden-1'))
+model.add(Dense(128, activation='relu', name='Hidden-2'))
+model.add(Dense(10, activation='softmax', name='Output'))
+model.summary()
+
+Modelden şöyle bir özet bilgi edilmiştir:
+
+Model: "MNIST"
+ ┌─────────────────────────────────┬────────────────────────┬───────────────┐
+ │ Layer (type)                    │ Output Shape           │       Param # │
+ ├─────────────────────────────────┼────────────────────────┼───────────────┤
+ │ Conv2D-1 (Conv2D)               │ (None, 26, 26, 32)     │           320 │
+ ├─────────────────────────────────┼────────────────────────┼───────────────┤
+ │ MaxPooling2D-1 (MaxPooling2D)   │ (None, 13, 13, 32)     │             0 │
+ ├─────────────────────────────────┼────────────────────────┼───────────────┤
+ │ Conv2D-2 (Conv2D)               │ (None, 11, 11, 64)     │        18,496 │
+ ├─────────────────────────────────┼────────────────────────┼───────────────┤
+ │ MaxPooling2D-2 (MaxPooling2D)   │ (None, 5, 5, 64)       │             0 │
+ ├─────────────────────────────────┼────────────────────────┼───────────────┤
+ │ Flatten (Flatten)               │ (None, 1600)           │             0 │
+ ├─────────────────────────────────┼────────────────────────┼───────────────┤
+ │ Hidden-1 (Dense)                │ (None, 128)            │       204,928 │
+ ├─────────────────────────────────┼────────────────────────┼───────────────┤
+ │ Hidden-2 (Dense)                │ (None, 128)            │        16,512 │
+ ├─────────────────────────────────┼────────────────────────┼───────────────┤
+ │ Output (Dense)                  │ (None, 10)             │         1,290 │
+ └─────────────────────────────────┴────────────────────────┴───────────────┘
+    Total params: 241,546 (943.54 KB)
+    Trainable params: 241,546 (943.54 KB)
+    Non-trainable params: 0 (0.00 B)
+
+
+Toplam eğitilebilir parametrelerin sayısı da 241546 tanedir. Bu değeri pooling 
+işlemini uygulamadığımız örnekteki 4755338 değeri ile karşılaştırdığımızda 
+uyguladığımız MaxPooling işleminin bu örnekte eğitilebilir parametrelerin sayısını 
+20 kat civarında düşürdüğü görülmektedir. Resimler büyüdükçe bu parametrelerin 
+sayısının azaltılmasının etkisi çok daha iyi anlaşılacaktır.
+
+MNIST örneğinin pooling uygulanmış hali ile pooling uygulanmamış hali 
+karşılaştırıldığında pooling uygulanmış halinin her bakımdan biraz daha iyi 
+performans gösterdiği görülmektedir.
 
 ---------------------------------------------------------------------------------
 """
