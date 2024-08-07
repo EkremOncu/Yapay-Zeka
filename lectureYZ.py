@@ -6053,7 +6053,7 @@ gerekmektedir.
 ---------------------------------------------------------------------------------
 
 ---------------------------------------------------------------------------------
-# min-max ölçekleme
+# minmax ölçekleme
 
 Diğer çok kullanılan bir özellik ölçeklemesi yöntemi de "min-max" ölçeklemesi denilen 
 yöntemdir. Bu ölçeklemede sütun değerleri [0, 1] arasında noktalı sayılarla temsil 
@@ -9367,9 +9367,9 @@ hedef matris 13x13x32'lik olur.
 ---------------------------------------------------------------------------------
 
 ---------------------------------------------------------------------------------
-Resimsel verilerde pooling işlemleri Keras'ta tipik olarak MaxPooling2D ve AveragePooling2D 
-sınıflarıyla temsil edilmiştir. Sınıfların __init__ metotlarının parametrik 
-yapıları şöyledir:
+Resimsel verilerde pooling işlemleri Keras'ta tipik olarak MaxPooling2D ve 
+AveragePooling2D sınıflarıyla temsil edilmiştir. Sınıfların __init__ metotlarının 
+parametrik yapıları şöyledir:
 
 MaxPooling2D(pool_size=(2, 2), strides=None, padding='valid', data_format=None, 
              **kwargs)
@@ -9445,7 +9445,150 @@ karşılaştırıldığında pooling uygulanmış halinin her bakımdan biraz da
 performans gösterdiği görülmektedir.
 
 ---------------------------------------------------------------------------------
+Pekiyi pooling çerçevesi hangi büyüklükte olmalıdır? Aslında bu da üzerinde 
+çalıştığımız resimlerin büyüklüklerine ve onların niteliklerine bağlı olarak 
+değişebilir. Keras'ın default pooling çerçevesinin 2x2'lik olduğunu belirtmiştik.
+Bu çerçevenin artırılması bazı uygulamalarda daha iyi sonuçların elde edilmesini 
+sağlayabilmektedir. Genel olarak bu çerçeve genişliğinin de üzerinde çalışılan 
+veri kümesi eşliğinde deneme yoluyla belirlenmesi uygun olmaktadır. Fakat bu 
+yönteme sapmayacaksanız 2x2'lik default çerçeve büyüklüğünü kullanabilirsiniz. 
+
+Resimler büyüdükçe 2x2 yerine 3x3'lük ya da 4x4'lik çerçeveleri tercih edebilirsiniz. 
+Çünkü büyük resimlerde eğitilebilir parametrelerin sayısı ciddi boyuta 
+gelebilmektedir. Büyük çerçeveler bunların daha fazla azaltılmasına katkı 
+sağlayacaktır. Çerçeve büyütüldükçe ayrıntıların daha fazla göz ardı edileceğine 
+dikkat ediniz. 
+
+---------------------------------------------------------------------------------
 """
+
+
+
+# CIFAR-10 Veri Kümesi ---  (Renkli resimlerin sınıflandırılması problemi)
+
+"""
+---------------------------------------------------------------------------------
+Renkli resimlerin sınıflandırılması için sık kullanılan deneme veri kümelerinden 
+biri CIFAR-10 (Canadian Institute for Advanced Research) isimli veri kümesidir. 
+Bu veri kümesi tensorflow.keras.datasets paketi içerisindeki cifar10 modülünde de 
+bulunmaktadır. CIFAR-10 veri kümesinde her biri 32x32 pixel olan 3 kanallı RGB 
+resimler bulunmaktadır. Bu RGB resimler 10 farklı sınıfa ayrılmıştır. Sınıflar 
+şunlardır:
+
+class_names = ['airplane', 'automobile', 'bird', 'cat', 'deer', 'dog', 'frog', 
+               'horse', 'ship', 'truck']
+
+Veri kümesinin orijinal https://www.cs.toronto.edu/~kriz/cifar.html adresinden 
+indirilebilir. (Bu bağlantıya tıklandığında veri kümesinin farklı programlama 
+dilleri için farklı versiyonlarının bulunduğunu göreceksiniz. Burada Python'a 
+ilişkin veri kümesini indirebilirsiniz.)
+
+Veri kümesinde 5 dosya eğitim verilerini, bir dosya da test verilerini 
+bulundurmaktadır. (Veri kümesini kullanıma sunanlar dosyalar çok büyümesin diye 
+bunları 5 dosyaya bölmüş olabilirler. Ya da verileri 5 dosyaya bölmelerinin nedeni 
+az veriyle denemeler yapacak kişilerin küçük bir dosyayı kullanmalarını sağlamak 
+da olabilir.) Ancak bu dosyalar Python'un pickle modülü ile seri hale getirilmiştir. 
+Bu dosyalar pickle.load ile deserialize yapıldığında 5 tane anahtardan oluşan 
+sözlük nesneleri elde edilmektedir. Sözlüğün 5 anahtarı şöyledir:
+
+
+dict_keys([b'batch_label', b'labels', b'data', b'filenames'])
+
+
+Bizim bu 5 eğitim dosyasındaki x ve y verilerini ayrı ayrı elde edip birleştirmemiz 
+gerekir. Bu işlemi şöyle yapabiliriz:
+  
+    
+import pickle
+import glob
+import numpy as np
+
+x_lst = []
+y_lst = []
+
+for path in glob.glob('cifar-10-batches-py/data_batch_*'):
+    with open(path, 'rb') as f:
+        d = pickle.load(f, encoding='bytes')
+        x_lst.append(d[b'data'])
+        y_lst.append(d[b'labels'])     
+
+import numpy as np
+        
+training_dataset_x = np.concatenate(x_lst)
+training_dataset_y = np.concatenate(y_lst)
+
+with open('cifar-10-batches-py/test_batch', 'rb') as f:
+    d = pickle.load(f, encoding='bytes')
+    test_dataset_x = d[b'data']
+    test_dataset_y = d[b'labels']
+      
+---------------------------------------------------------------------------------
+Buradan elde ettiğimiz matrisler iki boyutludur. Evrişim katmanları için bunların 
+üç boyutlu hale getirilmesi gerekir. Ancak resmin orijinalleri maalesef tek boyutlu 
+hale getirilirken standart bir eksen sistemi uygulanmamış aşağıdaki gibi boyutlar 
+uç uca eklenmiştir:
+
+Tek boyutlu resmin 0'ınci boyutu ---> Gerçek resmin 2'üncü boyutu
+Tek boyutlu resmin 1'inci boyutu ---> Gerçek resmin 0'ıncı boyutu
+Tek boyutlu resmin 2'inci boyutu ---> Gerçek resmin 1'inci boyutu
+
+Bu nedenle tek boyut olarak elde ettiğimiz resimlerin klasik RGB boyutlarına 
+dönüştürülmesi için NumPy'ın transpose fonksiyonundan faydalanılması gerekmektedir. 
+Dönüştürme işlemi şöyle yapılabilir:
+
+training_dataset_x = training_dataset_x.reshape(-1, 3, 32, 32)
+training_dataset_x = np.transpose(training_dataset_x, [0, 2, 3, 1])
+
+test_dataset_x = test_dataset_x.reshape(-1, 3, 32, 32)
+test_dataset_x = np.transpose(test_dataset_x, [0, 2, 3, 1])
+
+
+Burada transpose işleminde 3 boyut değil 4 boyut kullanıldığına dikkat ediniz. 
+Çünkü aslında matrisler resimlerden oluşmaktadır. Bu işlemlerden sonra bir grup 
+resmi fikir vermesi için aşağıdaki gibi çizdirebiliriz:
+
+---------------------------------------------------------------------------------
+class_names = ['airplane', 'automobile', 'bird', 'cat', 'deer', 'dog', 'frog', 
+               'horse', 'ship', 'truck']
+
+
+import matplotlib.pyplot as plt
+    
+plt.figure(figsize=(4, 20))
+for i in range(30):
+    plt.subplot(10, 3, i + 1)
+    plt.title(class_names[training_dataset_y[i]], pad=10)    
+    plt.imshow(training_dataset_x[i])
+plt.show()
+
+---------------------------------------------------------------------------------
+Tabii yine resimler üzerinde minmax ölçeklemesinin yapılması uygundur:
+
+training_dataset_x = training_dataset_x / 255
+test_dataset_x = training_dataset_x / 255
+
+Artık modelimizi kurup eğitebiliriz. Model MNIST örneğinde olduğu gibi 
+oluşturulabiliriz. Ancak burada resim 3 kanallı olduğu için ve biraz daha büyük 
+olduğu için iki yerine üç evrişim katmanı kullanabiliriz. Filtre sayılarını da 
+artırabiliriz. Dense katmanlardaki nöronları da artırmak daha iyi sonucun elde 
+edilmesine yol açabilecektir:
+
+---------------------------------------------------------------------------------
+"""
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
