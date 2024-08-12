@@ -1,7 +1,7 @@
 import pickle
 import glob
 
-EPOCHS = 5
+EPOCHS = 10
 
 x_lst = []
 y_lst = []
@@ -28,9 +28,9 @@ training_dataset_x = np.transpose(training_dataset_x, [0, 2, 3, 1])
 test_dataset_x = test_dataset_x.reshape(-1, 3, 32, 32)
 test_dataset_x = np.transpose(test_dataset_x, [0, 2, 3, 1])
 
+
 class_names = ['airplane', 'automobile', 'bird', 'cat', 'deer', 'dog', 'frog', 
                'horse', 'ship', 'truck']
-
   
 import matplotlib.pyplot as plt
      
@@ -41,7 +41,6 @@ for i in range(30):
     plt.imshow(training_dataset_x[i])
 plt.show()
 
-
 scaled_training_dataset_x = training_dataset_x / 255
 scaled_test_dataset_x = test_dataset_x / 255
 
@@ -50,7 +49,6 @@ from tensorflow.keras.utils import to_categorical
 
 ohe_training_dataset_y = to_categorical(training_dataset_y)
 ohe_test_dataset_y = to_categorical(test_dataset_y)
-
 
 from tensorflow.keras.models import Sequential
 from tensorflow.keras.layers import Input, Dense, Conv2D, MaxPooling2D, Flatten
@@ -102,19 +100,23 @@ for i in range(len(eval_result)):
 import numpy as np
 import os
 
-for path in glob.glob('Predict-Pictures/*.bmp'):
+count = 0
+hit_count = 0
+for path in glob.glob('Predict-Pictures/*.*'):
     image = plt.imread(path)
     scaled_image = image / 255
     model_result = model.predict(scaled_image.reshape(-1, 32, 32, 3), verbose=0)
     predict_result = np.argmax(model_result)
+    
     fname = os.path.basename(path)
     real_class = fname[:fname.index('-')]
-    print()
-    print(f'Real class: {real_class}, Predicted Class: {class_names[predict_result]}, Path: {path}')
+    predict_class = class_names[predict_result]
     
+    print(f'Real class: {real_class}, Predicted Class: {predict_class}, Path: {path}')
     
-
-
-
-
-
+    if real_class == predict_class:
+        hit_count += 1
+    count += 1
+    
+print('-' * 20)
+print(f'Prediction accuracy: {hit_count / count}')
