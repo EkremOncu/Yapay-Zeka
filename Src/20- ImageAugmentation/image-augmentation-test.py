@@ -1,7 +1,7 @@
 import matplotlib.pyplot as plt
 
 
-picture = plt.imread('Sample-Pictures/AbbeyRoad.jpg')
+picture = plt.imread("C:\\Users\\Lenovo\\Desktop\\GitHub\\YapayZeka\\Src\\20- ImageAugmentation\\Sample-Pictures\AbbeyRoad.jpg")
 plt.figure(figsize=(9, 16))
 plt.imshow(picture);
 plt.show()
@@ -20,7 +20,7 @@ plt.figure(figsize=(9, 16))
 plt.imshow(result.astype('uint8'));
 plt.show()
 
-rz = RandomZoom(0.2)
+rz = RandomZoom(0.3)
 result = rz(picture).numpy()
 plt.figure(figsize=(9, 16))
 plt.imshow(result.astype('uint8'));
@@ -33,10 +33,10 @@ plt.imshow(result.astype('uint8'));
 plt.show()
 
 rc = RandomCrop(500, 500)
-result = rc(picture).numpy()
+result1 = rc(picture).numpy() # result1.shape --> (500, 500, 3)
 plt.figure(figsize=(9, 16))
 rs = Resizing(1000, 1000)
-result = rs(result).numpy()
+result = rs(result1).numpy()  # result.shape --> (1000, 1000, 3)
 plt.figure(figsize=(9, 16))
 plt.imshow(result.astype('uint8'));
 plt.show()
