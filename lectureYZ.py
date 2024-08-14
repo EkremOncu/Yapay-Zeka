@@ -9574,20 +9574,235 @@ artırabiliriz. Dense katmanlardaki nöronları da artırmak daha iyi sonucun el
 edilmesine yol açabilecektir:
 
 ---------------------------------------------------------------------------------
+Kestirim işlemini Internet'ten rastgele resimler bulup onları 32x32'lik boyuta 
+getirerek yapabiliriz. Örneğimizde kestirilecek resimler "Predict-Pictures" isimli 
+bir dizinine yerleştirilmiştir. Bulunan resimlerin 32x32'lik boyuta ölçeklenmesi 
+hazır programlarla yapılabilir. Resimler üzerinde bu türlü manipülasyonlar yapmak 
+için sık kullanılan kütüphanelerden biri "PIL (Python Image Library)" denilen 
+kütüphanedir. Kütüphane aşağıdaki gibi kurulabilir:
+
+pip install pillow
+    
+Kütüphanenin dokümantasyonuna aşağıdaki bağlantıdan ulaşabilirsiniz:
+
+https://pillow.readthedocs.io/en/stable/
+
+PIL kütüphanesini kullanarak bir resmin ölçeklendirilip save edilmesi kabaca 
+şöyle yapılmaktadır:
+
+# rescale-image.py
+
+from PIL import Image
+import glob
+
+for path in glob.glob('Predict-Pictures/*.*'):
+    image = Image.open(path)
+    resized_image = image.resize((32, 32))
+    image.close()
+    resized_image.save(path)
+
+
+Burada önce glob fonksiyonu ile dizindeki tüm resim dosyaları elde edilmişl sonra 
+PIL ile yeniden boyutlandırılmış, sonra da yeni boyuttaki resim orijinal formatta 
+save edilmiştir.
+
+---------------------------------------------------------------------------------
 """
 
 
 
 
+# ------------------ Verilerin Artırılması (Data Augmentation) ------------------
+
+"""
+---------------------------------------------------------------------------------
+Verilerin Artırılması (Data Augmentation) makine öğrenmesi ve genel olarak veri 
+bilimi için önemli yardımcı konulardan biridir. Elimizdeki eğitim veri kümesi 
+kısıtlı olabilir. Biz de elimizdeki veri kümesinden hareketle veri kümemizi 
+büyütmek isteyebiliriz. Bu konuya genel olarak "verilerin artırılması (data 
+augmentation)" denilmektedir. 
+
+Verilerin artırılması değişik veri grupları için farklı tekniklerle gerçekleştirilmektedir. 
+Yani bu bakımdan genel tekniklerle değil ilgili konuya özgü tekniklerle veri 
+artırımı yapılmaktadır. Örneğin resimsel verilerin arttırılması ile metinsel 
+verilerin artırılması farklı tekniklerle yapılmaktadır. O halde verilerin 
+artırılması için tipik şu alt gruplar sıralanabilir:
+
+    
+- Resimsel verilerin artırılması
+- Metinsel verilerin artırılması
+- İşitsel (audio) verilerin artırılması
+- Hareketli görüntü verilerinin artırılması
+- Veri tabloları biçimindeki (Boston Hausing Price veri kümesinde olduğu gibi) 
+  verilerin artırılması
+- Zamansal (temporal/time series) verilerinin artırılması
 
 
+Verilerin artırılması için ilgili framework'ler ve kütüphaneler özel sınıflar ve 
+fonksiyonlar bulundurabilmektedir. Örneğin sinir ağları için kullandığımız Keras 
+kütüphanesi ve dolayısıyla Tensorflow kütüphanesi veri artırımı için çeşitli 
+fonksiyonlar ve katman sınıfları bulundurmaktadır. Aynı durum PyTorch kütüphanesi 
+için de geçerlidir. 
+
+Verilerin artırılması sırasında bazı genel unsurlara dikkat edilmesi gerekir. 
+Örneğin artırım sırasındaki "yanlılık (bias)" önemli sorunlardan biridir. Veriler 
+artırılırken onların özellikleri belli bir yöne kaydırılmamalıdır. 
+
+---------------------------------------------------------------------------------
+Örneğin Cifar-100 veri kümesinde eğitim için kullanabileceğimiz toplam 50000 resim 
+vardır. Resimlerin sınıfları 100 tane olduğuna göre her sınıf için ortalama 500 
+resim söz konusudur. Peki bu 500 resim ilgili resim sınıfı için genelleme yapabilir 
+mi? Örneklerimizde "categorical accuracy" değerinin %30 ile %40 arasında 
+değişebildiğini gördük. Bu da her 100 resmin 30 ile 40 arasındaki kısmının doğru 
+sınıflandırıldığı diğerlerinin yanlış sınıflandırıldığı anlamına gelmektedir. 
+
+Bu veri kümesindeki "yengeç (crab)" resimlerini dikkate alalım. Buradaki yengeçlerin 
+bize doğru konumu değişebilmektedir. Burada ters dönmüş bir yengeç yoktur. Buradaki 
+yengeç resimleri hep dik bir açıdan elde edilmiş resimlerdir. Ancak kestirim 
+yapılırken gerçek resimlerin eğitimdeki resimlerle aynı koşulda oluşturulması mümkün 
+olamayabilir. İşte biz bu yengeç resimleri üzerinde manipülasyonlar yaparak farklı 
+özelliklere sahip yengeç resimleri oluşturabiliriz. Veri kümesine bu resimleri 
+de dahil edebiliriz. 
+
+---------------------------------------------------------------------------------
+Verilerin artırılması konusu genellikle kitapların belli bölümlerinde karışık 
+bir biçimde ele alınmaktadır. Konusu tam olarak bu olan kitapların sayısı çok 
+azdır. Ancak bu alanda yazılmış akademik olan ve akademik olmayan çok sayıda 
+makale bulmak mümkündür. Bu konuya odaklanmış az sayıda kitaptan biri "Data 
+Augmentatiın in Python (Packt Yayınevi), Duc Haba (2023)" isimli kitaptır. 
+Buradaki notlarda bu kitaptaki konu başlıklarından alıntı yapacağız. Ancak bu 
+kitap uygulamalı bir kitap değildir.   
+
+Biz bu bölümde resimsel verilerin artırılması üzerinde duracağız.
+
+---------------------------------------------------------------------------------
+
+---------------------------------------------------------------------------------
+Resimsel verilerin artırılması için pek çok teknik kullanılmaktadır. Önemli 
+teknikler şunlardır:
+
+-- Resmin Çevrilmesi (Flipping): Resimlerin yatay ve düşey yönde çevrilmesiyle yeni 
+                                resimlerin elde edilmesi tekniğidir. Örneğin bir 
+resimde bir kişi sola bakarken o resmi yatay biçimde çevirirsek o kişi sağa bakar 
+hale gelir.
+
+-- Resmin Kırpılması (Cropping): Bir resmin bir bölgesinin alınarak yeni bir resim 
+                                haline getirilmesine ilişkin bir tekniktir. Crop 
+işlemi genellikle merkeze yönelik yapılır. Ancak diğer bölgeler üzerinde (özellikle 
+merkezden kayıklık yaratarak) crop işlemleri de yapılabilmektedir.
+
+-- Yeniden Boyutlandırma (Resizing): Resmin yatay düşey oranını (aspect ratio) 
+                                    değiştirerek başka resimler elde edilmesine 
+yönelik tekniklerdir. Örneğin böylece bir insan daha uzun boylu, daha zayıf hale 
+getirilebilmektedir. 
 
 
+-- Resmi Tamamlama (Padding): Resmin kenarlarına ekler yaparak resmi farklılaştırma 
+                            tekniğidir. 
+
+-- Resmi Döndürme (Rotating): Resmi belirli bir açıyla döndürerek yeni resimler 
+                            elde etme tekniğidir. 
+
+-- Resmin Transpose Edilmesi (Translation): Resmin eksenlere göre değişik bir biçime 
+                                            dönüştürülmesi tekniğidir. Burada 
+                                            geometrik dönüştürmeler yapılmaktadır. 
+
+-- Gürültü Eklemesi (Noise Injection): Resme resimde olmayan gürültülerin eklenmesi 
+                                    tekniğidir. Örneğin resim sanki bir sis 
+içerisinde çekilmiş gibi bir etki oluşturulabilir. Resme dumanlar eklenebilir. 
+Resimdeki netliğin bozulması sağlanabilir. 
 
 
+-- Resmin Zoom Edilmesi (Zooming): Resmin zoom-in ya da zoom-out yapılarak başka 
+                                resimlerin elde edilmesine ilişkin tekniklerdir. 
 
 
+-- Resmin Karanlık ya da Aydınlık Hale Getirilmesi (Darken and Lighten): Resmi 
 
+sanki daha karanlık bir ortamda ya da faha aydınlık bir ortamda çekilmiş gibi 
+değiştirme tekniğini belirtmektedir. 
+
+
+-- Resmin Saturasyonun Değiştirilmesi (Color Sturation): Resimdeki renk doygunluklarının 
+                                                    değiştirilmesi tekniğidir. 
+Yani, örneğin kırmızılar daha kırmızı, siyahlar daha siyah hale getirilebilir. 
+
+
+-- Resimdeki Renklerin Ötelenmesi (Hue Shifting): Resimdeki renklerin frekanslarını 
+                                                değiştirip başka renkler haline 
+                                                getirilmesine ilişkin tekniklerdir. 
+
+-- Resimdeki Bazı Renklerin Değiştirilmesi (Color Casting): Resimdeki bazı renkler 
+                                                            başka renklerle yer 
+değiştirilebilir. Örneğin koyu beyaz daha açık beyaz yapılabilir. Resimdeki yeşil 
+alanlar gri olarak değiştirilebilir.
+
+-- Resimdeki Bazı Kısımların Rastgele Silinmnesi (Random Erasing): Resimdeki bazı 
+
+alanların silinerek onlar yerine başka dolguların kullanılmasına ilişkin tekniklerdir. 
+
+
+-- Resimlerin Birleştirilmesi (Combining): Farklı küçük resimlerin bir araya getirilerek 
+                                            farklı bir resim haline getirilmesine
+                                            ilişkin tekniklerdir. 
+
+
+Resimsel verilerin artırılmasında burada belirttiğimiz tekniklerin hepsinin 
+uygulanması gerekmemektedir. Genellikle uygulamacılar yalnızca birkaç tekniği 
+kullanmaktadır. Bu teknikler uygulanırken abartıya kaçılmamalıdır. Abartılı 
+işlemler gerçekle bağlantının kesilmesine yol açıp modelin performasnını 
+düşürebilmektedir. 
+
+Genellikle uygulamacılar resimleri üzt üste birden fazla kez yukarıda belirttiğimiz 
+işlemlere sokarlar. Örneğin önce bir flip işlemi arkasından bir zoom işlemi 
+arkasından bir döndürme işlemi peşi sıra yapılabilir. 
+
+---------------------------------------------------------------------------------
+Peki bir resim tanıma problemi söz konusu olduğunda bir veri artırmayı nasıl 
+uygulamalıyız? Önce resimleri yukarıdaki tekniklerle çoğaltıp onları saklamak mı 
+yoksa eğitime sokarken onları hiç saklamadan o anda resimleri çoğaltmak mı daha
+iyi bir yöntemdir? 
+
+İşte genellikle ikinci yöntem tercih edilmektedir. Yani çoğaltma işlemi eğitimin 
+bir ön işlemi olarak eğitim sırasında yapılmaktadır. Çoğaltılmış verilerin saklanması 
+fazlaca disk hacmi gerekterirebilmektedir. Yalnızca orijinal resimlerin saklanması 
+daha uygun bir yöntem olabilir. 
+
+---------------------------------------------------------------------------------
+"""
+
+"""
+---------------------------------------------------------------------------------
+Keras'ta resimlerin artırımına ilişkin Tensorflow kütüphanesinden gelen fonksiyonlar 
+ve sınıflar bulunmaktadır. Bu amaçla keras.layers modülünde bulundurulmuş olan 
+katman nesneleri şunlardır:
+
+class RandomBrightness: A preprocessing layer which randomly adjusts brightness 
+                        during training.
+
+RandomFlip
+RandomRotation
+RandomZoom
+Rescaling
+RandomContrast
+RandomCrop
+RandomTranslation
+Resize
+
+
+RandomFlip katmanı "horizontol", "vertical" ya da "horizontal_and_vertical" 
+değerlerini parametre olarak almaktadır. Resmi rastgele yatay, düşey ya da her 
+iki yönde tam çevirmektedir. 
+
+RandomRotation katmanı parametre olarak maksimum radyan cinsinden dönüş açısı alır. 
+Resmi ratgele bu maksimum açıyı geçmeyecek biçimde döndürür. 
+
+RandomZoom makismum zoom faktörünü parametre olarak almaktadır. Sıfırdan büyük 
+değerler zoom-in sıfırdan küçük değerler zoom-out anlamına gelir. Bu katman resmi 
+bu maksimum değeri dikkate alarak rastgele biçimde zoom eder.
+
+---------------------------------------------------------------------------------
+"""
 
 
 
