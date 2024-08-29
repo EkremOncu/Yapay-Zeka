@@ -9622,11 +9622,11 @@ kısıtlı olabilir. Biz de elimizdeki veri kümesinden hareketle veri kümemizi
 büyütmek isteyebiliriz. Bu konuya genel olarak "verilerin artırılması (data 
 augmentation)" denilmektedir. 
 
-Verilerin artırılması değişik veri grupları için farklı tekniklerle gerçekleştirilmektedir. 
-Yani bu bakımdan genel tekniklerle değil ilgili konuya özgü tekniklerle veri 
-artırımı yapılmaktadır. Örneğin resimsel verilerin arttırılması ile metinsel 
-verilerin artırılması farklı tekniklerle yapılmaktadır. O halde verilerin 
-artırılması için tipik şu alt gruplar sıralanabilir:
+Verilerin artırılması değişik veri grupları için farklı tekniklerle 
+gerçekleştirilmektedir. Yani bu bakımdan genel tekniklerle değil ilgili konuya 
+özgü tekniklerle veri artırımı yapılmaktadır. Örneğin resimsel verilerin arttırılması 
+ile metinsel verilerin artırılması farklı tekniklerle yapılmaktadır. O halde 
+verilerin artırılması için tipik şu alt gruplar sıralanabilir:
 
     
 - Resimsel verilerin artırılması
@@ -9750,7 +9750,7 @@ alanların silinerek onlar yerine başka dolguların kullanılmasına ilişkin t
 Resimsel verilerin artırılmasında burada belirttiğimiz tekniklerin hepsinin 
 uygulanması gerekmemektedir. Genellikle uygulamacılar yalnızca birkaç tekniği 
 kullanmaktadır. Bu teknikler uygulanırken abartıya kaçılmamalıdır. Abartılı 
-işlemler gerçekle bağlantının kesilmesine yol açıp modelin performasnını 
+işlemler gerçekle bağlantının kesilmesine yol açıp modelin performansını 
 düşürebilmektedir. 
 
 Genellikle uygulamacılar resimleri üzt üste birden fazla kez yukarıda belirttiğimiz 
@@ -9765,7 +9765,7 @@ iyi bir yöntemdir?
 
 İşte genellikle ikinci yöntem tercih edilmektedir. Yani çoğaltma işlemi eğitimin 
 bir ön işlemi olarak eğitim sırasında yapılmaktadır. Çoğaltılmış verilerin saklanması 
-fazlaca disk hacmi gerekterirebilmektedir. Yalnızca orijinal resimlerin saklanması 
+fazlaca disk hacmi gerektirebilmektedir. Yalnızca orijinal resimlerin saklanması 
 daha uygun bir yöntem olabilir. 
 
 ---------------------------------------------------------------------------------
@@ -9797,9 +9797,38 @@ iki yönde tam çevirmektedir.
 RandomRotation katmanı parametre olarak maksimum radyan cinsinden dönüş açısı alır. 
 Resmi ratgele bu maksimum açıyı geçmeyecek biçimde döndürür. 
 
-RandomZoom makismum zoom faktörünü parametre olarak almaktadır. Sıfırdan büyük 
+RandomZoom maksimum zoom faktörünü parametre olarak almaktadır. Sıfırdan büyük 
 değerler zoom-in sıfırdan küçük değerler zoom-out anlamına gelir. Bu katman resmi 
 bu maksimum değeri dikkate alarak rastgele biçimde zoom eder.
+
+RandomCrop, resmin rastgele bir bölgesini elde etmekte kullanılmaktadır. Ancak 
+RandomCrop belli bir en-boy parametresi almaktadır. Resim rastgele bir biçimde 
+bizim istediğimiz en-boy halinde crop edilmektedir. Tabii bizim bu işlem sonucunda 
+resmi yeniden Resize sınıfı ile eski büyüklüğüne getirmemiz gerekir.
+
+
+---------------------------------------------------------------------------------
+Şimdi de yukarıdaki augmentation katman nesnelerini daha önce yapmış olduğumuz 
+CIFAR-100 veri kümesinde kullanalım. Aslında tek yapacağımız şey Input katmanından 
+sonra bu katman nesnelerini modele eklemektir.
+
+Burada Input katmanından sonra aşağıdaki üç augmentation katmanı modele eklenmiştir:
+
+
+model.add(RandomFlip('horizontal'))
+model.add(RandomRotation(0.1))
+model.add(RandomZoom(0.2))
+
+
+Böylece aslında her epoch'ta her resim rastgele bir biçimde çevrilip, döndürülüp 
+zoom edilmektedir. Tabii bu biçimdeki uygulamalarda artık eğitimdeki epoch sayısını 
+arttırmalıyız. Çünkü artık her epoch'ta aslında aynı veri kümesi işleme sokulmamaktadır. 
+
+Rastgelelikten dolayı farklı veri kümeleri işleme sokulmaktadır. Bu tür veri arttırma 
+işlemlerinde artık veri kümesine çok fazla epoch uygulamalıyız. Çünkü epoch'lar 
+sırasında aslında gerçek veri kümesinin aynısı değil rastgele biçimleri işleme 
+sokulmaktadır. Eğer bu tür modellere az epoch uygularsak modelin başarısını büyütmek 
+bir yana muhtemelen düşürmüş oluruz. 
 
 ---------------------------------------------------------------------------------
 """
