@@ -9831,6 +9831,88 @@ sokulmaktadır. Eğer bu tür modellere az epoch uygularsak modelin başarısın
 bir yana muhtemelen düşürmüş oluruz. 
 
 ---------------------------------------------------------------------------------
+
+---------------------------------------------------------------------------------
+tensorflow.keras.preprocessing modülündeki image_dataset_from_directory isimli 
+fonksiyon bir dizinden hareketle oradaki resimleri kullanıma hazır hale getirmektedir. 
+Uygulamacı bulduğu resimleri bir dizin içerisine belli bir düzende saklar. Sonra 
+da bu fonksiyonu çağırır. Fonksiyon da bu resimleri ön işleme sokarak bize 
+Tensorflow Dataset nesnesi olarak verir. Anımsanacağı gibi fit işleminde biz 
+x, y verileri yerine üretici fonksiyonları ve Tensorflow Dataset nesnelerini 
+kullanabiliyorduk Anımsanacağı gibi Dataset sınıfı istenildiği zaman sıradaki 
+batch'i tıpkı üretici fonksiyonlar gibi verebilen bir sınıftır. 
+
+image_dataset_from_directory fonksiyonunun parametrik yapısı şöyledir:
+
+tensorflow.keras.preprocessing.image_dataset_from_directory(
+    directory,
+    labels='inferred',
+    label_mode='int',
+    class_names=None,
+    color_mode='rgb',
+    batch_size=32,
+    image_size=(256, 256),
+    
+    shuffle=True,
+    seed=None,
+    validation_split=None,
+    subset=None,
+    interpolation='bilinear',
+    follow_links=False,
+    crop_to_aspect_ratio=False,
+    pad_to_aspect_ratio=False,
+    data_format=None,
+    verbose=True
+)
+
+
+Uygulamacı resimleri bir dizin içerisine yerleştirmelidir. Eğer bir sınıflandırma 
+problemi söz konusu ise her sınıftaki resimler ayrıca bir alt dizine yerleştirilmelidir. 
+Örneğin biz elmalarla portakalları sınıflandıran bir ikili sınıflandırma problemi
+üzerinde çalışacak olalım. Bu durumda oluşturacağımız dizin yapısı şöyle olmalıdır:
+
+
+Images
+    Apple
+    Orange
+
+
+Tabii burada dizinlere istediğimiz isimleri verebiliriz. Ancak sınıflara ilişkin 
+anlamlı isimlerin kullanılması tavsiye edilmektedir. İşte uygulamacı bulduğu elma 
+resimlerini Apple dizinine, portakal resimlerini Orange dizinine yerleştirir. 
+
+
+Fonksiyonun birinci parametresi resimlerin bulunduğu dizin'in yol ifadesini almaktadır. 
+
+İkinci parametre sınıf belirten etiketlerin nasıl oluşturulacağını belirtmektedir. 
+Buradaki default 'inferred' değeri etiketlerin otomatik olarak dizin yapısında 
+oluşturulacağı anlamına gelmektedir. Bu parametre birkaç biçimde daha geçilebilmektedir. 
+Bunun için dokümanlara başvurabilirsiniz. 
+
+label_mode parametresi default olarak 'int' biçimdedir. Bu durumda her bir kategori 
+bir int değerle temsil edilmektedir. (Yani y değeri olarak int değerler elde edilecektir.) 
+Eğer bu parametreye 'categorical' girilirse burada y değerleri "one-hot-encoding" 
+biçiminde oluşturulur. Eğer bu parametreye 'binary' girilirse y değerleri 0, 1
+biçiminde oluşturulmaktadır. İkili sınıflandırma problemleri için bu parametreye 
+'binary', çoklu sınıflandırma problemleri için 'categorical' girilmelidir. 
+
+class_names parametresi sınıfların yazısal isimlerini belirtmektedir. Default 
+durumda sınıfların isimleri alt dizin isimlerinden elde edilmektedir. 
+
+color_mode parametresi dizinlerdeki resimlerin renk durumlarının nasıl ele alınacağını 
+belirtmektedir. Bu parametrenin default değeri 'rgb' biçimindedir. Ancak duruma 
+göre bu parametre 'grayscale' ya da 'rgba' biçiminde de girilebilir. 
+
+batch_size parametresi bir batch'lik resmin kaç resimden oluşacağını belirtmektedir. 
+Bu sınıf kullanılarak fit işlemi yapılırken artık fit metodunun batch_size 
+parametresi girilmez. Bu batch_size değeri bu nesnede belirtilmektedir. Fonksiyonun 
+
+image_size parametresi dizinlerdeki resimlerin hangi boyuta çekileceğini belirtmektedir. 
+Bu parametrenin default değeri (256, 256) biçimindedir. shuffle parametresi 
+dizinlerden elde edilen resimlerin her epoch'ta karıştırılıp karıştırılmayacağını 
+belirtmektedir. Fonksiyonun diğer parametreleri için dokümanlara başvurulabilir.
+
+---------------------------------------------------------------------------------
 """
 
 
