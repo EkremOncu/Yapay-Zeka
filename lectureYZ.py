@@ -9239,7 +9239,7 @@ genellikle "relu" alınmaktadır. Eğer aktivasyon fonksiyonu hiç girilmezse sa
 ---------------------------------------------------------------------------------
 Evrişim katmanlarından sonra modele genellikle yine Dense katmanlar eklenmektedir. 
 Ancak Conv2D katmanın çıktısı çok boyutlu olduğu için ve Dense katmanı da girdi 
-olarak tek boyut istediği için Conv2D çıktısının Dense katmana verilmedne önce 
+olarak tek boyut istediği için Conv2D çıktısının Dense katmana verilmeden önce 
 tek boyuta indirgenmesi gerekmektedir. Çok boyutlu girdileri tek boyuta indirgemek 
 için Keras'ta Flatten isimli bir katman bulundurulmuştur. Örneğin:
 
@@ -9665,17 +9665,6 @@ olamayabilir. İşte biz bu yengeç resimleri üzerinde manipülasyonlar yaparak
 de dahil edebiliriz. 
 
 ---------------------------------------------------------------------------------
-Verilerin artırılması konusu genellikle kitapların belli bölümlerinde karışık 
-bir biçimde ele alınmaktadır. Konusu tam olarak bu olan kitapların sayısı çok 
-azdır. Ancak bu alanda yazılmış akademik olan ve akademik olmayan çok sayıda 
-makale bulmak mümkündür. Bu konuya odaklanmış az sayıda kitaptan biri "Data 
-Augmentatiın in Python (Packt Yayınevi), Duc Haba (2023)" isimli kitaptır. 
-Buradaki notlarda bu kitaptaki konu başlıklarından alıntı yapacağız. Ancak bu 
-kitap uygulamalı bir kitap değildir.   
-
-Biz bu bölümde resimsel verilerin artırılması üzerinde duracağız.
-
----------------------------------------------------------------------------------
 
 ---------------------------------------------------------------------------------
 Resimsel verilerin artırılması için pek çok teknik kullanılmaktadır. Önemli 
@@ -9753,7 +9742,7 @@ kullanmaktadır. Bu teknikler uygulanırken abartıya kaçılmamalıdır. Abart�
 işlemler gerçekle bağlantının kesilmesine yol açıp modelin performansını 
 düşürebilmektedir. 
 
-Genellikle uygulamacılar resimleri üzt üste birden fazla kez yukarıda belirttiğimiz 
+Genellikle uygulamacılar resimleri üst üste birden fazla kez yukarıda belirttiğimiz 
 işlemlere sokarlar. Örneğin önce bir flip işlemi arkasından bir zoom işlemi 
 arkasından bir döndürme işlemi peşi sıra yapılabilir. 
 
@@ -9913,7 +9902,178 @@ dizinlerden elde edilen resimlerin her epoch'ta karıştırılıp karıştırıl
 belirtmektedir. Fonksiyonun diğer parametreleri için dokümanlara başvurulabilir.
 
 ---------------------------------------------------------------------------------
+Örneğin yukarıdaki gibi bir dizin  yapısı olsun:
+
+
+Images
+    Apple
+    Orange
+
+
+Biz bu dizinden resimleri aşağıdaki gibi Dataset biçiminde oluşturabiliriz:
+
+
+dataset = image_dataset_from_directory ('Images', label_mode='binary', 
+                                       image_size=(128, 128), batch_size=1)    
+
+
+Artık image_dataset_from_dreictory fonksiyonuyla elde ettiğimiz Dataset nesnesini 
+daha önce görmüş olduğumuz parçalı verilerle eğitimde kullanabiliriz. Bir Dataset 
+nesnesi içerisindeki bilgiler sınıfın take isimli metoduyla elde edilebilmektedir. 
+take metodunun parametrik yapısı şöyledir:
+
+take(count, name=None) 
+
+
+Metodun count parametresi Dataset nesnesinden kaç elemanın alınacağını belirtmektedir. 
+Bu parametre -1 girilirse tüm elemanlar elde edilmektedir. Bu count parametresinin 
+image_dataset_from_directory fonunda girilen batch_size parametresi ile doğrudan 
+bir ilgisisi yoktur. batch_size parametresi dizinden bilgilerin kaçarlı bir biçimde 
+alınacağını belirtmektedir. Aşağıda ilgili dizinlerdeki resimleri görüntüleyen 
+bir örnek verilmiştir.
+
+
+Biz image_dataset_from_directory fonksiyonunu yalnız fit işlemlerinde değil, test 
+ve kestirim işlemlerinde de kullanabiliriz. 
+
+---------------------------------------------------------------------------------
 """
+
+
+
+"""
+---------------------------------------------------------------------------------
+ Bir modeli eğtirken ne kadar epoch uygulamak gerekir? Epoch uygularken şu 
+durumları göz önüne almalıyız?
+
+- Modeldeki loss ya da metrik değerler iyileşmedikten sonra (örneğin loss değeri 
+düşmedikten sonra) fazla epoch uygulamanın bir yararı olmadığı gibi zararı olabilmektedir. 
+
+- Modeli eğitirken eğitimdeki loss ya da metrik değerlerin sınamadaki loss ya da 
+metrik değerlerden kopması (yani biri iyileşirken diğerinin iyileşmemesi) epoch 
+kaynaklı bir overfitting oluşumuna yol açabilmektedir. 
+
+- Modelin eğitilmesi sırasında loss ya da metrik değerler dalgalanabilmektedir. 
+Bu dalgalanmanın kötü bir noktasında epoch'lar bittiğinden dolayı eğitimin 
+sonlanması da arzu edilen bir durum değildir. Çünkü modelde geçmiş epoch'larda 
+daha iyi değerler oluştuğu halde son durumda daha kötü değerler oluşmuş durumdadır.
+
+
+Peki bu durumda uygun epoch sayısı nasıl belirlenmelidir? Yöntemlerden biri modeli 
+yüksek bir epoch sayısı ile eğitip loss ve metirk değerleri gözle inceleyerek uygun 
+epoch değerinin ne olacağına gözle karar vermek olabilir. Tabii bu yöntemin
+kusurları vardır. Bu yöntemde epoch sayısı gözle tespit edilip modelin eğitilmesi 
+uzun eğitim zamanına yol açabilir. Dalgalı durumlarda bu yöntem genellikle çalışmaz. 
+Çünkü her eğitimde birtakım değerlerin rastgele alınması nedeniyle dalgalanmalar
+değişebilmektedir.
+
+Gözle belirleme yöntemi yerine her epoch'ta callback mekanizması yoluyla 
+uygulamacının değerlere bakıp modeli manuel bir biçimde sonlandırması daha iyi 
+bir yöntemdir. Biz Keras'taki callback mekanizmalarını daha önce görmüştük.
+Ancak bu işlemler için kullanılabilecek iki hazır callback sınıfı da bulundurulmuştur. 
+Bu sınıflar EarlyStopping ve ModelCheckpoint isimli sınıflardır. 
+
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+EarlyStopping callback sınıfının amacı loss ya da metrik değerlerde istenilen kadar 
+iyileşmenin sağlanmadığı durumlarda eğitimin otomatik sonlandırılmasını sağlamaktır. 
+Normal olarak epoch'lar sırasında loss ve metrik değerlerin iyileşmesi beklenir. 
+Yukarıda da belirttiğimiz gibi bu değerlerin iyileşmemesi durumunda eğitime devam 
+etmek iyi bir fikir değildir. EarlyStopping callback sınıfının __init__ metodunun 
+parametrik yapısı şöyledir:
+
+
+tf.keras.callbacks.EarlyStopping(
+    monitor='val_loss',
+    min_delta=0,
+    patience=0,
+    verbose=0,
+    mode='auto',
+    baseline=None,
+    restore_best_weights=False,
+    start_from_epoch=0
+)
+
+Burada monitor parametresi izlenecek metrik değeri belirtir. Loss ya da metrik 
+değerin başında "val_" ön eki varsa bunun sınamaya ilişkin değer olduğu kabul 
+edilmektedir. Örneğin bu parametreye "loss" değeri girilirse bu eğitimdeki loss 
+değerini "val_loss" girilirse bu sınamadaki loss değerini belirtmektedir. Örneğin 
+sınamadaki accuracy metrik değeri için bu parametreye "val_accuracy" girilmelidir. 
+
+min_delta parametresi iyileşme için minimum aralığı belirtmektedir. (Örneğin bu 
+değer "val_loss" için 0.01 girilirse ancak 0.01'den daha fazla bir düşüş iyileşme 
+kabul edilir.) 
+
+patience parametresi üst üste kaç kez iyileşme olmazsa eğitimin sonlandırılacağını 
+belirtir. Buraya tipik olarak 3, 5 gibi değerler girilebilir. 
+
+verbose parametresi 1 girilirse ekrana bilgi yazıları basılır. verbose parametresi 
+0 ya da 1 biçiminde girilebilir. Eğer bu parametre 1 olarak girilirse ekrana daha 
+fazla bilgi yazısı çıkartılmaktadır. 
+
+mode parametresi ise "min", "max" ya da "auto" biçiminde girilebilir. "min" 
+iyileşmenin düşüşle sağlandığını, "max" iyileşmenin yükselişle sağlandığını belirtir. 
+"auto"" ise monitor parametresine göre bunun otomatik belirleneceği anlamına 
+gelmektedir.  
+
+baseline parametresi sonlandırma için eşik değerin belirlenmesini sağlamaktadır. 
+
+restore_best_weights parametresi True geçilirse eğitim sonlandırılana kadar en 
+iyi loss ya da metrik değerin bulunduğu epoch'a ilişkin nöron ağırlık değerleri 
+modele set edilir. Bu parametre False geçilirse (default durum) modelin 
+sonlandırılması sırasındaki değerler model nesnesinde bırakılır. 
+
+start_from_epoch parametresi yeni versiyonlarda eklenmiştir. Bu parametre bu 
+mekanizmanın kaçıncı epoch'tan itibaren başlatılacağını belirtmektedir. 
+
+Örneğin:
+
+esc = EarlyStopping(monitor='val_loss', patience=3, restore_best_weights=True)
+
+hist = model.fit(scaled_training_dataset_x, training_dataset_y, batch_size=32, 
+                 epochs=EPOCHS, callbacks=[esc] )
+
+Burada "val_loss" değerinde üst üste 3 kez iyileşme olmadığnda eğitim otomatik 
+sonlandırılacaktır.
+
+---------------------------------------------------------------------------------
+Aşağıdaki örnekte Boston Housing Price veri kümesinde "val_loss" metrik değeri 
+üst üste 3 kez iyileşmediği zaman eğitim sonlandırılmıştır. restore_best_weights=True 
+yapıldığı için model son epoch'taki ağırlık değerleriyle değil tüm epoch'lar 
+arasındaki en iyi ağırlık değeriyle set edilecektir. Bu programı çalıştırdığımızda 
+aşağıdaki gibi bir çıktı elde edilmiştir:
+
+
+...
+val_loss: 16.5277 - val_mae: 2.9099
+Epoch 17/200
+12/12 ━━━━━━━━━━━━━━━━━━━━ 0s 1ms/step - loss: 15.6860 - mae: 2.7044 - val_loss: 16.0524 - val_mae: 2.8168
+Epoch 18/200
+12/12 ━━━━━━━━━━━━━━━━━━━━ 0s 1ms/step - loss: 15.7328 - mae: 2.6971 - val_loss: 16.0958 - val_mae: 2.8007
+Epoch 19/200
+12/12 ━━━━━━━━━━━━━━━━━━━━ 0s 1ms/step - loss: 19.8981 - mae: 2.8945 - val_loss: 15.7974 - val_mae: 2.7772
+Epoch 20/200
+12/12 ━━━━━━━━━━━━━━━━━━━━ 0s 2ms/step - loss: 13.1439 - mae: 2.5510 - val_loss: 17.2526 - val_mae: 2.8939
+Epoch 21/200
+12/12 ━━━━━━━━━━━━━━━━━━━━ 0s 2ms/step - loss: 14.5947 - mae: 2.5541 - val_loss: 15.7460 - val_mae: 2.7190
+Epoch 22/200
+12/12 ━━━━━━━━━━━━━━━━━━━━ 0s 2ms/step - loss: 11.9902 - mae: 2.4701 - val_loss: 17.3226 - val_mae: 2.8476
+Epoch 23/200
+12/12 ━━━━━━━━━━━━━━━━━━━━ 0s 1ms/step - loss: 12.7140 - mae: 2.4168 - val_loss: 17.7918 - val_mae: 2.8993
+Epoch 24/200
+12/12 ━━━━━━━━━━━━━━━━━━━━ 0s 2ms/step - loss: 15.0356 - mae: 2.5725 - val_loss: 16.6013 - val_mae: 2.6930
+Epoch 24: early stopping
+Restoring model weights from the end of the best epoch: 21.
+
+
+Burada epoch'lardaki "val_loss" değerlerini inceleyiniz. Bu "val_loss" değerleri 
+üst üste 3 kez iyileşmediğinde eğitim sonlandırılmıştır ve en iyi değere ilişkin 
+ağırlıklar modele yüklenmiştir.
+
+---------------------------------------------------------------------------------
+"""
+
+
 
 
 
