@@ -10071,6 +10071,94 @@ Burada epoch'lardaki "val_loss" değerlerini inceleyiniz. Bu "val_loss" değerle
 ağırlıklar modele yüklenmiştir.
 
 ---------------------------------------------------------------------------------
+
+---------------------------------------------------------------------------------
+ModelCheckpoint sınıfı epoch'lar sırasında modelin belli durumlarda save edilmesi 
+için kullanılmaktadır. Sınıfın __init__ metodunun parametrik yapısı şöyledir:
+
+
+tf.keras.callbacks.ModelCheckpoint(
+    filepath,
+    monitor='val_loss',
+    verbose=0,
+    save_best_only=False,
+    save_weights_only=False,
+    mode='auto',
+    save_freq='epoch',
+    initial_value_threshold=None
+)
+
+
+Metodun birinci parametresi modelin save edileceği dosyanın yol ifadesini alır. 
+Bu parametredeki isim formatlı (yani kalıp içeren biçimde) olabilmektedir. Metot 
+birden fazla save işlemi yapacaksa bu parametrede dosya ismi kalıp içeren biçimde 
+kullanılmalıdır. 
+
+İkinci parametre yine izlenecek loss ya da metrik değeri belirtmektedir. Yani bu 
+parametre save işleminin hangi loss ya da metrik değere dayalı olarak yapılacağını 
+belirtmektedir. Yine verbose parametresi 1 geçilirse daha fazla bilgi ekrana 
+yazdırılmaktadır. 
+
+Metodun save_best_only parametresi True girilirse yalnızca en iyi model save edilir. 
+
+mode parametresi yine EarlyStopping sınıfındaki gibidir. save_weights_only 
+parametresi default durumda False biçimdedir. Bu parametre True geçilirse tüm 
+model değil yalnızca katmanlardaki nöron ağırlıkları save edilir. 
+
+Örneğin bizim amacımız val_loss değerinin en iyi olduğu durumdaki modeli save 
+etmekse ModelCheckpoint nesnesini aşağıdaki gibi yaratabiliriz:
+
+mcp = ModelCheckpoint('boston-checkpoint.keras', monitor='val_loss', save_best_only=True)
+
+--------------------------------------------------------------------------------- 
+Bu callback sınıfının amacı eğitimi erkenden sonlandırmak değildir. Ancak tabii 
+bu callback sınıfı EarlyStopping callback sınıfıyla birlikte de kullanılabilir. 
+Metot aslında birden fazla save işlemi yapabilecek biçimde tasarlanmıştır. Ancak 
+bunun için metodun birinci parametresine bir kalıp girilmelidir. Eğer metodun 
+birinci parametresine bir kalıp girilirse ve metodun save_best_only parametresi 
+False geçilirse tüm epoch'lardaki ağırlıklar formatlama kalıba uygun dosya isimleri 
+ile save edilir. Eğer save_best_only parametresi True geçilirse bu durumda yalnızca 
+daha öncekine göre daha iyi olan epoch değerleri kalıba uygun dosya isimleriyle 
+save edilmektedir. Eğer dosya isminde bir kalıp kullanılmazsa bu durumda 
+save_best_only parametresi False geçilirse son epoch'taki değerler save edilir. 
+Eğer dosya isminde kalıp kullanılmazsa fakat save_best_only parametresi True 
+geçilirse bu durumda en iyi model save edilmiş olacaktır. Başka bir deyişle dosya 
+ismindeki kalıp aslında "save işlemini başka bir dosya üzerinde yap" anlamına 
+gelmektedir. Bu durumu özetle şöyle ifade edebiliriz:
+
+
+- Metodun birinci parametresine kalıp girilirse ve save_best_only parametresi 
+False geçilirse: Bu durumda her epoch'ta kalıba uygun save işlemi yapılmaktadır.
+
+
+- Metodun birinci parametresine kalıp girilirse ve save_best_only parametresi 
+True geçilirse: Bu durumda yalnızca daha öncekine göre daha iyi olan epoch 
+değerleri kalıba uygun dosya isimleriyle save edilmektedir. 
+
+
+- Metodun birinci parametresine kalıp girilmezse ve save_best_only parametresi 
+False geçilirse: Bu durumda son epoch'taki değerler save edilir. 
+
+
+- Metodun birinci parametresine kalıp girilmezse ve save_best_only parametresi 
+True geçilirse: Bu durumda yalnızca en iyi monitor değerleri save edilir.
+
+
+Kalıp olulştururken "{epoch}" ifadesi o andaki epoch değerini temsil eder. Örneğin 
+"{epoch:03d}" gibi bir kalıp epoch değerini iki basamak olarak (tek basamaksa 0 
+ile doldurarak)" oluşturma anlamına gelir. Diğer kalıp ifadeleri için sınıfın 
+dokümanlarına başvurabilirsiniz. Örneğin:
+
+
+mcp = ModelCheckpoint('boston-checkpoint-{epoch:03d}.keras', monitor='val_loss', 
+                      save_best_only=True)
+
+
+Burada "val_loss" metrik değeri daha öncekilere göre iyi olan epoch ile 
+karşılaşıldığında "boston-checkpoint-NNN" gibi (burada NN epoch numarasını belirtir) 
+bir dosyaya save işlemi yapılacaktır. 
+
+---------------------------------------------------------------------------------
 """
 
 
