@@ -10111,20 +10111,13 @@ etmekse ModelCheckpoint nesnesini aşağıdaki gibi yaratabiliriz:
 mcp = ModelCheckpoint('boston-checkpoint.keras', monitor='val_loss', save_best_only=True)
 
 --------------------------------------------------------------------------------- 
-Bu callback sınıfının amacı eğitimi erkenden sonlandırmak değildir. Ancak tabii 
-bu callback sınıfı EarlyStopping callback sınıfıyla birlikte de kullanılabilir. 
+Bu callback sınıfının amacı eğitimi erkenden sonlandırmak değildir. Tabii bu 
+callback sınıfı EarlyStopping callback sınıfıyla birlikte de kullanılabilir. 
 Metot aslında birden fazla save işlemi yapabilecek biçimde tasarlanmıştır. Ancak 
-bunun için metodun birinci parametresine bir kalıp girilmelidir. Eğer metodun 
-birinci parametresine bir kalıp girilirse ve metodun save_best_only parametresi 
-False geçilirse tüm epoch'lardaki ağırlıklar formatlama kalıba uygun dosya isimleri 
-ile save edilir. Eğer save_best_only parametresi True geçilirse bu durumda yalnızca 
-daha öncekine göre daha iyi olan epoch değerleri kalıba uygun dosya isimleriyle 
-save edilmektedir. Eğer dosya isminde bir kalıp kullanılmazsa bu durumda 
-save_best_only parametresi False geçilirse son epoch'taki değerler save edilir. 
-Eğer dosya isminde kalıp kullanılmazsa fakat save_best_only parametresi True 
-geçilirse bu durumda en iyi model save edilmiş olacaktır. Başka bir deyişle dosya 
-ismindeki kalıp aslında "save işlemini başka bir dosya üzerinde yap" anlamına 
-gelmektedir. Bu durumu özetle şöyle ifade edebiliriz:
+bunun için metodun birinci parametresine bir kalıp girilmelidir. 
+
+Dosya ismindeki kalıp aslında "save işlemini başka bir dosya üzerinde yap" 
+anlamına gelmektedir. Bu durumu özetle şöyle ifade edebiliriz:
 
 
 - Metodun birinci parametresine kalıp girilirse ve save_best_only parametresi 
@@ -10145,9 +10138,9 @@ True geçilirse: Bu durumda yalnızca en iyi monitor değerleri save edilir.
 
 
 Kalıp olulştururken "{epoch}" ifadesi o andaki epoch değerini temsil eder. Örneğin 
-"{epoch:03d}" gibi bir kalıp epoch değerini iki basamak olarak (tek basamaksa 0 
-ile doldurarak)" oluşturma anlamına gelir. Diğer kalıp ifadeleri için sınıfın 
-dokümanlarına başvurabilirsiniz. Örneğin:
+"{epoch:03d}" gibi bir kalıp epoch değerini en az üç haneli olmasını  (tek 
+basamaksa 0 ile doldurarak)" oluşturma anlamına gelir. Diğer kalıp ifadeleri için 
+sınıfın dokümanlarına başvurabilirsiniz. Örneğin:
 
 
 mcp = ModelCheckpoint('boston-checkpoint-{epoch:03d}.keras', monitor='val_loss', 
@@ -10159,14 +10152,194 @@ karşılaşıldığında "boston-checkpoint-NNN" gibi (burada NN epoch numarası
 bir dosyaya save işlemi yapılacaktır. 
 
 ---------------------------------------------------------------------------------
+Aşağıdaki örnekte "Boston Haousing Prices" veri kümesinde EarlyStopping ve 
+ModelCheckpoint sınıfları bir arada kullanılmıştır. Kodun ilgili kısmı şöyledir:
+
+
+mcp = ModelCheckpoint('Boston-Housing-{epoch:03d}.keras', monitor='val_loss', 
+                      save_best_only=True)
+
+esc = EarlyStopping(monitor='val_loss', patience=5, restore_best_weights=True, 
+                    verbose=1, mode='min')
+
+
+hist = model.fit(scaled_training_dataset_x, training_dataset_y, batch_size=32, 
+                 epochs=EPOCHS, validation_split=0.2, callbacks=[mcp, esc])
+
+
+Burada "val_loss" değerinde her yeni iyileşmede model "Boston-Housing-NNN.keras" 
+ismiyle save edilecektir. Aynı zamanda 5 kez üst üste "val_loss" değeri 
+iyileşmediği takdirde eğitim sonlandırılacaktır.
+
+---------------------------------------------------------------------------------
 """
 
 
 
 
 
+# ----------------------------- Aktarım Öğrenmesi (Transfer Learning) -----------------------------
 
 
+"""
+---------------------------------------------------------------------------------
+Aktarım öğrenmesi (transfer learning) psikolojiden aktarılmış bir terimdir. 
+Psikolojide aktarım öğrenmesi "daha önce öğrenilmiş olan şeylerin başka öğrenmeleri 
+etkilemesi sürecini" belirtmektedir. Örneğin İngilizce bilen bir kişi Almanca'yı 
+(farklı diller olduğu halde) daha kolay öğrenebilmektedir. Psikolojide aktarım 
+öğrenmesi pozitif ya da negatif olabilmektedir. Eğer önceden öğrenilen malzemeler 
+sonradan öğrenilecekleri olumlu biçimde destekliyorsa buna "pozitif aktarım" 
+olumsuz bir biçimde etkiliyorsa buna da "negatif aktarım" denilmektedir. Örneğin 
+Q-Klavyede yazan bir kişinin F-Klavyeye geçmesi hiç klavye kullanmamış kişilere 
+göre daha zor olabilmektedir. İşte makine öğrenmesinde "aktarım öğrenmesi" de 
+psikolojide olduğu gibi önceden öğrenilmiş malzemenin sonraki öğrenmede olumlu bir 
+biçimde kullanılması anlamına gelmektedir. 
+
+Aktarım öğrenmesi sayesinde önceden eğitilmiş (pretrained) ağların başka amaçlarla 
+kullanılması sağlanmaktadır. Örneğin çok geniş bir resim veritabanı kullanılarak 
+sınıflandırma amacıyla bir eğitim yapılmış olabilir. Bu eğitimdeki nöron ağırlıkları 
+save edilmiş olabilir. Biz de kendi resim sınıflandırmamızda bu eğitilmiş modelden 
+faydalanabiliriz. Tabii buradaki eğitilmiş modelin bizim hedefimize yönelik 
+eğitilmiş olması da aslında gerekmemektedir. Örneğin eğitilmiş model resimleri 
+100 farklı sınıfa ayırmak üzere eğitilmiş olabilir. Biz bu modeli farklı sınıflar 
+için de yine kullanabiliriz. Çünkü bu tür modellerde aslında gerekli olan pek çok 
+faaliyet (filtreleme, evirişim gibi) zaten yapılmış durumdadır. Her ne kadar 
+eğitilmiş model bizim hedeflerimiz için eğitilmemiş olsa da yine bizim 
+modelimizde önemli faydalar sağlayabilecektir. 
+
+---------------------------------------------------------------------------------
+Aktarım öğrenmesi resimsel uygulamalarda, metinsel uygulamalarda, işitsel 
+uygulamalarda yaygın bir biçimde kullanılmaktadır. Şüphesiz aktarım öğrenmesi 
+konusu "önceden eğitilmiş (pre-trained)" modeller konusuyla iç içe girmiş bir 
+konudur. Tabii biz Keras'ta önceden eğitilmiş modelleri kullanamdan da başkalarının 
+oluşturduğu modelleri kendi modelimize monte ederek kullanabiliriz. 
+
+Tipik olarak önceden eğitilmiş modellerle aktarım öğrenmesi şu aşamalardan 
+geçilerek gerçekleştirilmektedir:
+
+
+1) Aktarım öğrenmesi için uygun eğitilmiş modelin belirlenmesi: Çeşitli kurumlar 
+tarafından farklı amaçlarla farklı modeller kullanılarak önceden eğitilmiş modeller 
+oluşturulmuştur. Bunlardan uygun olanını uygulamacının seçmesi gerekmektedir. 
+
+
+2) Önceden eğitilmiş modelin çıktısının uygulamacının özel modeline bağlanması: 
+Genellikle önceden eğitilmiş modeller sinir ağının ilk katmanları olarak 
+kullanılmaktadır. Uygulamacı kendi modeli için kendi sinir ağı katmanlarını 
+oluşturup önceden eğitilmiş modelin çıktısını kendi modeline bağlamalıdır. 
+
+
+Girdiler ---> önceden eğitilmiş model ---> uygulamacının kendi amaçları için 
+
+oluşturduğu model ---> çıktılar
+
+
+3) Modelin uygulamacının hedeflerine yönelik eğitilmesi: Her ne kadar uygulamacı 
+modelinin önüne önceden eğitilmiş modeli eklemiş olsa da modelin yine uygulamacının 
+hedeflerine yönelik eğitilmesi gerekmektedir. Yani uygulamacı yine modelini kendi 
+verileriyle ayrıca eğitmelidir. Tabii şüphesiz eğer önceden eğitilmiş model zaten 
+uygulamacının hedefleriyle tam örtüşüyorsa ayrıca böyle bir eğitimin yapılmasına 
+gerek de kalmaz. 
+
+---------------------------------------------------------------------------------
+"""
+
+"""
+---------------------------------------------------------------------------------
+
+# Keras Modelinin Fonksiyonel Biçimde Oluşturulması
+
+
+Keras'ın Sequential modelinde Sequential sınıfının add metoduyla modele katman 
+nesnelerini ekliyorduk. Ancak bu katman nesneleri hep modelin sonuna ekleniyordu. 
+Ayrıca Sequential modelde yalnızca bir tane girdi katmanı ve yalnızca bir tane 
+çıktı katmanı bulunabiliyordu. Oysa bazı uygulamalarda girdiler ve çıktılar birden 
+fazla çeşit olabilmektedir. Örneğin ağın girdisi hem bir resim hem de bir yazı 
+hem de bir takım sayısal verilerden oluşabilmektedir. Benzer biçimde ağın çıktısı 
+da hem bir kategorik değer hem de gerçek bir değerden oluşabilmektedir. Örneğin 
+bir resim ve bir yazı içeren girdiler söz konusu olsun. Kişi resme bakıp ilgili 
+soruyu yanıtlıyor olsun. Burada girdi yalnızca bir resim değil aynı zamanda bir 
+metin de içermektedir. 
+
+Biz şimdiye kadar yalnızca resimlerden ve yazılardan girdiler oluşturduk. Bunların 
+ikisini bir arada kullanmadık. Böyle bir modelin girdisi için iki girdi katmanının 
+bulunuyor olması gerekmektedir. Halbuki Sequential modelde modelin tek bir girdi 
+katmanı olmak zorundadır. Benzer biçimde bazen çıktının da birden fazla olması 
+istenebilmektedir. Örneğin ağ hem bir yazının kategorisini belirleyebilir hem de 
+yazıdaki beğeni miktarını tespit etmeye çalışabilir. Birden fazla çıktı katmanına 
+sahip olan modeller de Sequential sınıfı ile oluşturulamamaktadır. İşte bu tür 
+gereksinimlerden dolayı Sequential model yetersiz kalabilmektedir. Bu nedenle bu 
+tür uygulamalarda daha aşağı seviyeli olan "fonksiyonel model" tercih edilmektedir. 
+Fonksiyonel model aslında Tensorflow'daki gerçek modeldir. Yani aslında Tensorflow 
+zaten bu biçimde tasarlanmıoş olan temel (base) bir kütüphanedir. Sequential 
+model aslında bazı işlemleri kolaylaştırmak için düşünülmüş olan yüksek seviyeli 
+bir tasarımdır.
+
+---------------------------------------------------------------------------------
+Asında Tensorflow'daki katman nesneleri, girdiyi işleme sokup çıktı oluşturmaktadır. 
+Bu katman nesnelerinde bu işlem ilgili katman sınıfının fonksiyon çağırma operatör 
+metodu ile (yani __call__ metodu ile) yapılmaktadır. Örneğin:
+
+
+dense1 = Dense(256, activation='relu', name='Dense-1')
+dense2 = Dense(256, activation='relu', name='Dense-2')
+
+
+Burada aslında asıl nöron işlemlerini Dense sınıfının __call__ metodu yapmaktadır. 
+Bu __call__ metoduna nöronların girdi değerleri verilir. Metot da onları nöral 
+işlemlere sokarak bir çıktı verir. Örneğin:
+
+
+result = dense1(data)
+
+
+Şimdi bu çıktıyı biz diğer Dense katman nesnesine girdi olarak verebiliriz:
+
+
+result = dense2(result)
+
+
+Yani aslında Sequential model yukarıdaki gibi bir katmanın çıktısı diğer katmana 
+girdi yapılarak oluşturulmuştur. Örneğin:
+
+
+inp = Input(...)
+d1 = Dense(...)
+d2 = Dense(...)
+d3 = Dense(...)
+d4 = Dense(...)
+
+
+result = d1(inp)
+result = d2(result)
+result = d3(result)
+out = d4(result)
+
+
+Yukarıdaki işlemleri daha kompakt olarak aşağıdaki gibi de yapabiliriz:
+
+
+inp = Input(...)
+result = Dense(...)(inp)
+result = Dense(...)(result)
+result = Dense(...)(result)
+out = Dense(result)
+
+
+Burada önemli bir nokta üzerinde durmak istiyoruz. Tensorflow ve PyTorch gibi 
+kütüphaneler bir çeşit "meta programlama" kütüphaneleridir. 
+
+Yani bu programlama modelinde önce işlemi yapacak kodlar oluşturulur. Sonra onlar 
+çalıştırılır. Biz yukarıda hangi işlemlerin yapılacağını tanımlamış olduk. Ancak 
+gerçekte henüz bu modele bir veri verip çıktısını almadık. Başka bir deyişle biz 
+yukarıda istediğimiz işlemleri yapan bir program oluşturmuş olduk. Fakat henüz 
+onu çalıştırmadık. Tensorflow kütüphanesinin 2'li versiyonlarıyla birlikte 
+"eager tensor" adı altında doğrudan çalıştırmalı tensör modeli de kütüphaneye 
+eklenmiştir. Bu konuların ayrıntıları Tensorflow kütüphanesinin anlatıldığı bölümde 
+ele alınacaktır.
+
+---------------------------------------------------------------------------------
+"""
 
 
 
