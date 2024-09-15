@@ -10270,13 +10270,14 @@ yazıdaki beğeni miktarını tespit etmeye çalışabilir. Birden fazla çıkt�
 sahip olan modeller de Sequential sınıfı ile oluşturulamamaktadır. İşte bu tür 
 gereksinimlerden dolayı Sequential model yetersiz kalabilmektedir. Bu nedenle bu 
 tür uygulamalarda daha aşağı seviyeli olan "fonksiyonel model" tercih edilmektedir. 
+
 Fonksiyonel model aslında Tensorflow'daki gerçek modeldir. Yani aslında Tensorflow 
 zaten bu biçimde tasarlanmıoş olan temel (base) bir kütüphanedir. Sequential 
 model aslında bazı işlemleri kolaylaştırmak için düşünülmüş olan yüksek seviyeli 
 bir tasarımdır.
 
 ---------------------------------------------------------------------------------
-Asında Tensorflow'daki katman nesneleri, girdiyi işleme sokup çıktı oluşturmaktadır. 
+Aslında Tensorflow'daki katman nesneleri, girdiyi işleme sokup çıktı oluşturmaktadır. 
 Bu katman nesnelerinde bu işlem ilgili katman sınıfının fonksiyon çağırma operatör 
 metodu ile (yani __call__ metodu ile) yapılmaktadır. Örneğin:
 
@@ -10337,6 +10338,88 @@ onu çalıştırmadık. Tensorflow kütüphanesinin 2'li versiyonlarıyla birlik
 "eager tensor" adı altında doğrudan çalıştırmalı tensör modeli de kütüphaneye 
 eklenmiştir. Bu konuların ayrıntıları Tensorflow kütüphanesinin anlatıldığı bölümde 
 ele alınacaktır.
+
+---------------------------------------------------------------------------------
+Örneğin biz bir Dense katmanı tamamen ayrı bir biçimde işletmek isteyelim. Bu 
+durumda Tensorflow'un 2'li versiyonlarından sonra artık biz bu işlemi sanki Dense 
+nesnesiyle fonksiyon çağırıyormuş gibi yapabiliriz. Örneğin:
+
+    
+import numpy as np
+from tensorflow.keras.layers import Dense
+
+data = np.random.random((32, 8))
+
+
+d = Dense(16, activation='relu', name='Dense')
+result = d(data).numpy()
+
+Katman nesnelerinin bir grup satırı (batch) alıp işlem yaptığını anımsayınız. Yani 
+biz Dense katmana tek bir satırı değil bir grup satırı girdi olarak vermeliyiz. 
+Yukarıdaki örnekte her biri 8 sütundan 32 satırdan oluşan rastgele bir NumPy dizisi 
+oluşturulup bu dizi Dense katmana verilmiştir. Tensorflow'da katman nesneleri 
+Tensor alıp Tensor vermektedir. Ancak Tensor yerine bazı katman nesneleri NumPy 
+dizilerini de girdi olarak alabilmektedir. Örneğimizde çıktı olarak aslında bir 
+Tensor nesnesi elde edilmiştir. Biz de bu Tensor nesnesini yeniden NumPy dizisine 
+dönüştürdük. Yukarıdaki örnekte elde ettiğimiz NumPy dizisi (32, 16) boyutlarında 
+olacaktır. 
+
+---------------------------------------------------------------------------------
+Fonksiyonel olarak oluşturduğumuz yapıya dikkat ediniz:
+
+
+   inp = Input(...)
+   result = Dense(...)(inp)
+   result = Dense(...)(result)
+   result = Dense(...)(result)
+   out = Dense(result)
+
+
+Burada sonuçta bir girdi bir de çıktı tensörü oluşturulmuştur. İşlemlerin yapılabilmesi 
+için bu girdi ve çıktı tensörleri ile bir Model nesnesinin yaratılması gerekmektedir. 
+Bunun için tensorflow.keras modülündeki Model sınıfı kullanılmaktadır. Model 
+sınıfının __init__ metodunun iki önemli parametresi vardır: inputs ve outputs. 
+inputs girdi tensörünü, outputs ise çıktı çıktı tensörünü almaktadır. Yukarıdaki 
+bağlantıyı biz model nesnesi haline şöyle getirebiliriz:
+
+
+model = Model(inputs=inp, outputs=out, name='MyModel')
+
+
+Aslında burada oluşturmaya çalıştığımız modelin Sequential eşdeğeri şöyledir:
+
+
+model = Sequential('MyModel')
+model.add(Input(...))
+model.add(Dense(...)
+model.add(Dense(...))
+model.add(Dense(...))   
+model.add(Dense(...))
+
+---------------------------------------------------------------------------------
+Aslında asıl olan model fonksiyonel modeldir. Sequential sınıfı fonksiyonel model 
+kullanılarak yazılmış olan yüksek seviyeli yardımcı bir sınıftır. Ancak önceki 
+paragraflarda da belirttiğimiz gibi Sequential model bazı uygulamalarda yetersiz 
+kalmaktadır. Yani aslında Sequential sınıfında add işlemi yapıldıkça yukarıdaki 
+gibi fonksiyonel modele fonksiyon çağırma operatöryle eklemeler yapılmaktadır. 
+Bir fikir vermesi için Sequential sınıfının aşağıdaki biçimde yazılmış olduğunu 
+varsayabilirsiniz:
+
+
+class Sequential:
+    def __init__(self):
+        self.result = None
+    
+    def add(self, layer):
+        if self.result is None:
+            self.inp = layer
+            self.result = self.inp
+        else:
+            self.result = self.result(layer)
+            
+    def compile(self, *args):
+        self.model = Model(inputs=self.inp, outputs=self.result)
+        # ....
 
 ---------------------------------------------------------------------------------
 """
