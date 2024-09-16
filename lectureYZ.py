@@ -10422,6 +10422,119 @@ class Sequential:
         # ....
 
 ---------------------------------------------------------------------------------
+Şimdi daha önce yapmış olduğumuz "iris" örneğini fonksiyonel modelle yeniden yapalım. 
+Model şöyle kurulabilir:
+
+
+from tensorflow.keras import Model
+from tensorflow.keras.layers import Input, Dense
+
+
+inp = Input((training_dataset_x.shape[1], ), name='Input')
+result = Dense(64, activation='relu', name='Hidden-1')(inp)
+result = Dense(64, activation='relu', name='Hidden-2')(result)
+out = Dense(dataset_y.shape[1], activation='softmax', name='Output')(result)
+
+
+model = Model(inputs=inp, outputs=out, name='FunctionalModel')
+
+
+Görüldüğü gibi modelde bir girdi katmanı iki saklı katman ve bir de çıktı 
+katmanı bulunmaktadır.
+
+---------------------------------------------------------------------------------
+
+---------------------------------------------------------------------------------
+Bir kestirim modelinde veriler farklı alanlara ilişkin olabilir. Örneğin veri 
+kümesindeki sütunlardan biri bir yazı olabilir, diğerleri sayısal sütunlar olabilir. 
+Bu tür veri kümelerine "çok modaliteye sahip (multimodal)" ya da "karışık (mixed)" 
+veri kümeleri de denilmektedir. ("Multimodal" sözcüğü aslında "psikoloji" ve 
+"bişilsel bilimlerden" aktarılmış bir terimdir. Buradaki "modalite"" farklı duyu 
+organlarına hitap eden bilgiler anlamına gelmektedir.) 
+
+Önceki paragraflarda da belirttiğimiz gibi karışık veri kümelerinde Sequential 
+model kullanılamamaktadır. Bu tür durumlarda mecburen fonksiyonel modelin 
+kullanılması gerekmektedir. Farklı alanlardaki girdilerin fonksiyonel modelle 
+oluşturulabilmesi birenden fazla girdi katmanının bulundurulması gerekir. Tipik 
+olarak bu girdi karmanlarına farklı işlemler uygulandıktan sonra bunlar birleştirilirler. 
+Birleştirme işlemi için Concatenate katmanı kullanılmaktadır. Concatenate katmanı 
+yine fonksiyonel biçimde kullanılabilmektedir. Örneğin:
+   
+inp1 = Input(...)
+...
+inp2 = Input(...)
+...
+result = Concatenate()([inp1, inp2])
+
+result = Dense(...)(result)
+result = Dense(...)(result)
+out = Dense(...)(result)
+
+
+Aslında Concatenate katmanının yanı sıra tensorflow.keras modülünde aynı zamanda
+concatenate isminde bir fonksiyon da vardır. Concatenate katmanı yerine 
+concatenate fonksiyonu da kullanılabilir:
+
+
+inp1 = Input(...)
+...
+inp2 = Input(...)
+...
+result = concatenate([inp1, inp2])
+
+result = Dense(...)(result)
+result = Dense(...)(result)
+out = Dense(...)(result)
+
+---------------------------------------------------------------------------------
+Bu biçimde birden fazla girdi katmanının olduğu durumda Model nesnesi yaratılırken 
+inputs parametresine girdi katmanları bir liste biçiminde (liste olması şart 
+değil)verilmelidir. Örneğin:
+
+
+model = Model(inputs=[inp1, inp2], outputs=out)
+
+
+Burada şöyle bir model oluşturulmuştur:
+
+
+inp1 ---> .... ---> 
+                        Dense ---> Dense ----> Dense (output)
+inp2 ---> ... ---->
+
+---------------------------------------------------------------------------------  
+Pekiyi yukarıdaki gibi iki girişli bir modelin eğitimi, testi ve kestirimi nasıl 
+yapılacaktır? İşte bu işlemlerde bizim girdileri bir liste ile (liste olmak zorunda 
+değil) ayrı ayrı vermemiz gerekir. 
+
+model.fit([training_dataset_x1, training_dataset_x2], training_dataset_y, ...)
+
+
+Tabii yukarıdaki gibi iki girişli bir modelde aslında x verileri de iki parçadan 
+oluşacaktır. Burada training_dataset_x1 ve training_dataset_x2 veri kümeleri bu 
+parçaları temsil etmektedir. Benzer biçimde modelin test edilmesi sırasında da 
+evaluate metodunda yine x verileri bir liste biçiminde verilmelidir:
+
+eval_result = model.evaluate([test_dataset_x1, test_dataset_x2], test_dataset_y)
+
+
+Burada test verilerinin de iki parça haline oluşturulduğuna dikkat ediniz. 
+test_datset_x1 ve test_dataset_x2 bu parçaları temsil etmektedir. 
+
+Benzer biçimde kestirim işleminde de predict metodunda x verileri bir liste 
+biçiminde (liste olmak zorunda değil) girilir. Örneğin:
+
+
+predict_result = model.predict([predict_dataset_x1, predict_dataset_x2])
+
+Burada predict_dataset_x1 ve predict_dataset_x2 bu parçaları temsil etmektedir. 
+
+
+Birden fazla girdiye sahip olan modellerde özellik ölçeklemesi iki model 
+birleştirildiğinde uyumlu olacak biçimde yapılmalıdır. Bunun için girişlere tür 
+olarak aynı özellik ölçeklemesini uygulayabilirsiniz.
+
+---------------------------------------------------------------------------------
 """
 
 
