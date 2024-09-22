@@ -10641,6 +10641,57 @@ Yani yukarıdaki örnekte Embedding katmanındaki eğitilebilir parametrelerin
 sayısı 30000 * 32 tane olacaktır. 
 
 ---------------------------------------------------------------------------------
+pad_sequences fonksiyonun parametrik yapısı şöyledir:
+
+
+tf.keras.utils.pad_sequences(
+    sequences,
+    maxlen=None,
+    dtype="int32",
+    padding="pre",
+    truncating="pre",
+    value=0.0,
+):
+
+pad_sequences fonksiyonu her biri dolaşılabilir nesnelerden oluşan dolaşılabilir 
+nesneleri parametre olarak almaktadır. (Örneğin argüman NumPy dizilerinden oluşan 
+listeler olabilir ya da listelerden oluşan listeler olabilir.) 
+
+İkinci parametre hedeflenen sütun uzunluğunu belirtir. (Yani bu parametre her 
+yazının kaç sözcükle ifade edileceğini belirtmektedir.) 
+
+dtype parametresi hedef matristeki elemanların dtype türünü belirtmektedir. 
+
+padding ve trucanting parametreleri padding ve kırpma işleminin baş taraftan mı 
+son taraftan mı yapılacağını belirtmektedir. Burada 'pre' baş tarafı 'post' son 
+tarafı belirtir. 
+
+value parametresi ise padding yapılacak değeri belirtmektedir. Bu değerin default 
+olarak 0 biçiminde olduğuna dikat ediniz. Bu durumda sözcük numaralarını 1'den 
+başlatabilirsiniz. 
+
+pad_sequences işleminin sonucunda iki boyutlu bir NumPy dizisi elde edilmektedir. 
+
+Örneğin:
+
+    
+from tensorflow.keras.utils import pad_sequences
+
+a = [[1, 2, 3], [3, 4, 5, 6, 7], [10], [11, 12]]
+
+result = pad_sequences(a, 3, padding='post')
+print(result)
+
+
+Buradan şöyle bir çıktı elde edilecektir:
+
+
+[[ 1  2  3]
+[ 5  6  7]
+[10  0  0]
+[11 12  0]]
+
+---------------------------------------------------------------------------------
 """
 
 
