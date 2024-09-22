@@ -10503,7 +10503,7 @@ inp1 ---> .... --->
 inp2 ---> ... ---->
 
 ---------------------------------------------------------------------------------  
-Pekiyi yukarıdaki gibi iki girişli bir modelin eğitimi, testi ve kestirimi nasıl 
+Peki yukarıdaki gibi iki girişli bir modelin eğitimi, testi ve kestirimi nasıl 
 yapılacaktır? İşte bu işlemlerde bizim girdileri bir liste ile (liste olmak zorunda 
 değil) ayrı ayrı vermemiz gerekir. 
 
@@ -10536,6 +10536,115 @@ olarak aynı özellik ölçeklemesini uygulayabilirsiniz.
 
 ---------------------------------------------------------------------------------
 """
+
+
+
+# ------------------------------------ Word Embedding ------------------------------------
+
+
+"""
+---------------------------------------------------------------------------------
+Word embedding iki önemli dezavantajı azaltmaktadır. Bu teknikle hem sözcükler 
+arasında anlamsal bir ilişki kurulur hem de yazılar daha kısa vektörlerle temsil 
+edilir.  Word Embedding yönteminde sözcüklere ilişkin vektörler oluşturulduktan 
+sonra bunların arasında Öklit uzaklıkları (Eucledian distances) birbirine yakın 
+sözcüklerin daha az biribirine uzak sözcüklerin daha fazla olacağı biçimdedir.
+
+Peki Word Embedding işlemlerinde bu vektörler nasıl oluşturulmaktadır? Bu konuda 
+çeşitli algoritmalar önerilmiştir. Örneğin Google'ın "Word2Vec" algoritması 
+Stanford'ın "GloVe" algoritması Facebook'un "fastText" algoritması en fazla 
+kullanılanlardandır. Ancak Keras'ın Embedding katmanı doğrudan bu algoritmaları 
+kullanmaz. Ana fikir olarak bu bu algoritmalar temel alınmıştır ancak Embedding 
+katmanı bir öğrenme katmanı olarak çalışmaktadır. Biz burada bu algoritmaların 
+üzerinde durmayacağız. 
+
+ Word embedding işlemleri aslında sözcüklerden anlam çıkartmaya ve onları bir 
+bağlama oturtmaya çalışmaktadır.
+
+---------------------------------------------------------------------------------
+Keras'ta word embedding işlemleri Embedding isimli katmanla yapılmaktadır. Uygulamacı 
+tipik olarak ağın girdi katmanını Embedding katmanına, bu katmanın çıktılarını 
+diğer ara katmanlara bağlamaktadır. Embedding sınıfının __init__ metodunun 
+parametreleri şöyledir:
+
+
+tf.keras.layers.Embedding(
+    input_dim,
+    output_dim,
+    embeddings_initializer='uniform',
+    embeddings_regularizer=None,
+    embeddings_constraint=None,
+    mask_zero=False,
+    weights=None,
+    lora_rank=None,
+    **kwargs
+)
+
+
+Embedding katmanının ilk iki parametresi zorunlu parametrelerdir. Birinci parametre 
+tüm yazılardaki tüm sözcüklerin (vocabulary) sayısını belirtmektedir. 
+
+İkinci parametre ise her sözcük için oluşturulacak vektörün uzunluğunu belirtmektedir. 
+Genellekle bu değerler 8, 16, 32, 64 biçiminde alınmaktadır.
+
+input_length (deprecated oldu) parametresi yazıların sözcük uzunluğunu belirtmektedir. 
+Burada tüm yazıların aynı  miktarda sözcüklerden oluşması gerekir. (Vektörizasyon 
+işleminde zaten yazılar farklı miktarda sözcüklerden oluşsa bile girdi vektörleri 
+vocabulary kadar olduğu için girdiler doğal olarak aynı boyutta olmaktadır.) Oysa 
+gerçekte her yazı (örneğin yorum) farklı miktarda sözcükten oluşabilmektedir. O halde 
+uygulamacının her yazıyı sanki eşit miktarda sözcükten oluşuyormuş gibi bir biçime 
+dönüştürmesi gerekmektedir. Bunun için genellikle "padding" yöntemi kullanılmaktadır. 
+Padding eğer yazı küçükse yazının başının ya da sonunun boş sözcüklerle doldurulması 
+işlemidir. Tabii yazı büyükse tam ters olarak yazının başından ya da sonundan 
+sözcük atılmalıdır.
+
+weights parametresi ağırlık değerleri zaten bir biçimde uygulamacının elinde 
+bulunuyorsa o ağırlık değerleriyle katmanın set edilmesini sağlamaktadır.
+
+---------------------------------------------------------------------------------
+...
+model.add(Embedding(30000, 32, input_length=100))
+...
+
+
+Burada tüm yazılardaki tüm sözcükler 30000 tanedir. Yazıdaki her sözcük 32 elemanlı 
+bir vektörle temsil edilecektir. Her yazı ise 100 sözcükten oluşacaktır. Eskiden 
+Embedded katmanı aynı zamanda bir girdi katmanı gibi de kullanılmaktaydı. Ancak
+Tensorflow'un ileri sürümlerinde artık girdi katmanının her zaman Input katmanıyla 
+oluşturulması yöntemi benimsenmiştir. Bu nedenle artık Embedding katmanındaki 
+input_length parametresi "deprecated" yapılmıştır. Yani artık girdi büyüklüğünün 
+Input katmanıyla verilmesi yönteminin kullanılması önerilmektedir. Bu durumda 
+Embedding katmanı aşağıdaki gibi oluşturulabilir:
+
+
+...    
+model.add(Input((100, )))
+model.add(Embedding(30000, 32))
+...
+
+
+Burada tüm yazılardaki tüm sözcüklerin sayısı 30000 tanedeir. Her sözük 32 eleman 
+uzunluğundaki vektörle temsil edilmektedir. Yazılar da 100 sözcük içermektedir. 
+
+
+Embedding katmanı sözcükleri vektörlere dönüştürmektedir. Pekiyi Embedding 
+katmanının girdisi nasıl olmalıdır? Embedding katmanının girdisi (yani modelin 
+girdi katmanı) yazıdaki sözcük indekslerinin numaralarından oluşmalıdır. Bu durumda 
+uygulamacının önce yine vocabulary'deki her sözcüğe birer numara vermesi sonra da 
+yazıları bu numaralardan oluşan birer dizi haline getirmesi gerekir. 
+
+
+Embedding katmanındaki eğitilebilir parametrelerin sayısı =
+"vocabulary'deki sözcük sayısı * vektör uzunluğu"  kadardır. 
+
+Yani yukarıdaki örnekte Embedding katmanındaki eğitilebilir parametrelerin 
+sayısı 30000 * 32 tane olacaktır. 
+
+---------------------------------------------------------------------------------
+"""
+
+
+
 
 
 
