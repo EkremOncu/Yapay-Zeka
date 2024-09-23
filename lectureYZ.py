@@ -10622,7 +10622,6 @@ model.add(Input((100, )))
 model.add(Embedding(30000, 32))
 ...
 
-
 Burada tüm yazılardaki tüm sözcüklerin sayısı 30000 tanedeir. Her sözük 32 eleman 
 uzunluğundaki vektörle temsil edilmektedir. Yazılar da 100 sözcük içermektedir. 
 
@@ -10690,6 +10689,55 @@ Buradan şöyle bir çıktı elde edilecektir:
 [ 5  6  7]
 [10  0  0]
 [11 12  0]]
+
+---------------------------------------------------------------------------------
+
+---------------------------------------------------------------------------------
+Embedding katmanının çıktısı her bir yazı için iki boyutludur. Çıktı yazıdaki 
+sözcük sayısı kadar satırdan, her sözcük için de belirlenen vektör uzunluğu kadar 
+sütundan oluşmaktadır. 
+
+Burada bir noktaya dikkat ediniz: Embedding katmanı aslında tüm vocabulary için 
+vektörler oluşturmaktadır. Ancak çıktı olarak yazılardaki sözcüklere ilişkin 
+vektörleri vermektedir. 
+
+Anımsanacağı gibi Dense katmanların girdilerinin tek boyutlu olması gerekiyordu. 
+O halde bizim Embedding katmanının çıktısını Flatten katmanına sokarak onu tek 
+boyutlu hale getirmemiz sonra Dense katmanlara vermemiz gerekir. Örneğin:
+
+
+ Input --> Embedding --> Flatten --> Dense --> Dense --> Dense (Çıktı katmanı)
+
+---------------------------------------------------------------------------------
+İlk olarak tüm yazılardaki tüm sözcüklerden bir "vocabulary" elde etmemiz ve her 
+sözcüğe bir indeks numarası vermemiz gerekir. Anımsanacağı gibi CountVectorizer 
+sınıfı zaten fit işleminden sonra böyle bir sözlüğü bizim için oluşturuyordu.
+
+
+from sklearn.feature_extraction.text import CountVectorizer
+
+
+cv = CountVectorizer()
+cv.fit(df['review'])
+
+
+Bu işlemden sonra artık cv nesnesinin vocabulary_ özniteliğinde vocabulary için 
+bir sözlük oluşturulmuş durumdadır. Şimdi bizim tüm yorumları sözcük indekslerinden 
+oluşan liste listesi biçiminde ifade etmemiz gerekir. Bunun için yorumları tek 
+tek sözcüklere ayıracağız onlar yerine onların indekslerini atayacağız. Padding 
+işlemleri için 0'ıncı indeksi boş bırakabiliriz. Örneğin:
+
+
+text_vectors = [[cv.vocabulary_[word] + 1  for word in re.findall(r'(?u)\b\w\w+\b', text.lower())] for text in df['review']]
+
+
+Ancak burada her yazının indeks dizisi farklı uzunluktadır. İşte bizim pad_sequences 
+fonksiyonu ile bunları eşit uzunluğa getirmemiz gerekir:
+
+
+from tensorflow.keras.utils import pad_sequences
+
+dataset_x = pad_sequences(text_vectors, TEXT_SIZE, dtype='float32')
 
 ---------------------------------------------------------------------------------
 """
