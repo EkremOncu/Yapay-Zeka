@@ -10740,6 +10740,43 @@ from tensorflow.keras.utils import pad_sequences
 dataset_x = pad_sequences(text_vectors, TEXT_SIZE, dtype='float32')
 
 ---------------------------------------------------------------------------------
+Aslında daha önce görmüş olduğumuz TextVectorization katmanıyla bu işlemler daha 
+kolay yapılabilmektedir. TextVectorization sınıfının __init__ metodunun parametrik 
+yapısını yeniden anımsaymak istiyoruz:
+
+
+tf.keras.layers.TextVectorization(
+    max_tokens=None,
+    standardize='lower_and_strip_punctuation',
+    split='whitespace',
+    ngrams=None,
+    output_mode='int',
+    output_sequence_length=None,
+    pad_to_max_tokens=False,
+    vocabulary=None,
+    idf_weights=None,
+    sparse=False,
+    ragged=False,
+    encoding='utf-8',
+    name=None,
+    **kwargs
+)
+
+
+Anımsanacağı gibi burada output_mode parametresi "int" olarak geçildiğinde 
+(default durum) aslında TextVectorization katmanı vektör oluşturmak yerine 
+onların indeks numaralarını oluşturuyordu. 
+
+Bu katman pad_sequences işlemini de kendisi yapmaktadır. Eğer katmanda 
+output_sequence_length parametresi spesifik bir değer olarak girilirse padding 
+otomatik olarak yapılmaktadır. 
+
+Metodun max_tokens parametresi sözcük sayısını üst bir limitte kısıtlamak için 
+kullanılmaktadır. İşte eğer bu katman kullanılırsa artık girdi katmanına doğrudan 
+yazılar verilir. Yani bu katman zaten bizim yukarıda CountVectorizer ile yaptığımız 
+işlemleri kendisi yapmaktadır.
+
+---------------------------------------------------------------------------------
 """
 
 
