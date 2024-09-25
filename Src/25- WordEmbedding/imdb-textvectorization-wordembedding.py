@@ -18,7 +18,8 @@ from tensorflow.keras import Sequential
 from tensorflow.keras.layers import Input, TextVectorization, Embedding, Dense, GlobalAveragePooling1D
 
 tv = TextVectorization(output_sequence_length=TEXT_SIZE, output_mode='int') # output_mode dikkat
-tv.adapt(dataset_x)
+tv.adapt(dataset_x)  
+# output_sequence_length parametresi spesifik bir değer olarak girilirse padding otomatik olarak yapılmaktadır. 
 
 
 model = Sequential(name='IMBD-WordEmbedding')
