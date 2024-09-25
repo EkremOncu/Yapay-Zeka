@@ -10777,6 +10777,35 @@ yazılar verilir. Yani bu katman zaten bizim yukarıda CountVectorizer ile yapt�
 işlemleri kendisi yapmaktadır.
 
 ---------------------------------------------------------------------------------
+
+---------------------------------------------------------------------------------
+Yukarıda da belirttiğimiz gibi aslında word embedding vektörlerini sıfırdan oluşturmak 
+yerine zaten oluşturulmuş olan vektörleri de kullanabiliriz. Çeşitli diller için 
+önceden oluşturulmuş geniş kapasiteli ve büyük veri kümeleriyle eğitilmiş hazır 
+vektörler bulunmaktadır. Örneğin Facebook'un "fasttext" algoritması kullanılarak 
+hazırlanmış vektörler aşağıdaki bağlantıdan indirilebilir:
+
+
+https://fasttext.cc/docs/en/crawl-vectors.html
+
+
+Glove algoritması ile hazırlanmış olan vektörleri de aşağıdaki bağlantıdan indiribeilirsiniz:
+
+
+https://nlp.stanford.edu/projects/glove/
+
+
+Benzer çalışmalar başka kurumlar tarafından yapılmıştır. Internet'te çeşitli 
+alternatifleri kullanabilirsiniz. 
+
+---------------------------------------------------------------------------------
+Genellikle bu sitelerden indirilen word embedding vektörleri text bir formattadır. 
+İlgili text dosyanın her satırındada bir sözcük ve o sözcüğüe ilişkin vektör 
+değerleri kodlanmıştır. Yani tipik bir dosyanın bir satırının görünümü şöyledir:
+
+sözcük değer değer değer değer ....
+
+---------------------------------------------------------------------------------
 """
 
 
