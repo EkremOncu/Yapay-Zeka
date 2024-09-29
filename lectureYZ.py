@@ -10777,7 +10777,9 @@ yazılar verilir. Yani bu katman zaten bizim yukarıda CountVectorizer ile yapt�
 işlemleri kendisi yapmaktadır.
 
 ---------------------------------------------------------------------------------
+"""
 
+"""
 ---------------------------------------------------------------------------------
 Yukarıda da belirttiğimiz gibi aslında word embedding vektörlerini sıfırdan oluşturmak 
 yerine zaten oluşturulmuş olan vektörleri de kullanabiliriz. Çeşitli diller için 
@@ -10804,6 +10806,50 @@ Genellikle bu sitelerden indirilen word embedding vektörleri text bir formattad
 değerleri kodlanmıştır. Yani tipik bir dosyanın bir satırının görünümü şöyledir:
 
 sözcük değer değer değer değer ....
+
+Bu tür dosyaların başında genellikle iki elemanlı bir başlık kısmı bulunmaktadır. 
+Burada toplam sözcük sayısı ve bir sözcüğün hangi uzunlukta vektörle ifade edileceği 
+bilgisi yer almaktadır. Örneğin İngilizce için fasttext'ten indirdiğimiz hazır 
+word embedding vektör dosyasının başlık kısmı şöyledir:
+
+2000000 300
+
+Burada toplam 2000000 sözcük için  vektörler bulunmaktadır. (Yani dosya toplam 
+2.000.000 satır büyüklüğündedir.) Her sözcük 300 eleman uzunluğunda vektörden 
+oluşmaktadır. İngilizce'de yaklaşık 800.000 sözcük vardır. Ancak bu vektörlerde 
+yalnızca sözcükler değil özel isimler, tireli sözcükler, kısaltmalar da bulunmaktadır. 
+
+---------------------------------------------------------------------------------
+
+---------------------------------------------------------------------------------
+
+Hazır word embedding vektörlerini kullanmak için yapılacak ilk işlem vektörlerin 
+bulunduğu dosyayı okuyup onu bir Python sözlüğü haline getirmektir. Burada sözlüğün 
+anahtarları sözcüklerden değerleri de o sözcüğün hazır vektör değerlerinden
+oluşabilir. Bu işlemi şöyle yapabiliriz:
+
+
+FASTTEXT_WORD_EMBEDDING_FILE = R'C:\Users\pc\Downloads\cc.en.300.vec'
+
+import numpy as np
+
+
+we_dict = {}
+with  open(FASTTEXT_WORD_EMBEDDING_FILE, 'r', encoding='utf-8') as f:
+    for line in f:
+        tokens = line.rstrip().split(' ')
+        we_dict[tokens[0]] = np.array([float(vecdata) for vecdata in tokens[1:]], dtype='float32')
+
+
+Peki biz neden bu dosyayı doğrudan Pandas'la okuyup DataFrame nesnesi yapmadık 
+da onu satır satır okuyup birz sözlük nesnesi haline getirdik? 
+
+İşte aslında izleyen paragraflarda da açıklayacağımız gibi biz bu hazır vektör 
+dosyasından bazı satırları alıp kullanacağız. Böylesi büyük bir dosyadan elde 
+edilen DataFrame nesnesi üzerinde sıralı arama uygulamak çok yavaş bir yöntemdir. 
+Hızlı arama için sözlük nesneleri kullanılmalıdır. Tabii dosyayı önce DataFrame 
+haline getirip sonra bundan bir sözlük oluşturmak iyi bir fikir değildir. Çünkü 
+bu durumda DataFrame nesnesi de bellekte çok yer kaplayacaktır.
 
 ---------------------------------------------------------------------------------
 """
