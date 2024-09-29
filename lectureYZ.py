@@ -10781,6 +10781,10 @@ işlemleri kendisi yapmaktadır.
 
 """
 ---------------------------------------------------------------------------------
+
+# imdb-fasttext-wordembedding
+
+
 Yukarıda da belirttiğimiz gibi aslında word embedding vektörlerini sıfırdan oluşturmak 
 yerine zaten oluşturulmuş olan vektörleri de kullanabiliriz. Çeşitli diller için 
 önceden oluşturulmuş geniş kapasiteli ve büyük veri kümeleriyle eğitilmiş hazır 
@@ -10850,6 +10854,68 @@ edilen DataFrame nesnesi üzerinde sıralı arama uygulamak çok yavaş bir yön
 Hızlı arama için sözlük nesneleri kullanılmalıdır. Tabii dosyayı önce DataFrame 
 haline getirip sonra bundan bir sözlük oluşturmak iyi bir fikir değildir. Çünkü 
 bu durumda DataFrame nesnesi de bellekte çok yer kaplayacaktır.
+
+---------------------------------------------------------------------------------
+Pekiyi bundan sonra ne yapacağız? Anımsanacağı gibi Embedding katmanının girdisi 
+aslında sözük numaralarından oluşmaktadır. Biz bu sözcük numaralarını ya manuel 
+olarak CountVectorizer sınıfını kullanarak oluşturduk ya da hazır TextVecorization 
+katmanının oluşturmasını sağladık. 
+
+Embedding katmanında weights isimli parametre önceden hazırlanmış olan vektörlerin 
+kullanılmasını sağlamak için bulundurulmuştur. Eğer biz bu parametreye önceden 
+hazırlanmış vektör matrisini girersek bu katman doğrudan bu matristeki vektörleri 
+kullanacaktır. Örneğin:
+
+
+model.add(Embedding(VOCAB_LEN, WORD_VECT_SIZE, weights = [pretrained_matrix],  name='Embedding'))
+
+
+Ayrıca bu tür durumlarda uygulamacı artık Embedding katmanını eğitminden çıkartmak 
+isteyebilir. Ne de olsa zaten vektörler hazır bir biçimde verilmiştir. 
+
+!!!
+İşte katman nesnelerinde trainable isimli bir parametre ve öznitelik vardır. Eğer 
+bu parametre ya da öznitelik False biçimde geçilirse ilgili katman eğitimde yokmuş 
+gibi ele alınıp, kestirim ve test işlemlerinde varmış gibi ele alınmaktadır. O 
+halde Embedding katmanı hazır vektörlerle şöyle kullanılabilir:
+!!!
+
+model.add(Embedding(VOCAB_LEN, WORD_VECT_SIZE, weights = [pretrained_matrix], trainable=False, name='Embedding'))
+
+
+Tabii trainable parametresi False geçilmeyebilir. Bu durumda hem önceden hazırlanmış 
+vektörler kullanılar hem de onlar eldeki veri kümesine göre iyileştirilir. Zaten 
+trainable parametresi default durumda True biçimdedir. 
+
+
+Fakat burada dikkat edilmesi gereken başka bir nokta da vardır. Bizim weights 
+parametresiyle girdiğimiz önceden eğitilmiş vektörlerin matristeki satır numaralarıyla 
+sözüklerin numaralarının örtüşmesi gerekir. Yani örneğin IMDB veri kümesinde 
+"fine" sözcüğünün numarası 1172 ise bizim pretained_matrix ismiyle oluşturduğumuz 
+matrisin 1172'inci satırı "fine" sözcüğüne ilişkin vektör olmalıdır. O halde 
+bizim dosyadan hareketle elde ettiğimiz vektörlerden kendi veri kümemizdeki sözlüklere 
+karşı gelen sayılarla uyumlu bir matris elde etmemiz gerekir. Eğer biz katman 
+olarak TextVectorization katmanını kullanıyorsak bu katman nesnesindeki get_vocabulary 
+metodu bize zaten numaralarla uyumlu sözcük listesini vermektedir. O halde biz 
+bu listeden hareketle bir döngü içerisinde weights parametresi için gereken matrisi 
+aşağıdaki gibi oluştuabiliriz:
+
+
+pretrained_matrix = np.zeros((len(vocab_list), WORD_VECT_SIZE), dtype='float32')
+
+
+for index, word in enumerate(vocab_list):
+    vect = we_dict.get(word)
+    if vect is None:
+        vect = np.zeros(WORD_VECT_SIZE)
+    pretrained_matrix[index] = vect
+        
+    
+Burada önce IMDB'deki sözcüklerin sayısı kadar satıra sahip ve önceden eğitilmiş 
+word embedding vektörlerinin uzunluğu kadar (örneğimizde 300) sütuna sahip içi 
+sıfırlarla dolu bir matris oluşturulmuştur. Sonra IMDB'deki sözcükler önceden 
+eğitilmiş vektörlerin bulunduğu sözlükte aranmış ve oradan alınarak aynı sırada 
+matrisin satırlarına yerleştirilmiştir.
 
 ---------------------------------------------------------------------------------
 """
