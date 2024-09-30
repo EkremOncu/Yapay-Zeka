@@ -10846,7 +10846,7 @@ with  open(FASTTEXT_WORD_EMBEDDING_FILE, 'r', encoding='utf-8') as f:
 
 
 Peki biz neden bu dosyayı doğrudan Pandas'la okuyup DataFrame nesnesi yapmadık 
-da onu satır satır okuyup birz sözlük nesnesi haline getirdik? 
+da onu satır satır okuyup bir sözlük nesnesi haline getirdik? 
 
 İşte aslında izleyen paragraflarda da açıklayacağımız gibi biz bu hazır vektör 
 dosyasından bazı satırları alıp kullanacağız. Böylesi büyük bir dosyadan elde 
@@ -10856,8 +10856,8 @@ haline getirip sonra bundan bir sözlük oluşturmak iyi bir fikir değildir. Ç
 bu durumda DataFrame nesnesi de bellekte çok yer kaplayacaktır.
 
 ---------------------------------------------------------------------------------
-Pekiyi bundan sonra ne yapacağız? Anımsanacağı gibi Embedding katmanının girdisi 
-aslında sözük numaralarından oluşmaktadır. Biz bu sözcük numaralarını ya manuel 
+Peki bundan sonra ne yapacağız? Anımsanacağı gibi Embedding katmanının girdisi 
+aslında sözcük numaralarından oluşmaktadır. Biz bu sözcük numaralarını ya manuel 
 olarak CountVectorizer sınıfını kullanarak oluşturduk ya da hazır TextVecorization 
 katmanının oluşturmasını sağladık. 
 
@@ -10867,7 +10867,8 @@ hazırlanmış vektör matrisini girersek bu katman doğrudan bu matristeki vekt
 kullanacaktır. Örneğin:
 
 
-model.add(Embedding(VOCAB_LEN, WORD_VECT_SIZE, weights = [pretrained_matrix],  name='Embedding'))
+model.add(Embedding(VOCAB_LEN, WORD_VECT_SIZE, weights = [pretrained_matrix], 
+                    name='Embedding'))
 
 
 Ayrıca bu tür durumlarda uygulamacı artık Embedding katmanını eğitminden çıkartmak 
@@ -10880,7 +10881,8 @@ gibi ele alınıp, kestirim ve test işlemlerinde varmış gibi ele alınmaktad�
 halde Embedding katmanı hazır vektörlerle şöyle kullanılabilir:
 !!!
 
-model.add(Embedding(VOCAB_LEN, WORD_VECT_SIZE, weights = [pretrained_matrix], trainable=False, name='Embedding'))
+model.add(Embedding(VOCAB_LEN, WORD_VECT_SIZE, weights = [pretrained_matrix], 
+                    trainable=False, name='Embedding'))
 
 
 Tabii trainable parametresi False geçilmeyebilir. Bu durumda hem önceden hazırlanmış 
