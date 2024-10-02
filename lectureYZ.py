@@ -10924,6 +10924,144 @@ matrisin satırlarına yerleştirilmiştir.
 
 
 
+# ------------------------------- Time Series (Zaman Serileri) -------------------------------
 
 
+"""
+---------------------------------------------------------------------------------
+İçerisinde zamana dayalı bilgilerin bulunduğu veri kümelerine zamansal veri kümeleri 
+(temporal data set) denilmektedir. Eğer bir zamansal veri kümesindeki her satırın 
+zamansal verisi bir sıra izliyorsa bu tür veri kümeleri de genellikle "zaman serileri 
+(time series)" biçiminde isimlendirilmektedir. Örneğin yağmurun yağıp yağmayacağını 
+tahmin etmek için her 10 dakikada bir hava durumuna ilişkin ölçüm alındığını 
+düşünelim. Bu ölçüm verileri zamansal verilerdir ve bunlara "zaman serileri" de 
+denilmektedir. Çünkü bu ölçümler birbirinden kopuk değil zaman içerisinde birbirlerini 
+izlemektedir. Yağmur bir anda yağmamaktadır. Bir süreç içerisinde yağmaktadır. 
+Belli bir andaki ölçüm değerlerinden yağmurun yağıp yağmayacağı anlaşılamayabilir. 
+Ancak geriye doğru bir grup ölçüm bize gidişat hakkında daha iyi bilgiler verebilecektir. 
+
+İşte eğitim sırasında verilerin kopuk kopuk değil peşi sıra bir bağlam içerisinde 
+değerlendirilmesi gerekir. Biz daha önce resimsel veriler üzerinde resmin pixel'lerini 
+ilişkilendirebilmek için "evrişim (convoluiton)" uygulamıştık. İşte zaman serisi 
+verileri için de benzer biçimde evrişim uygulanabilmektedir. Böylesi bir evrişim 
+işlemi zaman serisi verilerinin tek tek değil birbiriyle ilişkili biçimde ele 
+alınmasını sağlamaktadır.
+
+
+Aslında zamansal veriler geniş bir tanımla "yağmurun yağıp yağmayacağına ilişkin 
+10'ar dakikalık ölçümler" gibi olmak zorunda değildir. Yazılardaki sözcükler de 
+bu bağlamda zamansal verilere benzemektedir. Yazıdaki sözcükler ondan önce gelen 
+ve ondan sonra gelen sözcüklerle ilişkilendirilirse daha iyi anlamlandırılabilir. 
+O halde yazıların anlamlandırılmasında da evrişim işlemi uygulanabilir. 
+
+Biz daha önce resimler üzerinde evrişim uygulamıştık. Oradaki evrişim işlemine 
+"iki boyutlu evrişim işlemi" denilmektedir. Bunun nedeni o örneklerde alınan 
+filtrenin (kernel) iki yönlü (sağa ve aşağıya) kaydırılmasıdır. İşte zamansal 
+verilerde uygulanan evrişim tek boyutludur. Tek boyutlu evrişim demek filtrenin 
+tek boyutta kaydırılması demektir. Metin anlamlandırma işlemlerinde de tek 
+boyutlu evrişim uygulanmaktadır. 
+
+---------------------------------------------------------------------------------
+Tek boyutlu evrişim işleminde filtre büyüklüğü tek boyutludur (yani tek bir sayıdan 
+oluşur). Bu sayı evrişime sokulacak satırların sayısını belirtmektedir. Filtrenin 
+genişliği evrişime sokulacak verilerin sütun sayısı kadardır. Örneğin:
+
+
+x x x x x x x x 
+x x x x x x x x 
+x x x x x x x x
+x x x x x x x x
+x x x x x x x x
+x x x x x x x x
+x x x x x x x x
+...............
+
+
+Bunlar evrişime sokulacak verileri temsil ediyor olsun. Filteyi (kernel) 3 olarak 
+olarak almış olalım. Bu durumda filtre aşağıdaki gibi bir yapıya sahip olacaktır:
+
+
+F F F F F F F F  
+F F F F F F F F
+F F F F F F F F
+
+
+Buradaki filte ilk üç satır ile çakıştırılır, dot-product yapılır ve bir değer 
+elde edilir. Sonra filtre aşağıya doğru kaydırılır ve aynı işlem yinelenir. Asıl 
+matrisin satır sayısının N olduğunu filtrenin (kernel) satır sayısının da K 
+olduğunu varsayalım. Bu durumda "padding uygulandığında" elde edilecek matris 
+(N, 1) boyutunda, "padding uygulanmmadığında" ise (N - K + 1, 1) boyutunda olacaktır. 
+Örneğin biz biz 6 sözcük uzunluğundaki yazıların sözcüklerini word embedding yöntemi 
+ile 8 elemanlı vektörle ifade etmiş olalım. Bu durumda yazımız aşağıdaki gibi bir 
+görüntüye sahip olacaktır:
+
+
+XXXXXXXX  -> sözcük
+XXXXXXXX  -> sözcük
+XXXXXXXX  -> sözcük
+XXXXXXXX  -> sözcük
+XXXXXXXX  -> sözcük
+XXXXXXXX  -> sözcük
+
+
+Şimdi biz 2 uzunlukta bir filtre ile tek boyutlu evrişim uygulamak isteyelim. Bu 
+durumda filtenin yapısı şöyle olacaktır:
+
+
+FFFFFFFF
+FFFFFFFF
+
+
+Biz bu filtreyi "padding uygulamadan" yukarıdan aşağıya doğru gezdirirsek aşağıdaki 
+gibi bir vektör elde ederiz:
+
+
+R
+R
+R
+R
+R
+   
+Burada R değerleri filtre matrisi ile sözcüklere ilişkin word embedding matrisinin 
+çakıştırılması ile uygulanan "dot-product" ve sonrasında uygulanan aktivasyon 
+fonksiyonunun çıktısını temsil etmektedir. Biz böylece (6, 8)'lik matris yerine 
+(5, 1)'lik bir matris elde etmiş olduk. Tabii biz birden fazla filtre de 
+uygulayabiliriz. Örneğin toplamda 16 filtre uygularsak elde edeceğimiz matris 
+(16, 5, 1) boyutunda olacaktır.
+
+---------------------------------------------------------------------------------
+Keras'ta tek boyutlu evirişim işlemi için Conv1D katman sınıfı bulundurulmuştur. 
+Conv1D sınıfının __init__  metodunun parametrik yapısı şöyledir:
+
+tf.keras.layers.Conv1D(
+    filters,
+    kernel_size,
+    strides=1,
+    padding='valid',
+    data_format=None,
+    dilation_rate=1,
+    groups=1,
+    activation=None,
+    use_bias=True,
+    kernel_initializer='glorot_uniform',
+    bias_initializer='zeros',
+    kernel_regularizer=None,
+    bias_regularizer=None,
+    activity_regularizer=None,
+    kernel_constraint=None,
+    bias_constraint=None,
+    **kwargs
+)
+
+Metodun ilk parametresi filtre sayısını, ikinci parametresi filtrenin (kernel) 
+boyutunu belirtmektedir. Tabii burada boyut tek bir sayıdan oluşur (yani 
+yukarıdaki örnekte filtrenin satır uzunluğu). 
+
+Yine metodun strides ve padding parametreleri vardır. Bu padding parametresi 
+"valid" ise padding uygulanmaz, "same" ise padding uygulanır. stride değeri yukarıdan 
+aşağıya kaydırmanın kaçar kaçar yapılacağını belirtmektedir. Bu parametrenin 
+default değeri 1'dir. 
+
+---------------------------------------------------------------------------------
+"""
 
