@@ -11030,6 +11030,10 @@ uygulayabiliriz. Örneğin toplamda 16 filtre uygularsak elde edeceğimiz matris
 (16, 5, 1) boyutunda olacaktır.
 
 ---------------------------------------------------------------------------------
+"""
+
+"""
+---------------------------------------------------------------------------------
 Keras'ta tek boyutlu evirişim işlemi için Conv1D katman sınıfı bulundurulmuştur. 
 Conv1D sınıfının __init__  metodunun parametrik yapısı şöyledir:
 
@@ -11061,6 +11065,64 @@ Yine metodun strides ve padding parametreleri vardır. Bu padding parametresi
 "valid" ise padding uygulanmaz, "same" ise padding uygulanır. stride değeri yukarıdan 
 aşağıya kaydırmanın kaçar kaçar yapılacağını belirtmektedir. Bu parametrenin 
 default değeri 1'dir. 
+
+---------------------------------------------------------------------------------
+IMDB örneğinde word embedding yapıldıktan sonra bir kez tek boyutlu evrişim işlemi 
+uygulanmıştır. Modelin katmanları şöyledir:
+
+
+TextVectorization --> Embedding --> Conv1D --> Flatten/Reshape --> Dense --> Dense --> Dense (Output)
+
+
+Model Keras'ta aşağıdaki gibi oluşturulmuştur:
+
+
+tv = TextVectorization(output_sequence_length=TEXT_SIZE, output_mode='int')
+tv.adapt(dataset_x)
+
+
+model = Sequential(name='IMBD-WordEmbedding')
+model.add(Input((1, ), dtype='string', name='Input'))
+
+model.add(tv)
+
+model.add(Embedding(tv.vocabulary_size(), WORD_VECT_SIZE, name='Embedding'))
+
+model.add(Conv1D(128, 3, activation='relu', padding='same', name='Conv1D'))
+
+model.add(Reshape((-1, ), name='Reshape'))
+
+model.add(Dense(256, activation='relu', name='Hidden-1'))
+model.add(Dense(256, activation='relu', name='Hidden-2'))
+model.add(Dense(1, activation='sigmoid', name='Output'))
+model.summary()
+
+---------------------------------------------------------------------------------
+
+Aslında tıpkı resimlerde olduğu gibi metinsel ve zamansal verilerde de evrişim 
+işlemi sonrasında eğitilebilir parametreleri azaltmak ve bazı nitelikleri belirgin 
+hale getirmek için "pooling" işlemleri uygulanabilmektedir. 
+
+Tabii buradaki pooling işlemleri iki boyutlu değil tek boyutludur. Tek boyutlu 
+"pooling" işlemleri için MaxPooling1D ve AveragePooling1D sınıfları bulundurulmuştur. 
+    
+Tek boyutlu pooling işlemlerinde pool_size parametresi için tek bir sayı girilmektedir. 
+Bu sayı satır sayısıdır. Pooling işlemi burada belirtilen satır sayısı kadar satır 
+üzerinde ve onların her sütununda yani sütunsal olarak uygulanmaktadır. 
+
+---------------------------------------------------------------------------------
+Örneğin pooling işlemine sokacağımız veriler şöyle olsun:
+
+
+x x x x x x x x x x
+x x x x x x x x x x
+x x x x x x x x x x
+x x x x x x x x x x
+x x x x x x x x x x
+x x x x x x x x x x
+x x x x x x x x x x
+x x x x x x x x x x
+x x x x x x x x x x
 
 ---------------------------------------------------------------------------------
 """
