@@ -11124,6 +11124,78 @@ x x x x x x x x x x
 x x x x x x x x x x
 x x x x x x x x x x
 
+Burada MaxPooling1D sınıfını kullanıp pool_size parametresini 3 girmiş olalım. Bu 
+durumda ilk üç satır ele alınıp onların sütunlarının en büyük elemanları elde 
+edilecektir. Sonra default durumda pencere üç aşağıya kaydırılıp aynı işlem o üçlü 
+için de yapılacaktır. Bu işlemin sonucunda aynı sütun sayısına sahip ancak satır 
+sayısı üç kat daha az olan bir matris elde edilecektir. Yukarıdaki verilerin 
+pool_size 3 alınarak tek boyutlu "pooling" işlemine sokulmasıyla elde edilen matris 
+şöyle olacaktır:
+
+
+P P P P P P P P P P   ==> ilk üç satırın sütunlarının pooling değerleri
+P P P P P P P P P P   ==> sonraki üç satırın sütunlarının pooling değerleri
+P P P P P P P P P P   ==> sonraki üç satırın sütunlarının pooling değerleri
+
+Tıpkı resimsel uygulamalarda olduğu gibi metinsel uygulamalarda ve zamansal 
+uygulamalarda da evrişim ve pooling işlemleri bir kez değil üst üste birden fazla 
+kez uygulanmaktadır.
+
+---------------------------------------------------------------------------------
+Peki metinsel işlemlerde MaxPooling1D katmanı mı yoksa AveragePooling1D katmanı 
+mı tercih edilmelidir? Aslında hedefe bağlı olarak bu tercih değişebilir. Ancak 
+genel olarak metinsel uygulamalarda MaxPooling1D katmanı tercih edilmektedir. 
+Max pooling işlemi o bölgedeki en önemli sözcüklere dikkat edilmesini sağlamaktadır. 
+MaxPooling1D ve AveragePooling1D sınıflarının __init__metotlarının parametrik yapısı 
+şöyledir:
+
+
+tf.keras.layers.MaxPool1D(
+    pool_size=2,
+    strides=None,
+    padding='valid',
+    data_format=None,
+    name=None,
+    **kwargs
+)
+
+
+ttf.keras.layers.AveragePooling1D(
+    pool_size,
+    strides=None,
+    padding='valid',
+    data_format=None,
+    name=None,
+    **kwargs
+)
+
+
+Metotlardaki pool_size parametresi pooling uygulanacak satır uzunluğunu, strides ,
+parametresi kaydırma miktarını belirtmektedir. Bu parametrelerin default değerleri 
+None biçimindedir. Bu durumda kaydırma pool_size parametresinde belirtilen değer 
+kadar yapılmaktadır. padding parametreleri yine "same" ya da "valid" biçiminde 
+girilebilmektedir. 
+
+
+IMDB veri kümesi üzerinde yine önce word embedding sonra evrişim ve pooling 
+işlemleri art arda uygulanmıştır. Modelin katmanları şöyledir:
+
+
+TextVectorization --> Embedding --> Conv1D --> MaxPooling1D --> Conv1D --> MaxPooling1D 
+--> Conv1D --> MaxPooling1D --> Flatten/Reshape --> Dense --> Dense --> Dense (Output)
+
+---------------------------------------------------------------------------------
+AveragePooling1D ve MaxPooling1D katmanlarının global biçimleri de vardır. Bu 
+global pooling katmanları GlobalAveragePooling1D ve GlobalMaxPooling1D isimleriyle 
+bulundurulmuştur. Tıpkı iki boyutlu evrişim işlemlerinde olduğu gibi tek boyutlu 
+evrişim işlemlerinde de bu katmanlar tek bir çıktı üretmektedir. Örneğin 
+GlobalAveragePooling1D katmanı toplamda tek bir satır üretir. Örneğin bu katmanın 
+girdisi (250, 128) boyunda bir matris ise bu durumda bu katman her sütun için o 
+sütunun toplamdaki en büyük değerini elde edecektir. Bu değerler de toplamda 128 
+tane olacaktır. Bu katmanlar da bunların iki boyutlularında olduğu gibi evrişim 
+katmanlarının en sonunda yani Dense katmanlardan hemen önce bulunudurulmalıdır.
+
 ---------------------------------------------------------------------------------
 """
+
 
