@@ -11199,3 +11199,142 @@ katmanlarının en sonunda yani Dense katmanlardan hemen önce bulunudurulmalıd
 """
 
 
+"""
+---------------------------------------------------------------------------------
+Tek boyutlu evrişim ve pooling işlemleri yalnızca metinsel veri kümelerinde değil 
+aynı zamanda zamansal (temporal) veri kümelerinde de uygulabilmektedir. Gerçi 
+izlen paragraflarda biz zamansal veriler için daha iyi performans gösteren geri 
+beslemeli (recurrent) ağları kullanacağız. Ancak burada zamansal veriler üzerinde 
+de tek boyutlu evirişim işlemlerine bir örnek vermek istiyoruz. 
+
+Bir kağıdın ya da kripto paranın fiyatı birtakım olaylar sonucunda bir bağlam 
+içerisinde değişmektedir. Yani birtakım kestirimlerde yalnızca o andaki duruma 
+değil geçmişe de bakıp bağlamı da dikkate almak kestirimi güçlendirmektedir. Finansal 
+piyasalar bunlara tipik bir örnek oluşturmaktadır. 
+
+
+Hava durumu tahminine örnek için kullanılan veri kümelerinden biri "Jena Climate" 
+("yena klaymit" biçiminde okunuyor) isimli bir veri kümesidir . Bu veri kümesi 
+aşağıdaki bağlantıdan indirilebilir:
+
+
+https://www.kaggle.com/datasets/mnassrib/jena-climate?resource=download
+
+
+Bu siteden veri kümesi indirilip açıldığında "jena_climate_2009_2016.csv" isimli 
+bir dosya edilecektir. Veri kümesinin görünümü aşağıdaki gibidir:
+
+
+"Date Time","p (mbar)","T (degC)","Tpot (K)","Tdew (degC)","rh (%)","VPmax (mbar)","VPact (mbar)","VPdef (mbar)","sh 
+(g/kg)","H2OC (mmol/mol)","rho (g/m**3)","wv (m/s)","max. wv (m/s)","wd (deg)"
+01.01.2009 00:10:00,996.52,-8.02,265.40,-8.90,93.30,3.33,3.11,0.22,1.94,3.12,1307.75,1.03,1.75,152.30
+01.01.2009 00:20:00,996.57,-8.41,265.01,-9.28,93.40,3.23,3.02,0.21,1.89,3.03,1309.80,0.72,1.50,136.10
+01.01.2009 00:30:00,996.53,-8.51,264.91,-9.31,93.90,3.21,3.01,0.20,1.88,3.02,1310.24,0.19,0.63,171.60
+01.01.2009 00:40:00,996.51,-8.31,265.12,-9.07,94.20,3.26,3.07,0.19,1.92,3.08,1309.19,0.34,0.50,198.00
+01.01.2009 00:50:00,996.51,-8.27,265.15,-9.04,94.10,3.27,3.08,0.19,1.92,3.09,1309.00,0.32,0.63,214.30
+01.01.2009 01:00:00,996.50,-8.05,265.38,-8.78,94.40,3.33,3.14,0.19,1.96,3.15,1307.86,0.21,0.63,192.70
+...............................
+
+
+Dosyada bir başlık kısmı olduğunu görüyorsunuz. Bu veri kümesi 10'ar dakikalık 
+periyotlarla havaya ilişkin birtakım değerlerin ölçülerek saklanmasıyla oluşturulmuştur. 
+Sütunlardan biri (üçüncü sütun) derece cinsinden hava sıcaklığını belirtmektedir.  
+Veri kümesinde eksik veri bulunmamaktadır. 
+
+---------------------------------------------------------------------------------
+Jena Climate örneğinde bizim amacımız belli bir zamandaki ölçüm değerinden hareketle 
+bir gün sonraki hava ısısını tahmim etmek olsun. Böyle bir modelin eğitimi için 
+bizim bazı düzenlemeler yapmamız geekir. Burada eğitimde kullanılacak x değerlerine 
+karşı gelen y değerleri (havanın ısısı) bir gün sonraki değerler olmalıdır. Veri 
+kümesinde bir gün sonraki değerler 24 * 60 // 10 = 144 satır ilerideki değerlerdir. 
+O halde bizim eğitim verilerini oluştururken her x ile 144 ilerideki satırın y 
+değerini eşleştirmemiz gerekir.
+
+Bu işlemler çeşitli biçimlerde yapılabilir. Ayrıca veri kümesinde ölçümün yapıldığı 
+tarih ve zaman bilgisi de vardır. Pekiyi zamansal veri hangi ölçek türündendir? 
+İşte tarih ve zaman bilgileri uğraşılan konuya değişik biçimlerde ele alınabilmektedir. 
+Sürekli artan bir tarih-zaman bilgisinin kestirim modellerinde hiçbir kullanım 
+gerekçesi yoktur. Tarih-zaman bilgileri genellikle "özellik mÜhendisliği (feature engineering)" 
+teknikleriyle bileşene ayrılır ve bu bileşenler ayrı sütunlar biçiminde veri 
+kümesine eklenir. 
+
+Tarih bilgisinin aylara, günlere ya da haftanın günlerine ayrılması ve bunların 
+da kategorik bir bilgiler gibi ele alınması yaygındır. Yıl bilgisi de yine kategorik 
+bir bilgi olarak ele alınabilir. Buradaki "Jena Climate" veri kümesinde tarih 
+bilgisinin ay ve gün bileşenlerinden faydalanılabilir. Ölçümün günün hangi 10 
+dakikasına ilişkin olduğu da kestirimde önemli bir bilgi oluşturabilmektedir. Gerçi 
+zaman serisi tarzındaki veri kümelerinde zaten biz ağın bu örüntüyü kendisinin 
+yakalamasını isteriz. Bu nedenle ağın mimarisine göre bu tür bilgilerin önemi 
+değişebilmektedir. 
+
+Veri kümesinin diğer sütunları zaten nümerik sütunalardır. Orada bir dönüştürmenin 
+yapılmasına gerek yoktur. Tabii özellik ölçeklemesi uygulamak gerekir. Buradaki 
+sütunların anlamlandırlması meteorolojiye ilişkin bazı özel bilgilere gereksinim 
+vardır. Biz bu sütunların anlamları üzerinde burada durmayacağız. 
+
+---------------------------------------------------------------------------------
+Veri kümesini aşağıdaki gibi okumuş olalım:
+
+
+import pandas as pd
+
+
+df = pd.read_csv('jena_climate_2009_2016.csv')
+
+
+Biz tarih ve zaman bilgisi sütununu Pandas'ın datetime türüne dönüştürebiliriz:
+
+
+df['Date Time'] = pd.to_datetime(df['Date Time'])
+
+
+Artık biz bu sütunun bileşenlerini elde edebiliriz. Ancak bu yöntem aslında bizim 
+için daha zahmetlidir. Doğrudan biz yazının içerisindeki ilgili kısımları yine 
+yazı olarak alıp one-hot-encoding uygulayabiliriz:
+
+
+df = pd.read_csv('jena_climate_2009_2016.csv')
+
+
+df['Month'] = df['Date Time'].str[3:5]
+df['Hour-Minute'] = df['Date Time'].str[11:16]
+
+
+df.drop(['Date Time'], axis=1, inplace=True)
+df = pd.get_dummies(df, columns=['Month', 'Hour-Minute'],  dtype='int8')
+
+
+dataset = df.to_numpy('float32')
+
+
+Bir günün kaç 10 dakikadan oluştuğunu aşağıdaki gibi bir değişkenle ifade edebiliriz:
+
+
+PREDICTION_INTERVAL = 24 * 60 // 10         # 144
+   
+Biz evirişim katmanı olarak tek boyutlu Conv1D katmanını kullanacağız. Ancak bu 
+katman bizden girdiyi iki boyutlu matrisler biçiminde istemektedir. Yani bizim 
+sinir ağına girdileri 144'lük (PREDICTION_INTERVAL) matrisler biçiminde vermemiz
+gerekir. dataset_x ve dataset_y veri kümelerini hazırlarken bizim 144'lük peşi 
+sıra giden kaydırmalı bir veri kümesi oluşturmamız gerekir. Tabii burada kaydırma 
+miktarını istediğimiz gibi alabilir. dataset_x veri kümesinin aşağıdaki gibi bir 
+yapıya sahip olması gerekir:
+
+
+<ilk 144'lük satır>
+<Sonraki 144'lük satır>
+<Sonraki 144'lük satır>
+<Sonraki 144'lük satır>
+....
+
+
+Tabii burada oluşturulacak matris çok büyük olabilir. Bunun için kaydırmayı birer 
+değil daha daha geniş uygulayabiliriz. Ya da bu tür durumlarda parçalı eğitim 
+yoluna gidebiliriz. 
+
+---------------------------------------------------------------------------------
+"""
+
+
+
+
