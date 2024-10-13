@@ -11201,6 +11201,9 @@ katmanlarının en sonunda yani Dense katmanlardan hemen önce bulunudurulmalıd
 
 """
 ---------------------------------------------------------------------------------
+
+# Jena Climate
+
 Tek boyutlu evrişim ve pooling işlemleri yalnızca metinsel veri kümelerinde değil 
 aynı zamanda zamansal (temporal) veri kümelerinde de uygulabilmektedir. Gerçi 
 izlen paragraflarda biz zamansal veriler için daha iyi performans gösteren geri 
@@ -11243,7 +11246,7 @@ Veri kümesinde eksik veri bulunmamaktadır.
 
 ---------------------------------------------------------------------------------
 Jena Climate örneğinde bizim amacımız belli bir zamandaki ölçüm değerinden hareketle 
-bir gün sonraki hava ısısını tahmim etmek olsun. Böyle bir modelin eğitimi için 
+bir gün sonraki hava ısısını tahmin etmek olsun. Böyle bir modelin eğitimi için 
 bizim bazı düzenlemeler yapmamız geekir. Burada eğitimde kullanılacak x değerlerine 
 karşı gelen y değerleri (havanın ısısı) bir gün sonraki değerler olmalıdır. Veri 
 kümesinde bir gün sonraki değerler 24 * 60 // 10 = 144 satır ilerideki değerlerdir. 
@@ -11267,7 +11270,7 @@ zaman serisi tarzındaki veri kümelerinde zaten biz ağın bu örüntüyü kend
 yakalamasını isteriz. Bu nedenle ağın mimarisine göre bu tür bilgilerin önemi 
 değişebilmektedir. 
 
-Veri kümesinin diğer sütunları zaten nümerik sütunalardır. Orada bir dönüştürmenin 
+Veri kümesinin diğer sütunları zaten nümerik sütunlardır. Orada bir dönüştürmenin 
 yapılmasına gerek yoktur. Tabii özellik ölçeklemesi uygulamak gerekir. Buradaki 
 sütunların anlamlandırlması meteorolojiye ilişkin bazı özel bilgilere gereksinim 
 vardır. Biz bu sütunların anlamları üzerinde burada durmayacağız. 
@@ -11331,6 +11334,52 @@ yapıya sahip olması gerekir:
 Tabii burada oluşturulacak matris çok büyük olabilir. Bunun için kaydırmayı birer 
 değil daha daha geniş uygulayabiliriz. Ya da bu tür durumlarda parçalı eğitim 
 yoluna gidebiliriz. 
+
+
+PREDICTION_INTERVAL = 24 * 60 // 10         # 144
+WINDOW_SIZE = 24 * 60 // 10                 # 144
+SLIDING_SIZE = 10
+
+
+PREDICTION_ITERVAL bizim kaç 10 dakika sonraki hava ısısını tahmin edeceğimizi, 
+WINDOW_SIZE son kaç 10 dakikalık ölçümlerden kestirim yapacağımızı, SLIDING_SIZE 
+ise kaydırma miktarını belirtmektedir. Bu kaydırma miktarı 1 olarak alınırsa veri 
+kümesi çok büyümektedir. Bu nedenle biz örneğimizde kaydırmayı 10'arlı yapacağız. 
+Bizim öncelikle veriler üzerinde önişlemleri yapmamız gerekir. Veri kümesindeki 
+tarih ve zaman bilgisi kategorik bir bilgi olarak ele alınabilir. Burada makul 
+kategori sayısı ile bu sütunu sayısallaştırabiliriz:
+
+   
+df = pd.read_csv('jena_climate_2009_2016.csv')
+
+
+df['Month'] = df['Date Time'].str[3:5]
+df['Hour-Minute'] = df['Date Time'].str[11:16]
+
+
+df.drop(['Date Time'], axis=1, inplace=True)
+
+
+from sklearn.preprocessing import OneHotEncoder
+ohe = OneHotEncoder(sparse_output=False)
+
+
+ohe.fit(df[['Month', 'Hour-Minute']])
+ohe_result = ohe.transform(df[['Month', 'Hour-Minute']])
+
+
+df = pd.concat([df, pd.DataFrame(ohe_result)], axis=1)
+df.drop(['Month', 'Hour-Minute'], axis=1, inplace=True)
+
+
+Burada önce tarih ve zaman sütununu parse ettik. Sonra ay bilgisini ve saat ile 
+dakika bilgisini one-hot encoding uyglayarak sayısallaştırdık. Bunun sonucunda 
+aşağıdaki gibi x ve y veri kümelerini elde ettik:
+
+
+raw_dataset_x = df.to_numpy('float32')
+raw_dataset_y = df['T (degC)'].to_numpy('float32')
+    
 
 ---------------------------------------------------------------------------------
 """
