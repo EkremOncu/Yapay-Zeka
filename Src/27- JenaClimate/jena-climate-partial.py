@@ -35,10 +35,10 @@ raw_dataset_y = df['T (degC)'].to_numpy('float32')
 
 from sklearn.model_selection import train_test_split
 
-raw_temp_dataset_x, raw_test_dataset_x, raw_temp_dataset_y, raw_test_dataset_y =  train_test_split(raw_dataset_x, 
+raw_temp_dataset_x, raw_test_dataset_x, raw_temp_dataset_y, raw_test_dataset_y = train_test_split(raw_dataset_x, 
         raw_dataset_y, test_size=0.1, shuffle=False)
 
-raw_training_dataset_x, raw_validation_dataset_x, raw_training_dataset_y, raw_validation_dataset_y =  train_test_split(raw_temp_dataset_x, 
+raw_training_dataset_x, raw_validation_dataset_x, raw_training_dataset_y, raw_validation_dataset_y = train_test_split(raw_temp_dataset_x, 
         raw_temp_dataset_y, test_size=0.1, shuffle=False)
 
 
@@ -148,7 +148,8 @@ plt.show()
 
 # evaluation
 
-dg_test = DataGenerator(raw_scaled_test_dataset_x, raw_test_dataset_y, BATCH_SIZE, PREDICTION_INTERVAL, WINDOW_SIZE, SLIDING_SIZE, shuffle=False)
+dg_test = DataGenerator(raw_scaled_test_dataset_x, raw_test_dataset_y, BATCH_SIZE, 
+                        PREDICTION_INTERVAL, WINDOW_SIZE, SLIDING_SIZE, shuffle=False)
 
 eval_result = model.evaluate(dg_test)
 
@@ -173,7 +174,8 @@ predict_df.drop(['Month', 'Hour-Minute'], axis=1, inplace=True)
 predict_dataset = predict_df.to_numpy('float32')
 scaled_predict_dataset = ss.transform(predict_dataset)
 
-predict_result = model.predict(scaled_predict_dataset.reshape(1, predict_dataset.shape[0], predict_dataset.shape[1]))
+predict_result = model.predict(scaled_predict_dataset.reshape(1, predict_dataset.shape[0], 
+                                                              predict_dataset.shape[1]))
 
 for presult in predict_result[:, 0]:
     print(presult)
