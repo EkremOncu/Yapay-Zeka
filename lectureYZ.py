@@ -11380,6 +11380,75 @@ aşağıdaki gibi x ve y veri kümelerini elde ettik:
 raw_dataset_x = df.to_numpy('float32')
 raw_dataset_y = df['T (degC)'].to_numpy('float32')
     
+---------------------------------------------------------------------------------
+Daha önceden de belirttiğimiz gibi bu tür yoğun verilerin kullanıldığı durumlarda 
+eğer mümkünse eğitim, test ve kestirim işlemlerinin parçalı bir biçimde yapılması 
+daha uygundur. Biz yukraıdaki örnekte tüm eğitim verilerini tek hamlede oluşturduk.
+Bu veriler de çok yer kaplıyordu. Şimdi aynı örneği daha önce görmüş  parçalı eğitim 
+tekniği ile gerçekleşirelim. Parçalı eğitimde dikkat edilecek anahtr noktalar şunlardır:
+
+
+- Bizin parçalı eğitim sınıfına (DataGenerator sınıfına) bazı bilgileri geçirmemiz 
+gerekir. Sınıfın __init__ metodu şöyle olabilir:
+
+
+def __init__(self, raw_x, raw_y, batch_size, pi, ws, ss, *, shuffle=True):
+    super().__init__() 
+    self.raw_x = raw_x
+    self.raw_y = raw_y
+    self.batch_size = batch_size
+    self.pi = pi
+    self.ws = ws
+    self.ss = ss
+    self.shuffle = shuffle
+    self.nbatches = (len(raw_x) - pi - ws) // batch_size // ss
+    self.index_list = list(range((len(raw_x) - pi - ws) // ss))  
+
+
+- Sınıfın __len__ metodu bir epoch'un kaç batch'ten oluşacağı bilgisiyle geri 
+döndürülmelidir. Bu hesap şöyle yapılmıştır:
+
+
+self.nbatches = (len(raw_x) - pi - ws) // batch_size // ss
+
+
+- Sınıfın __getitem__ metodu model sınıfının fit, evaluate gibi metotları tarafından 
+köşeli parantez içerisine batch numarası verilerek çağrılmaktadır. 
+
+
+- Epoch'lar arasında hiç karıştırma yapmayabiliriz. Ancak eğer karıştırma yapacaksak 
+asıl veri kümesini karıştırmak iyi bir fikir değildir. Biz örneğimizde bir batch'i 
+oluşturacak olan her eleman için bir index numarası oluşturup bu index dizini 
+karıştırdık. __getitem__ metodu şöyle yazılmıştır:
+
+
+def __getitem__(self, batch_no):               
+    x = np.zeros((self.batch_size, self.ws, self.raw_x.shape[1]))
+    y = np.zeros(self.batch_size)
+    
+    for i in range(self.batch_size):
+        offset = self.index_list[batch_no * self.batch_size + i] * self.ss 
+        
+        x[i] = self.raw_x[offset:offset + self.ws]
+        y[i] = self.raw_y[offset + self.ws + self.pi - 1]
+ 
+    return tf.convert_to_tensor(x), tf.convert_to_tensor(y)
+
+
+Burada baştan x ve y için içi sıfırlarla dolu NumPy dizileri yaratılmıştır. Sonra 
+batch'in uzunluğu kadar bir döngü oluşturulmuştur. Karıştırılmış index listesindeki 
+ilgi yer batch_no * self.batch_size ile elde edilmektedir. Bu index'ten itibaren 
+bu dizide self.batch_size kadar ilerlenip oradaki index'ler kullanılırsa aslında 
+asıl dizinin farklı yerlerine erişilmiş olacaktır. Tabii diziden ilgili index 
+çekildiğinde bunun asıl dizinin hangi offseti olacağı bu değerin self.ss
+ile çarpımıyla elde edilmiştir. 
+
+
+- Her epoch bittiğinde çağrılan on_epoch_end işleminde karıştırma yapılmaktadır:
+
+def on_epoch_end(self):
+    if self.shuffle:
+        np.random.shuffle(self.index_list)   
 
 ---------------------------------------------------------------------------------
 """
