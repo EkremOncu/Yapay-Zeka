@@ -11456,3 +11456,43 @@ def on_epoch_end(self):
 
 
 
+
+
+# ------------------------- Geri Beslemeli Ağlar (Recurrent Neural Network) -------------------------
+
+
+"""
+---------------------------------------------------------------------------------
+Biz yazısal örneklerde ve zaman serilerinde tek boyutlu evrişim işlemlerini gördük. 
+Evrişim işlemi resimsel uygulamalarda pixel'leri birbirleriyle ilişkilendirmek 
+için en önemli ve etkin işlemlerden biridir. Ancak metinsel uygulamalarda ve zaman
+serilerinde evrişim işlemi bazı nedenlerden dolayı önemli faydalar sağlayamamaktadır. 
+Anımsanacağı gibi bir evrişim işleminde birbirine yakın öğeleri ilişkilendirmeye 
+çalışıyorduk. Sonra yeniden evrişim işlemleriyle bunu daha büyük öeğelere yaydırmaya
+çalışıyorduk. Ancak evrişim işlemi metinsel uygulamalarda ve zaman serilerinde 
+iyi bir bağlamsal etki oluşturamamaktadır. Bu tür uygulamalarda ağa hafıza kazandırmak 
+gerekir. İşte ağa hafıza kazandırmak için "geri beslemei ağlardan (recurrent 
+neural networks)" faydalanılmaktadır. 
+
+
+Geri beslemeli ağlarda temel fikir çıktının bir biçimde girdi ile ilişkilendirilip 
+unutulmamasının sağlanmasıdır. Eğitim sırasında bir önceki çıktı bir sonraki girdi 
+ile kombine edilerek ağa verilmektedir.
+
+İşte bu sayede ağın eski bilgileri unutmaması onlardan elde edilen ana fikrin 
+sürekli taze tutması sağlanmaktadır. Aslında bu yöntem insanın hafıza sistemine 
+de benzemektedir. Biz bir bilgiyi kalıcı hale getirmek için sürekli tekrarlarız. 
+Tekrarlanmayan bilgi kısa süreli hafızandan (short term memory) uçup gitmektedir. 
+Pekiyi bu geri besleme fikri bu haliyle ağa hafıza kazandırmakta yeterli olmakta 
+mıdır? Geri beslemeli ağlar bu anlamda hafıza kazandırmaya önemli bir katkı sunmuştur. 
+Ancak bu haliyle ağ eski bilgileri uzun süre hafızasında tutamaktadır. Bu probleme 
+İngilizce "vanishing gradient problem" denilmektedir. Son on senedir bu problem 
+üzerinde çokça çalışılmış ve geri beslemeli ağlar bu problemi tam olarak ortadan 
+kaldırmasa da azaltacak biçimde evrimleşmiştir. 
+
+---------------------------------------------------------------------------------
+"""
+
+
+
+
