@@ -11491,6 +11491,89 @@ Ancak bu haliyle ağ eski bilgileri uzun süre hafızasında tutamaktadır. Bu p
 kaldırmasa da azaltacak biçimde evrimleşmiştir. 
 
 ---------------------------------------------------------------------------------
+Geri beslemeli ağlardaki geri besleme bir katman biçiminde oluşturulmaktadır. Bu 
+katmanda yine n tane nörun bulunur. Ancak bu katmana girdiler tek hamlede değil  ????????????????????
+verilir. Girdinin her parçasından bir çıktı elde edilir. Sonra bu çıktı girdinin 
+sonraki parçasıyla işleme sokularak yine geri besleme katmanına sokulur. Böylece 
+katmanın her çıktısı sonraki girişle işleme sokularak bir hafıza oluşturulmaya çalışılır. 
+Tabii geri besleme katmanı genellikle tek başına kullanılmaz. Bu katmanın çıktısı 
+daha önceleri yaptığımız gibi Dense katmanlara verilir. 
+
+Yani geri besleme katmanı genellikle derin ağlardaki ilk katmanları oluşturmaktadır. 
+
+Bir Dense katmandaki bir nöronu düşünelim. Bu nörona o katmanın girdisi kadar giriş 
+uygulanmaktadır. Aynı zamanda bu nöronda bir bias değeri de vardır. Anımsanacağı 
+gibi bu nöronun çıktısı şöyle oluşturulmaktadır:
+
+
+activation(dot(W, X) + b) ---> çıktı
+
+
+Bizim bu nöronda konumlandırmaya çalıştığımız değerler W ve b değerleridir. Örneğin 
+5 girdiye sahip olan bir Dense katmandaki nörounun çıktısı şöyle hesaplanmaktadır:
+
+
+activation(w0x0 + w1x1 + w2x2 + w3x3 + w4x4 + b) ---> çıktı
+
+
+Bu nöronda toplam 6 tane eğitilebilir parametre olduğuna dikkat ediniz. Eğer Dense 
+katmanda bunun gibi N tane nöron varsa bu durumda eğitilebilir parametrelerin sayısı 
+N * 6 olacaktır. Katmanın girdi nöronlarının sayısı K tane olmak üzere Dense 
+katmandaki eğitilebilir parametrelerin sayısının K * N + N olduğunu anımsayınız. 
+
+
+Geri beslemeli ağlardaki katmanlarda bulunan nöronların çıktılarını aşağıdaki gibi 
+formülüze edebiliriz:
+   
+ht = activation(dot(W, xt) + dot(U, ht-1) + b)
+
+
+Burada ht nöronun çıktısını belirtmektedir. xt uygulanan girdiyi belirtmektedir. 
+ht-1 ise katmanın bir önceki çıktısını temsil etmektedir. W değeri girdiler için 
+konumlandırılacak ağırlık değerlerini U ise geri besleme için konumlandırılacak 
+ağırlık değerlerini belirtmektedir. 
+
+---------------------------------------------------------------------------------
+
+---------------------------------------------------------------------------------
+Geri besleme katmanı Keras'ta SimpleRNN isimli katman sınıfıyla temsil edilmektedir. 
+Bu katman değerleri satır satır ele alıp yukarıda belirttiğimiz gibi bir işlem yapmaktadır. 
+
+SimpleRNN sınıfının __init__ metodunun parametrik yapısı şöyledir:
+
+
+tf.keras.layers.SimpleRNN(
+    units,
+    activation='tanh',
+    use_bias=True,
+    kernel_initializer='glorot_uniform',
+    recurrent_initializer='orthogonal',
+    bias_initializer='zeros',
+    kernel_regularizer=None,
+    recurrent_regularizer=None,
+    bias_regularizer=None,
+    activity_regularizer=None,
+    kernel_constraint=None,
+    recurrent_constraint=None,
+    bias_constraint=None,
+    dropout=0.0,
+    recurrent_dropout=0.0,
+    return_sequences=False,
+    return_state=False,
+    go_backwards=False,
+    stateful=False,
+    unroll=False,
+    seed=None,
+    **kwargs
+)
+
+
+Metodun ilk parametresi katmandaki nöron sayısını belirtmektedir. 
+Aktivasyon fonksiyonunun default olarak 'tanh' biçiminde alındığına dikkat ediniz. 
+Geri besleme katmanlarında ReLU fonksiyonu yerine tanh (hiperbolik tanjant) fonksiyonu 
+tercih edilmektedir. Bu "vanishing gradient" problemine nispeten bir direnç oluşturmaktadır.
+
+---------------------------------------------------------------------------------
 """
 
 
