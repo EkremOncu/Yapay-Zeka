@@ -11492,12 +11492,12 @@ kaldırmasa da azaltacak biçimde evrimleşmiştir.
 
 ---------------------------------------------------------------------------------
 Geri beslemeli ağlardaki geri besleme bir katman biçiminde oluşturulmaktadır. Bu 
-katmanda yine n tane nörun bulunur. Ancak bu katmana girdiler tek hamlede değil  ????????????????????
-verilir. Girdinin her parçasından bir çıktı elde edilir. Sonra bu çıktı girdinin 
-sonraki parçasıyla işleme sokularak yine geri besleme katmanına sokulur. Böylece 
-katmanın her çıktısı sonraki girişle işleme sokularak bir hafıza oluşturulmaya çalışılır. 
-Tabii geri besleme katmanı genellikle tek başına kullanılmaz. Bu katmanın çıktısı 
-daha önceleri yaptığımız gibi Dense katmanlara verilir. 
+katmanda yine n tane nörun bulunur. Ancak bu katmana girdiler tek hamlede değil
+parça parça (batch batch) verilir. Girdinin her parçasından bir çıktı elde edilir. 
+Sonra bu çıktı girdinin sonraki parçasıyla işleme sokularak yine geri besleme 
+katmanına sokulur. Böylece katmanın her çıktısı sonraki girişle işleme sokularak 
+bir hafıza oluşturulmaya çalışılır. Tabi geri besleme katmanı genellikle tek başına 
+kullanılmaz. Bu katmanın çıktısı daha önceleri yaptığımız gibi Dense katmanlara verilir. 
 
 Yani geri besleme katmanı genellikle derin ağlardaki ilk katmanları oluşturmaktadır. 
 
@@ -11572,6 +11572,28 @@ Metodun ilk parametresi katmandaki nöron sayısını belirtmektedir.
 Aktivasyon fonksiyonunun default olarak 'tanh' biçiminde alındığına dikkat ediniz. 
 Geri besleme katmanlarında ReLU fonksiyonu yerine tanh (hiperbolik tanjant) fonksiyonu 
 tercih edilmektedir. Bu "vanishing gradient" problemine nispeten bir direnç oluşturmaktadır.
+
+Fonksiyonun diğer önemli parametresi return_sequences isimli parametredir. Bu 
+parametre True geçilirse (default durum False biçimdedir) bu durumda katman her 
+zamansal girişin (satırların) çıktılarını biriktirir. Eğer bu parametre True 
+geçilmezse bu biriktirme yapılmaz. Dolayısıyla sonraki katmana yalnızca son zamansal 
+verinin çıktısı sokulur. 
+
+---------------------------------------------------------------------------------
+Pekiyi SimpleRNN katmanının girdisi nasıl olmalıdır? İşte bu katmanın girdisi bir 
+matris olmalıdır. Matrisin her satırı zamanal veriyi belirtmektedir. Keras bu durumda 
+bu matrisin her bir satırını zamansal veri biçiminde ele alır ve önceki çıktıyla 
+işleme sokar. (Tabii Keras paralel programlama teknikleri ile daha karmışık bir 
+gerçekleştirime sahiptir. Ancak SimpleRNN katmanı satırları tek tek ele alıp kendi 
+içerisinde yukarıda belirttiğimiz gibi işleme sokmaktadır.)
+
+
+Aslında geri besleme katmanları genellikle bir kez değil üst üste birkaç kez uygulanmaktadır. 
+Tıpkı üstü üste evrişim uygulamak gibi üst üste geri besleme uygulamak hafızanın 
+güçlendirilmesine fayda sağlamaktadır. Tabi SimpleRNN katmanını birden fazla kez 
+uygulayacaksak bir önceki katmanın çıktısının bir matris olması gerekir. Bu da 
+önceki SimpleRNN katmanının return_sequences parametresinin True geçilmesiyle 
+sağlanabilir. 
 
 ---------------------------------------------------------------------------------
 """
