@@ -11596,8 +11596,69 @@ uygulayacaksak bir önceki katmanın çıktısının bir matris olması gerekir.
 sağlanabilir. 
 
 ---------------------------------------------------------------------------------
-"""
 
+---------------------------------------------------------------------------------
+Yazısal verilerin zaman serilerine benzediğinden bahsetmiştik. Her ne kadar yazılarda 
+sözcüklerin bir zaman bilgisi (time stamp) yoksa da sözcüklerin peşi sıra birbirini 
+izleemesi onların zaman serilerine benzemesine yol açmaktadır. İşte bu nedenle 
+geri beslemeli ağlar yalnızca zaman serilerinde değil aynı zamanda metinlerin 
+anlamlandırılmasında da kullanılmaktadır. 
+
+Biz metinler üzerinde işlemler yaparken Embedding katmanıyla sözcükleri vektörlerle 
+ifade etmiştik. Her sözcük bir vektör (bir satır olarak düşünebiliriz) ile ifade 
+edildiğine göre yazı da aslında vektörlerden oluşan bir matris biçiminde ele 
+alınabilir. O halde biz yazılar üzerinde işlemler yapan sinir ağlarında önce yazıları 
+Embedding katmanına sokup bu katmanın çıktısını da geri besleme katmanlarına verebiliriz. 
+Böylece modelimizin katman yapısı aşağıdaki gibi olabilir:
+
+
+Yazı ---> Embedding ---> SimpleRNN ---> Dense ---> Dense ---> Çıktı
+
+Şimdi daha önce üzerinde çalıştığımız IMDB örneğini SimpleRNN katmanını kullanarak 
+yeniden tasarlayalım. Modelin katman yapısı şöyle olabilir:
+
+
+TEXT_SIZE = 250
+WORD_VECT_SIZE = 64
+# ....
+
+
+model = Sequential(name='IMBD-WordEmbedding')
+
+model.add(Input((TEXT_SIZE, ), name='Input'))
+
+model.add(Embedding(len(cv.vocabulary_) + 1, WORD_VECT_SIZE, name='Embedding'))
+
+model.add(SimpleRNN(64, activation='tanh', return_sequences=True, name='SimpleRNN-1'))
+
+model.add(Reshape((-1, ), name='Reshape'))
+model.add(Dense(256, activation='relu', name='Hidden-1'))
+model.add(Dense(256, activation='relu', name='Hidden-2'))
+model.add(Dense(1, activation='sigmoid', name='Output'))
+model.summary()
+
+
+Burada önce bir Embedding katman kullanılmıştır. Bu katmandan çıktı olarak her biri 
+(WORD_VECT_SIZE) 64 sütundan, TEXT_SIZE kadar satırdan oluşan 64'lü sırasal değerler 
+elde edilmiştir. Bu 64'lü girişler 64 nörondan oluşan SimpleRNN katmanına girdi 
+yapılmıştır. 
+
+SimpleRNN katmanında return sequences=True parametresinin girildiğine dikkat ediniz. 
+Bu durumda her bir sözcüğün çıktısı olan 64'lük vektörler bir matris biçiminde 
+biriktirilmektedir. Sonra bunlar  Reshape katmanı ile düzleştirilip Dense katmanlara 
+verilmiştir. Bu örnekte biz yalnızca tek bir SimpleRNN katmanı kullandık. Burada 
+birden fazla SimpleRNN katmanın kullanılması parametre sayısının aşırı artması 
+nedeniyle bir "underfitting" olgusuna yol açabilmektedir. 
+
+Yukarıdaki örneklerden elde edilen sonuçlar aslında bu hali ile SimpleRNN katmanının 
+model üzerinde ciddi bir iyileşme sağlamadığı yönündedir. Daha önce yapmış olduğumuz 
+evrişim işlemi daha iyi bir sonucun elde edilmesine yol açmıştır. Pekiyi bu durumda 
+geri besleme IMDB örneğinde fayda sağlamayacak mıdır? Aslında geri besleme bir 
+hafıza oluşturmaktadır. Ancak SimpleRNN tek başına bu hafıza oluşumu için yeterli 
+olamamaktadır.
+
+---------------------------------------------------------------------------------
+"""
 
 
 
