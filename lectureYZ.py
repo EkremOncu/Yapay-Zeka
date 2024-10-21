@@ -11661,4 +11661,100 @@ olamamaktadır.
 """
 
 
+# Düzenleme (regularization)
+
+"""
+---------------------------------------------------------------------------------
+Yapay sinir ağlarında "overfitting" ve "underfitting" durumunu azaltmak için kullanılan 
+teniklere "düzenleme (regularization)" teknikleri denilmektedir. Bu bağlamda çeşitli 
+düzenleme teknikleri geliştirilmiştir. Bunlardan önemli olanları şunlardır:
+
+
+- L1 (Lasso) ve L2 (Ridge) Düzenlemeleri
+- Dropout Düzelnemesi
+- Batch Normalization Düzenlemesi
+- Erken Sonlandırma (Early Stopping) Düzenlemesi
+- Verilen Çoğaltılması (Data Augmentation)
+- Model Karmaşıklığını Azaltma 
+
+
+Biz bu yöntemlerden "erken sonlandırma (early stopping)" ve verilerin çoğaltılması 
+(data augmentation)" konularını görmüştük. Anımsanacağı gibi erken sonlandırma 
+eğitimdeki metrik değerlerle sınama değerlerinin birbirinden kopması durumunda 
+epoch kaynaklı overfitting durumunu engellemek için kullanılıyordu. Verilerin 
+çoğaltılması veri kümesinin büyütülmesi yoluyla "overfitting" ve "undefitting" 
+olgusunun azaltılmasına katkı sağlıyordu. Biz L1 ve L2 düzenlemelerini daha sonra 
+göreceğiz. 
+
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+
+Dropout düzenlemesi 2014 yılında bazı deneysel çalışmalar eşliğinde bulunmuştur. 
+Bu teknikte bir katmandaki nöronların bazıları rastgele biçimde katmandan atılmaktadır. 
+Böylece ağın ezberlediği yanlış şeylerin unutturulması sağlanmaktadır. Dropout 
+uygularken belli bir olasılık belirtilir. Bu olasılık o katmandaki nöronların atılma 
+olasılığıdır. Tipik olarak 0.2 ile 0.5 arasındaki değerler çok kullanılmaktadır. 
+Bazı uygulamacılar girdi katmanlarında 0.8'e varan daha yüksek olasılıkları kullanmaktadır. 
+Buradaki atılma olasılığı bir yüzde belirtmemektedir. Buradaki olasılık katmandaki 
+her nöron için ayrı ayrı uygulanan olasılıktır. Yani örneğin biz dropout olasılığını 
+0.1 yaptığımızda bu katmanın öncesindeki katmanda 100 nöron varsa bu durum bu 100 
+nöronun kesinlikle 10 tanesinin atılacağı anlamına gelmemektedir. Dropout düzenlemesi 
+çıktı katmanı dışındaki tüm katmanlara uygulanabilmektedir. 
+
+---------------------------------------------------------------------------------
+Keras'ta dropout işlemi Dropout isimli bir katman ile temsil edilmiştir. Dropout 
+sınıfının __init__ metdounun parametrik yapısı şöyledir:
+
+
+tf.keras.layers.Dropout(rate, noise_shape=None, seed=None, **kwargs)
+
+
+Metodun birinci parametresi droput olasılığını belirtmektedir. Droput katmanı ondan 
+önceki katmanın nöronlarını atmaktadır. Eğitim sırasında hep batch işleminde 
+katmandaki aynı nöronlar atılmamaktadır. Eğitim sırasında katmanın farklı nöronları 
+atılarak işlemler yapılmaktadır. Yani Keras'ın Dropout katmanı nöron atmayı epoch 
+temelinde değil batch temelinde yapmaktadır. Tabii aslında nöronlar gerçek anlamda 
+modelden atılmamaktadır. Yalnızca onların çıktıları 0'a çekilmektedir. Böylece 
+dot-product işleminde işlemden 0 elde edilmektedir. Bu da nöron atılmış gibi bir 
+etki oluşturmaktadır. 
+
+
+Katmandaki nöronların bir kısmı dropout işlemiyle atıldığında dot product sonucunda 
+elde edilen değer toplamı azalır. Bu durumu ortadan kaldırmak için genellikle 
+uygulamacılar dropout işleminde atılmayan nöronların çıktılarını atılan nöronların 
+oranı kadar artırırlar. Yani örneğin bir katmandaki dropout olasılığı 0.20 ise bu 
+katmanda atılmayan nöronların çıktıları da o oranda artırılmaktadır. rate atılma 
+oranını belirtmek üzere matematiksel olarak bu artırma 1 / (1 - rate)  işlemindne 
+elde edilen değer kullanılarak yapılmaktadır. Tabii Keras'ta biz bu işlemi manuel 
+olarak yapmayız. Zaten Keras'ın Dropout katmanı böyle davranmaktadır. 
+
+
+Dropout işlemi yalnızca eğitimde uygulanan bir işlemdir. Ağ eğitildikten sonra 
+test ve kestirim işlemlerinde dropout uygulanmaz. Burada dikkat edilmesi gereken 
+bir nokta şudur: Dropout işlemi nöron'un çıktısını sıfırlamamaktadır. Bir batch'lik 
+işlemde 0 gibi göstermektedir. (Zaten Dropout katmanı önceki katmanın çıkışına 
+uygulandığına göre önceki katmandaki nöronların ağırlıkları üzerinde bir değişiklik 
+yapamamaktadır.)
+
+---------------------------------------------------------------------------------
+Aşağıda dropout işleminin etkisine yönelik bir örnek verilmiştir. 
+
+
+from tensorflow.keras.layers import Dropout
+import numpy as np
+
+data = np.array([1, 2, 3, 4, 5, 6, 7, 8, 9, 10], dtype='float')
+
+dropout_layer = Dropout(0.8)
+
+result = dropout_layer(data, training=True)
+print(result)
+
+result = dropout_layer(data, training=True)
+print(result)
+
+---------------------------------------------------------------------------------
+"""
+
+
 
