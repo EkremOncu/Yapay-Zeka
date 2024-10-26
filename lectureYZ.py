@@ -11034,7 +11034,7 @@ uygulayabiliriz. Örneğin toplamda 16 filtre uygularsak elde edeceğimiz matris
 
 """
 ---------------------------------------------------------------------------------
-Keras'ta tek boyutlu evirişim işlemi için Conv1D katman sınıfı bulundurulmuştur. 
+     sınıfı bulundurulmuştur. 
 Conv1D sınıfının __init__  metodunun parametrik yapısı şöyledir:
 
 tf.keras.layers.Conv1D(
@@ -11600,7 +11600,7 @@ sağlanabilir.
 ---------------------------------------------------------------------------------
 Yazısal verilerin zaman serilerine benzediğinden bahsetmiştik. Her ne kadar yazılarda 
 sözcüklerin bir zaman bilgisi (time stamp) yoksa da sözcüklerin peşi sıra birbirini 
-izleemesi onların zaman serilerine benzemesine yol açmaktadır. İşte bu nedenle 
+izlemesi onların zaman serilerine benzemesine yol açmaktadır. İşte bu nedenle 
 geri beslemeli ağlar yalnızca zaman serilerinde değil aynı zamanda metinlerin 
 anlamlandırılmasında da kullanılmaktadır. 
 
@@ -11671,7 +11671,7 @@ düzenleme teknikleri geliştirilmiştir. Bunlardan önemli olanları şunlardı
 
 
 - L1 (Lasso) ve L2 (Ridge) Düzenlemeleri
-- Dropout Düzelnemesi
+- Dropout Düzenlemesi
 - Batch Normalization Düzenlemesi
 - Erken Sonlandırma (Early Stopping) Düzenlemesi
 - Verilen Çoğaltılması (Data Augmentation)
@@ -11758,3 +11758,70 @@ print(result)
 
 
 
+# LSTM
+
+"""
+---------------------------------------------------------------------------------
+Geri beslemeli ağlarda (Recurrent Neural Networks) çıktının bir sonraki girdi ile 
+işlemi sokulması ağa belli bir hafıza kazandırmaktadır. Ancak bu hafıza "gradyen 
+kaybolması (vanishing gradient)" denilen problem yüzünden yüzeyselleşmektedir. 
+Başka bir deyişle ağ eğitim sırasında öncekileri unutup son veriler üzerinde hafıza 
+oluşturmaktadır. Ya da başka bir deyişle oluşturulan hafıza "kısa süreli (short term)" 
+olmaktadır. Çıktının sürekli girdiye verilmesi ilk girdilerin belli bir zaman sonra 
+unutulmasına yol açmaktadır. Daha önce de bahsettiğimiz gibi "gradyen kaybolması" 
+ağın derinleşmesi sonucunda oluşan genel bir problemdir. Geri beslemeli ağlar aslında 
+ağı derinleştirmektedir. Bunun sonucu olarak da bu ağlarda gradyen kaybolması
+daha açık bir biçimde kendini göstermektedir. İşte geçmişin ağda daha iyi hatırlanması 
+için ve "gradyen kaybolması" denilen problemi azaltmak için bazı modeller önerilmiştir. 
+Bunlardan en önemlilerinden biri LSTM (Long Short Term Memory) denilen modeldir. 
+
+
+LSTM modelinde yine SimpleRNN modelinde olduğu gibi bir önceki çıktı bir sonraki 
+girdi ile işleme sokulmaktadır. Ancak ağa başka bir girdi bileşeni daha eklenmiştir. 
+Bu girdi bileşeni ağın geçmiş bilgileri unutmasını engellemesini (gradyen kaybolmasını 
+azaltmayı) hedeflemektedir. LSTM katmanındaki ağa eklenen ilave "carry" girişinin 
+nasıl olup da "gradyen kaybolmasını" azalttığı konusu biraz karmaşıktır.    
+
+LSTM katmanında her zamansal girdi önceki çıktı ve önceki carry değeri ile işleme 
+sokulmaktadır. 
+
+---------------------------------------------------------------------------------
+Keras'taki LSTM sınıfının __init__ metodunun parametrik yapısı şöyledir:
+
+
+tf.keras.layers.LSTM(
+    units,
+    activation='tanh',
+    recurrent_activation='sigmoid',
+    use_bias=True,
+    kernel_initializer='glorot_uniform',
+    recurrent_initializer='orthogonal',
+    bias_initializer='zeros',
+    unit_forget_bias=True,
+    kernel_regularizer=None,
+    recurrent_regularizer=None,
+    bias_regularizer=None,
+    activity_regularizer=None,
+    kernel_constraint=None,
+    recurrent_constraint=None,
+    bias_constraint=None,
+    dropout=0.0,
+    recurrent_dropout=0.0,
+    seed=None,
+    return_sequences=False,
+    return_state=False,
+    go_backwards=False,
+    stateful=False,
+    unroll=False,
+    use_cudnn='auto',
+    **kwargs
+)
+
+
+Burada yine ilk parametre katmandaki nöron sayısını belirtmektedir. 
+Aktivasyon fonksiyonu yine default olarak "tanh" biçiminde alınmıştır. 
+Yine katmandaki çıktıların biriktirilmesi için kullanılan return_sequences parametresi 
+vardır. Yani katmanın kullanımı SimpleRNN katmanına oldukça benzemektedir. 
+
+---------------------------------------------------------------------------------
+"""
