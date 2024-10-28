@@ -11991,3 +11991,114 @@ model.summary()
 
 ---------------------------------------------------------------------------------
 """
+
+
+
+# preTrained models
+
+"""
+---------------------------------------------------------------------------------
+Biz kursumuzda "aktarımsal öğrenme (transfer learning)" konusuna bir giriş yapmıştık. 
+Aktarımsal öğrenme bir modelin bazı amaçlarla eğitilmesi ve onun benzer amaçlarla 
+değişik uygulamalarda kullanılabilmesi anlamına geliyordu. İşte makine öğrenmesi 
+alanında framewrok'ler ve birtakım topluluklar önceden hazırlanmış ve eğitilmiş 
+modelleri bulundurabilmektedir. Böylece uygulamacı başarısı kanıtlanmış modelleri 
+sıfırdan oluşturmak yerine zaten oluşturulmuş ve eğitilmiş modelleri doğrudan 
+projelerinde kullanabilmektedir. 
+
+Başkaları tarafındna hazırlanmış olan modelleri kullanırken modellerin sunum biçimine 
+dikkat edilmesi gerekir. Modeller genellikle framework'e özgü bir biçimde 
+oluşturulmaktadır. Yani örneğin biz PyTorch için oluşturulmuş bir modeli Tensorflow'da
+kullanamayız. Dış sunulmuş modellerde dosya formatlarına da dikkat etmek gerekir. 
+Farklı framework'ler farklı dosya formatlarını kullanmaktadır. Dolayısıyla bu 
+dosyaların Python'da kullanıma hazır hale getirilmesinde de framework'e özgü sınıflar 
+ve fonksiyonlardan faydalanılmaktadır.
+
+---------------------------------------------------------------------------------
+Biz Tensorflow Keras'ta çalışırken hazır modelleri nasıl elde edebiliriz? Hazır 
+modellerin bazıları zaten framework'ün içerisine sınıflar biçiminde bulundurulmuştur. 
+En kolay yöntem bu sınıfların kullanılmasıdır. Çünkü bu sınıflar framework ile 
+tam bir uyum içerisinde çalışmaktadır. Keras'ın bu hazır modelleri 
+"tensorflow.keras.applications" paketi içerisindedir. Eskiden bu paket Tensorflow'a 
+resmi olarak dahil değildi. Sonra resmi olarak dahil edildi. Ancak bu paket ağırlıklı 
+olarak görüntü işlemeye ve resimsel uygulamalara yöneliktir. 
+
+Framework'lerin kendi hazır model sınıflarının yanı sıra çeşitli toplulukların 
+bünyesinde oluşturulmuş olan hazır modeller de bulunmaktadır. Örneğin Tensorflow 
+(dolayısıyla Google) tarafından oluşturulmuş olan "Tensorflow Hub" denilen bir 
+topluluk vardır. Bu topluluk kendi modellerini dış dünyaya açmaktadır.Ancak geçen 
+yıl bu topluluk Kaggle'ın bünyesine dahil edilmiştir.Kaggle zamanla Tensorflow Hub 
+dışında pek çok framework'e ilişkin modelleri barındıran vir topluluk haline gelmiştir. 
+Dolayısıyla bu tür hazır modeller için iyi bir kaynak oluşturmaktadır. Kaggle'ın 
+modelleri barındıran bağlantısı aşağıda verilmiştir:
+
+
+https://www.kaggle.com/models
+
+
+Kaggle topluluk sitelerinde model araştırırken modelin oluşturulduğu framework'e 
+dikkat ediniz. Yukarıda da belirttiğimiz gibi bir framework için oluşturulmuş model 
+başka bir framework'te kullanılamamaktadır. Bu tür topluluk sitelerinde modeller 
+framework temelinde aranabilmektedir. Bu tür topluluk sitelerinde modeller bir dosya 
+biçiminde indirilip kullanılabilir. Ancak kulanım kolaylığı oluşturabilmek için 
+aynı zamanda URL temelli yüklemelere de izin verilebilmektedir. URL temelli yüklemede 
+modeli oluşturan bir URL de oluşturmaktadır. Böylece modelin indirilip yüklenmesi 
+tek hamlede ilgili URL belirtilerek de yapılabilmektedir. Kaggle topluluğu modelleri 
+ve dosyaları uzaktan indirmek için ayrı bir kütüphane de sunmaktadır. Bu kütüphaneye 
+kagglehup kütüphanesi denilmektedir. Ancak bu kütüphanenin kullanılabilmesi için 
+"API Key" oluşturulması gerekmektedir. kagglehup kütüophanesinin genel kullanımı 
+aşağıdaki bağlantıda  açıklanmaktadır:
+
+https://github.com/Kaggle/kagglehub
+
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Bir topluluktan (örneğin Kaggle) bir model indirilirken yalnızca onun oluşturulduğu 
+framework'e değil aynı zamanda indirilecek model dosyasının dosya formatına ve 
+içeriğinde de dikkat etmek gerekir. Bazı dosya formatları genel amaçlıdır. Örneğin 
+".h5 formatı (Hierarchical Data Format)" genel amaçlı bir formattır. .h5 uzantılı 
+bir dosyanın içerisinde Keras uyumlu bir model bilgisinin bulunma zorunluluğu 
+yoktur. Örneğin ".pb formatı (Protocol Buffer Format)" da genel amaçlı bir formattır. 
+".pb" uzantılı bir dosyanın içinde ne olduğunun ayrıca biliniyor olması gerekir. 
+
+
+Tensorflow dünyasında çok karşılaşılan dosyalar ve formatlar şunlardır:
+
+
+
+- .h5 Dosyaları: Genellikle  bu dosyalar içerisinde Tensorflow modelinin kendisi ve 
+                ağırlıkları ya da yalnızca ağırlıkları bulunabilmektedir.
+
+
+
+- .keras Dosyaları: Eskiden Keras'ta model saklamak için H5 formatı yoğun kullanılıyordu. 
+                    Sonra Keras ekibi Keras'a özgü bir biçimde ".keras" formatını 
+                    kullanmaya başladı. Aslında ".keras" uzantılı dosyalar özel 
+                    bir formata sahip değildir. Bu dosyalar bir dizin'in ziplenmesinden 
+                    oluşmaktadır. ".keras" dosyasının belirttiği dizin içerisinde 
+                    ".h5" dosyasının yanı sıra bazı JSON dosyaları (ve duruma göre 
+                    bazı grafik dosyalar vs.) bulunmaktadır. Yani aslında model 
+                    bilgileri yine ".keras" uzantılı dosyaların içerisindeki ".h5" 
+                    dosyasında tutulmaktadır.
+
+
+- SavedModel Formatı: Bu format Tensorflow kütüphanesi tarafından kullanılan diğer 
+                    bir model saklama formatıdır. Genellikle ".pb uzantılı 
+                    (Protobcol Buffer Format)" dosyaların içerisine yerleştirilmektedir. 
+                    Yani biz ".pb" uzantılı bir model dosyası görürsek bunun içerisinde 
+                    muhtemelen "SavedFormat" biçiminde saklanmış model bilgileri bulunmaktadır.
+
+
+- .tflite Formatı: Bu format ve dosya uzantısı Tensorflow modellerini ve ağırlık 
+                değerlerini saklamak için tasarlanmış diğer bir formattır. Dolayısıyla 
+                özellikle düşük kapasiteli mobil aygıtlarda ve gömülü sistemlerde 
+                tercih edilmektedir. Bu format yalnızca makine öğrenmesinde değil 
+                özellikle mobil aygıtlarda da başka amaçlarla kullanılabilmektedir. 
+                Format daha az yer kaplayacak biçimde tasarlanmıştır.
+
+---------------------------------------------------------------------------------
+"""
+
+
+
+
