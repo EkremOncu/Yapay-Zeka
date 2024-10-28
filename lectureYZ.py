@@ -11825,3 +11825,169 @@ vardır. Yani katmanın kullanımı SimpleRNN katmanına oldukça benzemektedir.
 
 ---------------------------------------------------------------------------------
 """
+
+
+
+# GRU (Gated Recurrent Unit) 
+
+"""
+---------------------------------------------------------------------------------
+Ağa uzun dönem hafıza kazandırmaya çalışan diğer bir yöntem de GRU (Gated Recurrent Unit) 
+isimli yöntemdir. Bu yöntemde de yine ağa üçüncü bir giriş uygulanmaktadır. GRU 
+yöntemi de Keras'ta tensorflow.keras.layers modülündeki GRU katman sınıfıyla temsil 
+edilmiştir. Dolayısıyla uygulamacı LSTM yerine GRU katmanını kullandığında yöntemi 
+değiştirmiş olur. GRU sınıfının __init__ metodunun parametrik yapısı da LSTM 
+sınıfına benzemektedir:
+
+
+tf.keras.layers.GRU(
+    units,
+    activation='tanh',
+    recurrent_activation='sigmoid',
+    use_bias=True,
+    kernel_initializer='glorot_uniform',
+    recurrent_initializer='orthogonal',
+    bias_initializer='zeros',
+    kernel_regularizer=None,
+    recurrent_regularizer=None,
+    bias_regularizer=None,
+    activity_regularizer=None,
+    kernel_constraint=None,
+    recurrent_constraint=None,
+    bias_constraint=None,
+    dropout=0.0,
+    recurrent_dropout=0.0,
+    seed=None,
+    return_sequences=False,
+    return_state=False,
+    go_backwards=False,
+    stateful=False,
+    unroll=False,
+    reset_after=True,
+    use_cudnn='auto',
+    **kwargs
+)
+
+Yine metodun birinci parametresi katmandaki nöron sayısını, ikinci parametresi 
+ise aktivasyon fonksiyonunu belirtmektedir. 
+
+LSTM ile GRU arasında şu farklılıklar söz konusudur:
+
+---------------------------------------------------------------------------------    
+- LSTM'de ağa uzun dönem hafıza kazandırmak için uygulanan giriş üç bileşene sahipken 
+GRU katmanında iki bileşene sahiptir.  Dolayısıyla GRU katmanı LSTM katmanına göre 
+daha az eğitilebilir parametreye sahiptir. Genel GRU olarak katmanı LSTM katmanından 
+daha yalın görünümdedir.
+
+- GRU katmanında daha az bileşen olduğu için bu katmanın eğitimi LSTM katmanına 
+göre daha hızlı yapılabilmektedir. Ayrıca GRU katmanı daha düşük miktardaki eğitim 
+verileri için bu nedenden dolayı daha uygun olabilmektedir. 
+
+- LSTM katmanı GRU katmanına göre daha iyi performans gösterme eğilimindedir. Yani 
+ikisi arasındaki tercih hız ve duyarlılık ihtiyacına göre değişebilmektedir. 
+
+---------------------------------------------------------------------------------
+"""
+
+
+# bidriectional RNN
+
+"""
+---------------------------------------------------------------------------------
+Geri beslemeli ağlarda biz önceki çıktıyı sonraki girdi ile ilişkilendiriyorduk. 
+SimpleRNN katmanında "gradyen kaybolması (vanishing gradient)" denilen problem 
+yüzünden geçmişe ilişkin iyi bir biçimde tutulamıyordu. Bunun için LSTM ve GRU geri 
+beslemesi kullanılıyordu. Bu geri besleme modellerinde geçmişin daha iyi anımsanması 
+sağlanıyordu. Ancak önceki çıktının sonraki girdiyle işleme sokulması bazı durumlarda 
+yeterli olmamaktadır. Örneğin metinlerin anlamlandırılmasında önce bir şeyden 
+bahsedilip sonra o şey hakkında bilgi verildiğinde önce bahsedilen şeyin ne olduğu 
+ancak sonradan anlaşılmaktadır. Örneğin bir kişinin bir dükkana girdiği belirtilmiş 
+olabilir. Sonra da bu dükkanın eczane olduğu söylenmiş olabilir. Bu durumda eğer 
+o dükanın baştan eczane olduğu bilinse daha iyi bir çıkarım yapılabilir. Bazı doğal 
+dillerin dillerin gramerleri de bu biçimde gelişmiştir. Örneğin İngilizce'de 
+"the book on the table ..." biçimindeki bir cümlede kitabın masanın üzerinde 
+olduğu sonradan anlaşılmaktadır. Ancak "masanın üzerindeki kitap ..." cümlesinde 
+kitabın masanın üzerinde olduğu baştan anlaşılmaktadır. Ancak İngilizce'de de 
+yüklem hemen özneden sonra gelir. Böylece bir kişinin ne yaptığı baştan anlaşılmaktadır.
+
+
+İşte geri beslemede önceki çıkışın sonraki girişle ilişkilendirilmesinin yanı sıra 
+bunun tersinin de yapılması yani sonraki çıkışın önceki girişle ilişkilendirilmesinin 
+sağlanması daha iyi bir öğrenmeye yol açabilektedir. Bu tür geri beslemeli ağlara 
+"çift yönlü (bidriectional)" geri beslemeli ağlar denilmektedir. Mimari olarak 
+çift yönlü geri beslemeli ağlar tek yönlü ağlara geri doğru aynı biçimde bir besleme 
+eklenmesiyle oluşturulmaktadır. Ancak çift yönlü geri besleme ağı daha karmaşık 
+bir hale getirmektedr. Dolayısıyla eğitilebilir parametrelerin sayısını da artırmaktadır. 
+Ancak bazı uygulamalarda daha iyi bir sonucun elde edilmesine olanak sağlamaktadır. 
+
+Tabii zamansal verilerin söz konusu olduğu bazı uygulamalarda çift yönlü geri besleme
+bir fayda sağlamadığı gibi modelin başarısını bile düşürmektedir. Örneğin Jena 
+Cliamate veri kümesinde çift yönlü bir geri beslemenin açık bir faydası olmayacaktır. 
+Çünkü Jena Climate veri kümesinde gelecekteki bilginin geçmiş ile yeniden ilişkilendirilmesinin     
+açık bir faydası yoktur. Dolayıysyla çift yönlü geri beslemenin her zaman tek yönlü 
+geri beslemeden daha iyi sonuç vereceği söylenemez. Uygulamacının gerektiğinde 
+her iki yöntemi de denemesi tavsiye edilmektedir. Yukarıda da belirttiğimiz gibi Jena 
+Climate örneğinde olduğu gibi pek çok zaman serisi tarzındaki veri kümelerinde 
+çift yönlü geri besleme açık bir fayda sağlamamaktadır. 
+
+Çift yönlü geri beslemenin en sık kullanıldığı alan "makine çevirisi", 
+"metinden anlam çıkartma" gibi metinsel işlemlerdir. 
+
+---------------------------------------------------------------------------------
+Keras'ta çift yönlü geri besleme işlemi tensorflow.keras.layers modülündeki 
+Bidirectional sınıfı ile yapılmaktadır. Bu sınıf dekoratör kalıbı (decorator pattern) 
+biçiminde oluşturulmuştur. Biz bu sınıfa SimpleRNN, LSTM ya da GRU katman nesnelerini 
+veririz. Sınıf da onu çift yönlü hale getirir. Sınıfın __init__ metodunun parametrik 
+yapısı şöyledir:
+
+
+tf.keras.layers.Bidirectional(
+    layer,
+    merge_mode='concat',
+    weights=None,
+    backward_layer=None,
+    **kwargs
+)
+
+
+Metodun birinci parametresi kullanılacak geri tek yönlü geri besleme katman nesnesini 
+almaktadır. Aslında Keras'ın içsel tasarımında SimpleRNN, LSTM ve GRU katmanları 
+RNN isimli bir sınıftan türetilmiştir. Dolayısıyla bu parametre için RNN sınıfından
+türetilmiş bir katmana ilişkin katman nesnesi girilmelidir. Örneğin:
+
+
+model.add(Bidirectional(LSTM(64, name='LSTM', return_sequences=True), name='Bidirectional'))
+
+
+Burada Bidirectional fonksiyonun birinci parametresi LSTM nesnesi olarak girilmiştir. 
+Yani Bidirectional sınıfı tek yönlü geri beslemeli sınıfların çift yönlü çalışmasını 
+sağlamaktadır. 
+
+
+Bu durumda bizim ağı çift yönlü yapmak için tek yapacağımız şey SimpleRNN, LSTM 
+ya da GRU katman nesnesini Bidirectional katmanına vermektir.
+
+---------------------------------------------------------------------------------
+from tensorflow.keras import Sequential
+from tensorflow.keras.layers import Embedding, Bidirectional, LSTM, Dropout, Flatten, Dense
+
+
+model = Sequential(name='IMDB-LSTM-Bidirectional')
+model.add(Embedding(len(cv.vocabulary_), 64, input_length=TExT_SIZE, name='Embedding'))
+
+model.add(Bidirectional(LSTM(64, name='LSTM', return_sequences=True), name='Bidirectional'))
+
+model.add(Dropout(0.2, name='Dropout-1'))
+
+model.add(Flatten(name='Flatten'))
+
+model.add(Dense(64, activation='relu', name='Dense-1'))
+model.add(Dropout(0.2, name='Dropout-2'))
+
+
+model.add(Dense(1, activation='sigmoid', name='Output'))
+model.summary()
+
+
+---------------------------------------------------------------------------------
+"""
