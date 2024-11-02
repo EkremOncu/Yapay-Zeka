@@ -11998,10 +11998,9 @@ model.summary()
 
 """
 ---------------------------------------------------------------------------------
-Biz kursumuzda "aktarımsal öğrenme (transfer learning)" konusuna bir giriş yapmıştık. 
 Aktarımsal öğrenme bir modelin bazı amaçlarla eğitilmesi ve onun benzer amaçlarla 
 değişik uygulamalarda kullanılabilmesi anlamına geliyordu. İşte makine öğrenmesi 
-alanında framewrok'ler ve birtakım topluluklar önceden hazırlanmış ve eğitilmiş 
+alanında framework'ler ve bir takım topluluklar önceden hazırlanmış ve eğitilmiş 
 modelleri bulundurabilmektedir. Böylece uygulamacı başarısı kanıtlanmış modelleri 
 sıfırdan oluşturmak yerine zaten oluşturulmuş ve eğitilmiş modelleri doğrudan 
 projelerinde kullanabilmektedir. 
@@ -12028,7 +12027,7 @@ bünyesinde oluşturulmuş olan hazır modeller de bulunmaktadır. Örneğin Ten
 (dolayısıyla Google) tarafından oluşturulmuş olan "Tensorflow Hub" denilen bir 
 topluluk vardır. Bu topluluk kendi modellerini dış dünyaya açmaktadır.Ancak geçen 
 yıl bu topluluk Kaggle'ın bünyesine dahil edilmiştir.Kaggle zamanla Tensorflow Hub 
-dışında pek çok framework'e ilişkin modelleri barındıran vir topluluk haline gelmiştir. 
+dışında pek çok framework'e ilişkin modelleri barındıran bir topluluk haline gelmiştir. 
 Dolayısıyla bu tür hazır modeller için iyi bir kaynak oluşturmaktadır. Kaggle'ın 
 modelleri barındıran bağlantısı aşağıda verilmiştir:
 
@@ -12046,7 +12045,7 @@ modeli oluşturan bir URL de oluşturmaktadır. Böylece modelin indirilip yükl
 tek hamlede ilgili URL belirtilerek de yapılabilmektedir. Kaggle topluluğu modelleri 
 ve dosyaları uzaktan indirmek için ayrı bir kütüphane de sunmaktadır. Bu kütüphaneye 
 kagglehup kütüphanesi denilmektedir. Ancak bu kütüphanenin kullanılabilmesi için 
-"API Key" oluşturulması gerekmektedir. kagglehup kütüophanesinin genel kullanımı 
+"API Key" oluşturulması gerekmektedir. kagglehup kütüphanesinin genel kullanımı 
 aşağıdaki bağlantıda  açıklanmaktadır:
 
 https://github.com/Kaggle/kagglehub
@@ -12084,7 +12083,7 @@ Tensorflow dünyasında çok karşılaşılan dosyalar ve formatlar şunlardır:
 
 - SavedModel Formatı: Bu format Tensorflow kütüphanesi tarafından kullanılan diğer 
                     bir model saklama formatıdır. Genellikle ".pb uzantılı 
-                    (Protobcol Buffer Format)" dosyaların içerisine yerleştirilmektedir. 
+                    (Protocol Buffer Format)" dosyaların içerisine yerleştirilmektedir. 
                     Yani biz ".pb" uzantılı bir model dosyası görürsek bunun içerisinde 
                     muhtemelen "SavedFormat" biçiminde saklanmış model bilgileri bulunmaktadır.
 
