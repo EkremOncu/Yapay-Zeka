@@ -12096,6 +12096,89 @@ Tensorflow dünyasında çok karşılaşılan dosyalar ve formatlar şunlardır:
                 Format daha az yer kaplayacak biçimde tasarlanmıştır.
 
 ---------------------------------------------------------------------------------
+Örneğğin kaggle.com sitesindeki Models sekmesine girip "framework" için Keras 
+seçildiğinde karşımıza çeşitli amaçlarla başkaları tarafından oluşturulmuş olan 
+eğitilmiş ya da eğitilmemiş modeller çıkacaktır. Biz framework olarak Keras'ı 
+seçtiğimiz için genellikle buradaki model dosyaları ".keras" uzantılı biçimde karşımıza 
+çıkacaktır. Biz de bu dosyaları indirip yukarıda belirttiğimiz gibi load_model 
+fonksiyonuyla yükleyebiliriz. Örneğin aşağıdaki siteden modeli indirdiğimizde
+"ResNet50.keras" isminde bir dosya elde etmiş olacağız:
+
+
+https://www.kaggle.com/models/paripatel2709/resnet
+
+
+Bu dosyayı da yularıda belirttiğimiz gibi load_model fonksiyonuyla yükleyebiliriz:
+
+
+from tensorflow.keras.models import load_model
+
+
+model = load_model('ResNet50.keras')
+model.summary()
+
+---------------------------------------------------------------------------------
+Şimdi Keras içerisinde tensorflow.keras.applications paketinde hazır bir biçimde 
+bulunan modellerin nasıl yüklenerek kendi amaçlarımız doğrultusunda kullanılabileceğine 
+bazı örnekler verelim.
+
+Resim sınıflandırma ve anlamlandırmada kabul görmüş olan en önemli modellerden 
+ikisi ResNet ve VGG modelleridir. Bu modeller onlarca katmana sahip olan çok ayrıntılı 
+modellerdir. Biz burada bu modellerin iç yapısı üzerinde durmayacağız. Ancak bu 
+modelleri açıklayan pek çok kaynak bulunmaktadır. 
+
+Keras içeisindeki ResNet modellerinin yanında bazı sayılar bulunmaktadır. Örneğin 
+ResNet50, ResNet101, ResNet152 gibi. Bu sayılar modelin katman sayısı ile ilgilidir. 
+Yüksek sayılarda daha fazla katman vardır. Dolayısıyla daha fazla eğitilebilir 
+parametre bulunmaktadır. Yukarıda sözünü ettiğimiz bu hazır modeller oldukça derin 
+bir mimariye sahiptir. Dolayısıyla bu modellerin eğitilmesi daha önce yaptığımız 
+modellere göre daha fazla zaman almaktadır. Eğitim için saatlerce zaman gerekebilmektedir. 
+
+---------------------------------------------------------------------------------
+Örneğin biz popüler bir mimari olan DenseNet121'i kullanmak isteyelim. Bunun 
+için önce bir DenseNet121 nesnesi yaratılır. DenseNet121 sınıfının __init__ metodunun 
+parametrik yapısı şöyledri:
+
+
+tf.keras.applications.DenseNet121(
+    include_top=True,
+    weights='imagenet',
+    input_tensor=None,
+    input_shape=None,
+    pooling=None,
+    classes=1000,
+    classifier_activation='softmax'
+)
+
+
+Metodun birinci parametresi True geçilirse model girdi ve çıktı katmanıyla birlikte 
+bir bütün olarak kullanılır. Genellikle bu parametre False biçimde geçilir. Çünkü 
+genellikle uygulamacılar modeli bir bütün olarak kullanmak yerine modeli kendi 
+amaçları doğrultusunda kullanırlar ve ince ayar (fine-tuning) yapmak isterler. 
+
+Metodun weights parametresi önceden eğitimle elde edilmiş olan ağırlıkların kullanılıp 
+kullanılmayacağını belirtmektedir. Burada biz nereden elde edilen ağırlıkların 
+kullanılacağını belirtiriz. Bu parametre default olarak "imagenet" biçiminde girilmiştir. 
+ImageNet resimlerden oluşan dev bir veritabanıdır. Bu veritabanı özellikle makine 
+öğrenmesinde resimlerle ilgili işlemler yapan modellerin eğitilmesinde yaygın biçimde 
+kullanılmaktadır. Burada weights parametresi None geçilirse model eğitilmemiş bir 
+biçimde kullanılır. Yani bu durumda tüm eğitimi uygulamacının kendisi yapmak zorundadır. 
+Bu parametreye ağırlıkların bulunduğu desteklenen bir formattaki dosyanın yol 
+ifadesi de geçirilebilmektedir. 
+
+Metodun input_shape parametresi girdi resimlerinin boyutunu belirtmektedir. Burada 
+önemli bir noktayı da belirtmek istiyoruz. Biz "ImageNet" veritabanındaki resimlerden 
+elde edilen ağırlıkları kullanmak istediğimizi düşünelim. Bu veritabanındaki eğitimler 
+(224, 224, 3) boyutundaki resimlerle yapılmıştır. Eğer bizim resimlerimiz bu boyuttan 
+büyük ise ya da küçük ise dönüştürme sırasında performans kayıpları oluşabilecektir. 
+Bu nedenle bu sınıfları kullanıyorsanız eğitimin yapıldığı orijinal resim boyutuna 
+ne kadar yakın bir boyut seçerseniz performans daha daha iyi olacaktır. Örneğin 
+biz CIFAR-100 örneği için ResNet121 modelini kullanmak isteyelim. Ancak önceden 
+eğitilmiş ağırlık değerleri yerine modelimizi biz kendi verilerimizle eğitmek isteyelim. 
+Bu durumda ResNet121 nesnesi aşağıdaki gibi yaratılabilir. Eğer bu katmanın önünde
+bir girdi katmanı bulundurulacaksa bu durumda image_shape parametresi hiç girilmeyebilir. 
+    
+---------------------------------------------------------------------------------
 """
 
 
