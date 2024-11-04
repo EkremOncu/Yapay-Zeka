@@ -9901,6 +9901,48 @@ Bu parametrenin default değeri (256, 256) biçimindedir. shuffle parametresi
 dizinlerden elde edilen resimlerin her epoch'ta karıştırılıp karıştırılmayacağını 
 belirtmektedir. Fonksiyonun diğer parametreleri için dokümanlara başvurulabilir.
 
+Biz bu dizinden resimleri aşağıdaki gibi Dataset biçiminde oluşturabiliriz:
+
+
+dataset = image_dataset_from_directory('Images', label_mode='binary', image_size=(128, 128), batch_size=32)    
+
+
+Artık image_dataset_from_directory fonksiyonuyla elde ettiğimiz Dataset nesnesini 
+daha önce görmüş olduğumuz parçalı verilerle eğitimde kullanabiliriz. Bir Dataset 
+nesnesi içerisindeki bilgiler sınıfın take isimli metoduyla elde edilebilmektedir. 
+take metodunun parametrik yapısı şöyledir:
+
+
+take(count, name=None) 
+
+
+Metodun count parametresi Dataset nesnesinden kaç batch'lik alınacağını belirtmektedir. 
+Bu parametre -1 girilirse tüm elemanlar elde edilmektedir. take metodu bize dolaşılabilir 
+bir nesne verir. Bu dolaşılabilir nesne her dolaşıldığında x ve y değerlerinden 
+oluşan demetler elde edilmektedir. Bize verilen bu dolaşılabilir nesne toplamda 
+count defa dolaşılmaktadır. Örneğin biz image_dataset_from_directory fonksiyonunda 
+batch_size parametresi için 32 girmiş olalım. take metodunda count parametresi 
+için 10 girersek bu nesneyi her dolaştığımızda 32'lik bir x ve y veri kümesi elde 
+ederiz. Toplamda da bu nesneyi 10 kez dolaşabiliriz. Aşağıda ilgili dizindeki 10 
+resmi görüntüleyen bir örnek verilmiştir.
+
+
+Biz image_dataset_from_directory fonksiyonunu yalnız fit işlemlerinde değil, test 
+ve kestirim işlemlerinde de kullanabiliriz. Fonksiyonun subset parametresi 'training', 
+'validation' ya da 'both' biçiminde girilebilmektedir. 'training' eldeki resim 
+kümesindenki bir grup resmin eğitim amacıyla 'validation' ise sınama amacıyla 
+kullanılacağını belirtmektedir. Ancak subset parametresi girildiğinde validation_split 
+parametresinin ve seed parametresinin de girilmesi gerekmektedir. Örneğin biz 
+eğitim ve sınama kümeleri için ayrışırmayı şöyle yapabiliriz:
+
+
+training_dataset = image_dataset_from_directory('Images', label_mode='binary', 
+        image_size=(128, 128), subset='training', seed=123, validation_split=0.2, batch_size=32)  
+
+
+validation_dataset = image_dataset_from_directory('Images', label_mode='binary', 
+        image_size=(128, 128), subset='training', seed=123, validation_split=0.2, batch_size=32)  
+
 ---------------------------------------------------------------------------------
 Örneğin yukarıdaki gibi bir dizin  yapısı olsun:
 
@@ -12162,9 +12204,9 @@ kullanılacağını belirtiriz. Bu parametre default olarak "imagenet" biçimind
 ImageNet resimlerden oluşan dev bir veritabanıdır. Bu veritabanı özellikle makine 
 öğrenmesinde resimlerle ilgili işlemler yapan modellerin eğitilmesinde yaygın biçimde 
 kullanılmaktadır. Burada weights parametresi None geçilirse model eğitilmemiş bir 
-biçimde kullanılır. Yani bu durumda tüm eğitimi uygulamacının kendisi yapmak zorundadır. 
-Bu parametreye ağırlıkların bulunduğu desteklenen bir formattaki dosyanın yol 
-ifadesi de geçirilebilmektedir. 
+biçimde kullanılır. (sadece modelin mimarisi kullanılır) Yani bu durumda tüm eğitimi 
+uygulamacının kendisi yapmak zorundadır. Bu parametreye ağırlıkların bulunduğu 
+desteklenen bir formattaki dosyanın yol ifadesi de geçirilebilmektedir. 
 
 Metodun input_shape parametresi girdi resimlerinin boyutunu belirtmektedir. Burada 
 önemli bir noktayı da belirtmek istiyoruz. Biz "ImageNet" veritabanındaki resimlerden 
@@ -12176,8 +12218,159 @@ ne kadar yakın bir boyut seçerseniz performans daha daha iyi olacaktır. Örne
 biz CIFAR-100 örneği için ResNet121 modelini kullanmak isteyelim. Ancak önceden 
 eğitilmiş ağırlık değerleri yerine modelimizi biz kendi verilerimizle eğitmek isteyelim. 
 Bu durumda ResNet121 nesnesi aşağıdaki gibi yaratılabilir. Eğer bu katmanın önünde
-bir girdi katmanı bulundurulacaksa bu durumda image_shape parametresi hiç girilmeyebilir. 
+bir girdi katmanı bulundurulacaksa bu durumda image_shape parametresi hiç girilmeyebilir.
+
+
+from tensorflow.keras.applications.densenet import DenseNet121
     
+dn121 = DenseNet121(include_top=False, weights=None, input_shape=(32, 32, 3))
+
+Burada include_top parametresi False geçildiği için modelin çıktı katmanını bizim oluşturmamız gerekir. 
+
+---------------------------------------------------------------------------------
+Pekiyi biz bu hazır modeli nasıl Cifar-100 örneğinde kullanabiliriz? Daha önceden de 
+belirttiğimiz gibi bu tür hazır modellerin Keras'ta fonksiyonel bir biçimde kullanılması 
+tavsiye edilmektedir. Ancak biz burada önce klasik Sequential modeli kullanacağız 
+sonra fonksiyonel model ile örnek vereceğiz. 
+
+Önceden oluşturulmuş Keras modeli adeta bir katman gibi Sequential modele eklenmelidir. 
+Zaten Model sınıflarının kendisi de aynı zamanda bir katman gibi kullanılabilmektedir. 
+(Model sınıfın da aynı zamanda çoklu bir biçimde Layer sınıfından türetilmiş olduğunu 
+ anımsayınız.)
+
+
+model = Sequential(name='ResNet121-Cifar-100')
+
+model.add(Input((32, 32, 3), name='Input'))
+
+model.add(DenseNet121(include_top=False, weights=None, input_shape=(32, 32, 3), name='DenseModelTest'))
+
+model.add(Reshape((-1, )))
+model.add(Dense(128, activation='relu', name='Dense-1'))
+model.add(Dense(128, activation='relu', name='Dense-2'))
+model.add(Dense(100, activation='softmax', name='Output'))
+model.summary()
+
+Burada önce modele bir Input katmanı eklenmiştir. Sonra da Dense121 modelinin tamamı 
+adeta bir katman gibi modele eklenmiştir. Biz ayrıca bu hazır modelin ucuna iki 
+Dense katman ve bir de çıktı katmanı ekledik. Artık modeli compile edip fit işlemi 
+uygulayabiliriz. Bu örnekte önceden eğitilmiş modelin ağırlıklarını kullanmadığımıza 
+dikkat ediniz. Burada aslında biz Dense121 nesnesi yaratılırken input_shape parametresini 
+girmeyebilirdik. Çünkü modelimizin bir girdi katmanı olduğu için bu sınıf bu girdi 
+katmanından hareketle zaten input_shape parametresini belirleyebilmektedir. Eğer 
+biz hem girdi katmanı kullanıyorsak hem de bu input_shape parametresine argüman 
+giriyorsak bu durumda bu iki resim boyutunun aynı olması gerekmektedir. 
+
+---------------------------------------------------------------------------------
+Biz yukarıdaki örnekte yalnızca modelin kendisinden faydalanmak istedik. Tabii 
+önceden eğitilmiş modelin ağırlıklaırnı da kullanabilirz. Bunun için Dense121 
+nesnesinde weights parametresi 'imagenet" biçiminde geçilmelidir: 
+
+
+model.add(DenseNet121(include_top=False, weights='imagenet', input_shape=(32, 32, 3), name='DenseModelTest'))
+
+
+Biz DenseNet121 katmanında (bu aslında aynı zamanda katmanlardan oluşan model nesnesidir) 
+önceden elde edilmiş ağırlıkları kullandığımızda artık kendi verilerimizle yaptığımız 
+eğitimde bu katmanların eğitime dahil edilmemesini isteyebiliriz. Katmanı eğitim 
+işleminden muaf hale getirmek için katman sınıflarının trainable parametresinden 
+faydalanabiliriz. Örneğin:
+
+
+model.add(DenseNet121(include_top=False, weights='imagenet', input_shape=(32, 32, 3), trainable=False, name='DenseModelTest'))
+
+
+Burada artık trainable=False argümanı kullanıldığı için kendi verilerimiz ile 
+eğitim yapılırken bu katmandaki tüm katmanlar eğitimden muaf tutulacaktır. Tabii 
+test ve kestirim işlemlerinde kullanılacaktır. Bu hazır katmanı eğitimden muaf 
+tutmanın bir avantajı da eğitim sırasında geçen zamanın kısaltılmasıdır. Tabii 
+buradaki DenseNet121 katmanın içerisinde katmanların da yalnızca bir bölümü için 
+trainable=False işlemi de yapılabilir. 
+
+
+Daha önceden de belirttiğimiz gibi hazır ağılıkların kullanılmasından sonra ayrıca 
+modeli birkaç katman ekleyerek kendi veri kümemiz için eğitmeye "ince ayar (fine-tuning)" 
+yapılması denilmektedir. 
+
+
+Dense121 sınıfının ağırlıkları toplam 1000 tane sınıf için uygulanan eğitimle 
+oluşturulmuştur. Bu 1000 tane sınıf içerisinde pek çok farklı temadan resimler 
+bulunmaktadır. 
+    
+---------------------------------------------------------------------------------
+
+---------------------------------------------------------------------------------
+Şimdi de DenseNet121 sınıfının fonksiyonel bir modelde nasıl kullanılacağı üzerinde 
+duralım. Önceki konularda da bellirttiğimiz gibi uygulamacılar aslında önceden 
+hazırlanmış bu modelleri genellikle fonksiyonel model içerisinde kullanmaktadır. 
+Fonksiyonel modelde anımsayacağınız gibi sürekli çıktı girdiye verilerek katmanlar 
+oluşturuluyordu:
+
+
+inputs = Input((32, 32, 3), name='Input')
+x = DenseNet121(include_top=False, weights='imagenet', input_shape=(32, 32, 3), name='DenseModelTest')(inputs)
+x = Reshape((-1, ))(x)
+x = Dense(128, activation='relu', name='Dense-1')(x)
+x = Dense(128, activation='relu', name='Dense-2')(x)
+outputs = Dense(100, activation='softmax', name='Output')(x)
+
+model = Model(inputs, outputs)
+
+
+Burada Model nesnesinin kullanıldığına dikkat ediniz. Anımsanacağı gibi Model nesnesi 
+oluşturulurken ona girdi ve çıktı katmanlarının verilmesi gerekiyordu. Geri kalan 
+işlemler artık daha önce yaptığımız gibi devam ettirilebilir. 
+
+---------------------------------------------------------------------------------
+
+---------------------------------------------------------------------------------
+Şimdi de başkaları tarafından hazırlanmış ve eğitilmiş olan modellerin kulanılmasına 
+ilişkin örnekler verelim. Biz daha önce de bu amaçla çeşitli toplulukların 
+oluşturulduğundan bahsetmiştik. Bunların en bilineni Kaggle denilen topluluktur. 
+Ancak çeşitli framework'ler de "hub" adı altında Kaggle benzeri topluluklar oluşturmuştur. 
+Örneğin Tensorflow için kişilerin modellerini paylaşabileceği "tensorflow hub" 
+denilen bir topluluk vardır. Fakat daha önceden de belirttiğimiz gibi bu topluluk 
+kendi sitesini kapatıp Kaggle'a geçmiştir.
+
+
+Tensorflow Hub içerisine yerleştirilmiş olan modeller için bir URL'de oluşturulmaktadır. 
+Bu modellerin doğrudan URL eşliğinde yüklenenip bir katman nesnesi haline getirilmesi 
+için KerasLayer isimli bir sınıf bulundurulmuştur. Bu sınıfın __init__ metodunun 
+parametrik yapısı şöyledir:
+
+---------------------------------------------------------------------------------
+hub.KerasLayer(
+    handle,
+    trainable=False,
+    arguments=None,
+    _sentinel=None,
+    tags=None,
+    signature=None,
+    signature_outputs_as_dict=None,
+    output_key=None,
+    output_shape=None,
+    load_options=None,
+    **kwargs
+)
+
+
+Buradaki en önemli iki parametre handle ve trainable parametreleridir. 
+
+handle parametresinde modelin URL'si girilmektedir. 
+
+trainable parametresi de modelin katmanlarının eğitime dahil edilip edilmeyeceğini 
+belirtmektedir. 
+
+Tabii yukarıda da belirttiğimiz gibi Tensorflow Hub artık tümden Kaggle'a taşınmış 
+durumdadır. Biz söz konusu modelleri bu yöntemle kullanmak yerine model dosyasını 
+Kaggle'dan indirip load_model fonksiyonuyla da yükleyebiliriz. 
+
+Tensorflow Hub'ı modelleri kolay yüklemek amacıyla kullanabilmek için ona özgü 
+olan kütüphaneyi de yüklememiz gerekir. Yukarıda açıkladığımız KerasLayer sınıfı 
+da aslında bu kütüphane içerisindedir. Kütüphaneyi şöyle yükleyebiliriz:
+
+pip install tensorflow_hub
+
 ---------------------------------------------------------------------------------
 """
 
