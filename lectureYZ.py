@@ -12377,3 +12377,65 @@ pip install tensorflow_hub
 
 
 
+# MAKİNE ÖĞRENMESİ SÜRECİNİ OTOMATİK HALE GETİREN KÜTÜPHANELER ve ARAÇLAR
+
+
+"""
+---------------------------------------------------------------------------------
+Makine öğrenmesi uygulamalarında kullanılan en önemli araçlardan biri de 
+"Otomatik Makine Öğrenmesi (Auto ML)" araçlarıdır. Bu araçlar pek çok yükü uygulamacının 
+üzerinden alarak kendileri yapmaktadır. Auto ML araçlarının uygulamacı için yaptığı 
+tipik işlemler şunlardır:
+
+
+- Özellik seçimi (feature selection)
+- Özelliklerin indirgenmesi (dimensionality feature reduction)
+- Verilerin ölçeklendirilmesi (feature scaling)
+- Kategorik verilerin sayısallaştırılması (label encoding, one-hot encoding, ...)
+- Verilerin kullanıma hazır hale getirilmesi için gereken diğer işlemler
+- Model seçimi (model selection)
+- Modelin çeşitli parametrelerinin (hyperparameters) uygun biçimde ayarlanması (hyperparameter tuning)
+- Modelin kullanıma hazır hale getirilmesi (model deployment)
+
+
+Yukarıdaki işlemlerin hepsini tüm Auto ML araçları yapamaktadır. Bu konuda araçlar 
+arasında farklılıklar bulunmaktadır. Bir ML probleminde karşılaşılan en önemli 
+aşamalardan biri model seçimi ve modelin çeşitli üst (hyper) parametrelerinin uygun 
+biçimde konumlandırılmasıdır. Örneğin bir resim tanıma işleminde bizim problemimize 
+özgü hangi mimarinin daha iyi olduğu ve bu mimarideki katmanlardaki nöron sayılarının 
+ne olması gerektiği, optimizasyon algoritmasındaki parametrelerin nasıl ayarlanacağı 
+uygulamacı tarafından deneme yanılma yöntemleriyle tespit edilmektedir. Bu tür 
+araçlar bu sıkıcı deneme yanılma yöntemlerini bizim için kendileri uygulamaktadır. 
+
+Auto ML araçlarından bazıları yapay sinir ağları için oluşturulmuştur. Bazıları 
+ise kursumuzun sonraki bölümlerinde ele alacağımız istatistiksel makine öğrenmesi 
+yöntemlerini uygulamak için oluşturulmuştur. Bazı Auto ML araçları ise kurumuzun 
+son bölümünde ele alacağımız "pekiştirmeli öğrenme (reinforcement learning)" 
+uygulamaları için tasarlanmıştır.
+
+Otomatik makine öğrenmesi kütüphanelerini ve araçlarını kendi aralarında kullandıkları 
+öğrenme yöntemlerine üç gruba ayırabiliriz:
+
+- Denetimli öğrenme kütüphaneleri ve araçları
+- Denetimsiz öğrenme kütüphaneleri ve araçları
+- Pekiştirmeli öğrenme kütüphaneleri ve araçları
+
+Denetimli öğrenme araçlarının bazıları yalnızca yapay sinir ağlarına ilişkin 
+yöntemleri, bazıları yalnızca istatistiksel yöntemleri bazıları da her iki grup 
+yöntemleri de kullanabilmektedir
+
+---------------------------------------------------------------------------------
+
+---------------------------------------------------------------------------------
+
+# AUTOKERAS KÜTÜPHANESİNİN KULLANIMI
+
+AutoKeras yapay sinir ağlarını kullanarak kestirim işlemlerini otomatize eden bir 
+araçtır. İsminden de anlaşılacağı gibi bu araç neticede bir Keras modeli oluşturmaktadır. 
+AutoKeras aracının resmi sitesi şöyledir:
+
+https://autokeras.com/
+
+
+---------------------------------------------------------------------------------
+"""    
