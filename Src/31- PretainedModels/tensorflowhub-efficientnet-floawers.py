@@ -2,11 +2,13 @@ from tensorflow.keras.preprocessing import image_dataset_from_directory
 
 IMAGE_SIZE = (250, 250)
 
+# parçalı eğitim yapıyor
+
 training_dataset = image_dataset_from_directory(r'flower_photos', label_mode='categorical',
-      subset='training', seed=123, validation_split=0.2, image_size=IMAGE_SIZE,  batch_size=1)
+      subset='training', seed=123, validation_split=0.2, image_size=IMAGE_SIZE,  batch_size=32)
 
 validation_dataset = image_dataset_from_directory(r'flower_photos', label_mode='categorical',
-      subset='validation', seed=123, validation_split=0.2, image_size=IMAGE_SIZE,  batch_size=1)
+      subset='validation', seed=123, validation_split=0.2, image_size=IMAGE_SIZE,  batch_size=32)
 
 
 from tensorflow_hub import KerasLayer
@@ -27,7 +29,7 @@ model.add(Dense(5, activation='softmax', name='Output'))
 
 
 model.compile('rmsprop', loss='categorical_crossentropy', metrics=['categorical_accuracy'])
-hist = model.fit(training_dataset, validation_data=validation_dataset, epochs=3)
+hist = model.fit(training_dataset, validation_data=validation_dataset, epochs=10)
 
 
 import matplotlib.pyplot as plt
