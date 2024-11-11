@@ -12322,7 +12322,11 @@ oluşturulurken ona girdi ve çıktı katmanlarının verilmesi gerekiyordu. Ger
 işlemler artık daha önce yaptığımız gibi devam ettirilebilir. 
 
 ---------------------------------------------------------------------------------
+"""
 
+
+
+"""
 ---------------------------------------------------------------------------------
 Şimdi de başkaları tarafından hazırlanmış ve eğitilmiş olan modellerin kulanılmasına 
 ilişkin örnekler verelim. Biz daha önce de bu amaçla çeşitli toplulukların 
