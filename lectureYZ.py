@@ -12251,15 +12251,16 @@ model.add(Dense(128, activation='relu', name='Dense-2'))
 model.add(Dense(100, activation='softmax', name='Output'))
 model.summary()
 
-Burada önce modele bir Input katmanı eklenmiştir. Sonra da Dense121 modelinin tamamı 
-adeta bir katman gibi modele eklenmiştir. Biz ayrıca bu hazır modelin ucuna iki 
-Dense katman ve bir de çıktı katmanı ekledik. Artık modeli compile edip fit işlemi 
-uygulayabiliriz. Bu örnekte önceden eğitilmiş modelin ağırlıklarını kullanmadığımıza 
-dikkat ediniz. Burada aslında biz Dense121 nesnesi yaratılırken input_shape parametresini 
-girmeyebilirdik. Çünkü modelimizin bir girdi katmanı olduğu için bu sınıf bu girdi 
-katmanından hareketle zaten input_shape parametresini belirleyebilmektedir. Eğer 
-biz hem girdi katmanı kullanıyorsak hem de bu input_shape parametresine argüman 
-giriyorsak bu durumda bu iki resim boyutunun aynı olması gerekmektedir. 
+Burada önce modele bir Input katmanı eklenmiştir. Sonra da DenseNet121 modelinin 
+tamamı adeta bir katman gibi modele eklenmiştir. Biz ayrıca bu hazır modelin ucuna 
+iki Dense katman ve bir de çıktı katmanı ekledik. Artık modeli compile edip fit 
+işlemi uygulayabiliriz. Bu örnekte önceden eğitilmiş modelin ağırlıklarını 
+kullanmadığımıza dikkat ediniz. Burada aslında biz Dense121 nesnesi yaratılırken 
+input_shape parametresini girmeyebilirdik. Çünkü modelimizin bir girdi katmanı 
+olduğu için bu sınıf bu girdi katmanından hareketle zaten input_shape parametresini 
+belirleyebilmektedir. Eğer biz hem girdi katmanı kullanıyorsak hem de bu input_shape 
+parametresine argüman giriyorsak bu durumda bu iki resim boyutunun aynı olması 
+gerekmektedir. 
 
 ---------------------------------------------------------------------------------
 Biz yukarıdaki örnekte yalnızca modelin kendisinden faydalanmak istedik. Tabii 
@@ -12440,6 +12441,161 @@ AutoKeras aracının resmi sitesi şöyledir:
 
 https://autokeras.com/
 
+AutoKeras'ı kurmak için aşağıdaki komut uygulanabilir:
+
+
+pip install autokeras
+
+
+Biz kütüphaneyi aşağıdaki gibi import ederek kullanacağız:
+
+
+import autokeras as ak
+
+
+Ancak AutoKeras'ın install edilen tensorflow versiyonu ile uyumlu olması gerekmektedir. 
+Kursun yapıldığı sırada AutoKeras'ın son versiyonu 2.0.0 versiyonudur. Ancak bu 
+versiyon maalesef Windows'ta install edilememektedir. Fakat macOS ve Linux 
+sistemlerinde sorunsuz bir biçimde install edilebilmeektedir. Windows'ta autokeras 
+install edilmeye çalışıldığında 2.0.0 versiyonu değil 1.0.20 versiyonu install 
+edilebilmektedir. Bu versiyon da maalesef tensorflow'un eski versiyonları kullanılarak 
+yazılmıştır. Bu nedenle Windows sistemlerinde tensorflow kütüphanesinin de "downgrade" 
+edilmesi gerekir. AutoKeras'ın 1.0.20 versiyonunun çalışabilmesi için gereksinim 
+duyulan kütüphanelerin versiyon numaraları şöyledir:
+
+
+python==3.8.15
+tensorflow==2.10.0    
+numpy==1.24.4
+
+
+Windows'ta bu çalışma ortamını kolay hazırlamak için Anaconda'da "Envirionments/Create" 
+yapıp Python versiyonunu 3.8.X olarak ayarlayıp sanal bir ortam oluşturabilirsiniz. 
+Sonra bu sanal ortamda "Open Terminal" yapıp "conda-forge" kullanarak aşağıdaki 
+gibi kurulumu yapabilirsiniz:
+
+conda install autokeras --channel conda-forge
+
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+AutoKeras kütüphanesinde yüksek seviyeli 6 temel sınıf vardır:
+
+
+ImageClassifier
+ImageRegressor
+TextClassifier
+TextRegressor
+StructuredDataClassifier
+StructuredDataRegressor
+
+
+ImageClassifier sınıfı resimleri sınıflandırmak için, ImageRegressor sınıfı 
+resimlerden sınıf değil sayısal değer elde etmek için (örneğin resimdeki kişinin 
+yaşını tespit etme problemi gibi), 
+
+TextClassifier sınıfı yazıları sınıflandırmak için, 
+
+TextRegressor sınıfı yazılardan sayısal değer elde etmek için (örneğin yazının 
+konu ile alaka dercesini tespit etmeye çalışma gibi), 
+
+StructuredDataClassifier sınıfı resim ve yazı dışındaki farklı türlere ilişkin 
+sütunlara sahip sınıflandırma modelleri için,
+
+StructuredDataRegressor sınıfı da farklı türlere ilişkin sütunlara sahip regresyon 
+problemleri için kullanılmaktadır.
+
+
+Bu sınıflar kullanılırken uygulamacı özellik ölçeklemesi, değerlerin sayısal hale 
+dönüştürülmesi, one-hot-encoding gibi işlemleri kendisi yapmaz. Bu işlemleri zaten 
+bu sınıfların kendisi yapmaktadır.
+
+---------------------------------------------------------------------------------
+ImageClassifier sınıfının tipik kullanımı şöyledir:
+
+
+1) Önce ImageClassifer sınıfı türünden bir nesne yaratılır. Sınıfın __init__ metodunun 
+parametrik yapısı şöyledir:
+
+
+autokeras.ImageClassifier(
+    num_classes=None,
+    multi_label=False,
+    loss=None,
+    metrics=None,
+    project_name="image_classifier",
+    max_trials=100,
+    directory=None,
+    objective="val_loss",
+    tuner=None,
+    overwrite=False,
+    seed=None,
+    max_model_size=None,
+    **kwargs
+)
+
+
+Görüldüğü gibi parametreler default değerler almaktadır. num_classes parametresi 
+çıktının kaç sınıflı olduğunu belirtmektedir. Default durumda sınıf sayısı otomatik 
+olarak belirlenmektedir. Bu belirleme training_dataset_y içerisindeki farklı değerlerin 
+sayısı ile yapılmaktadır. 
+
+max_trials parametresi en fazla kaç modelin deneneceğini belirtmektedir. Tabii 
+bu değer ne kadar yüksek tutulursa o kadar iyi sonuç elde edilir. Ancak en iyi 
+modelin bulnması süreci uzayacaktır. Burada max_trials parametresi ile denenecek 
+model sayısı demekle yalnızca katmansal farklılık kastedilmemektedir. Örneğin 
+katmansal yapı aynı olsa bile hyper parametre farklılıkları da farklı bir model 
+olarak değerlendirilmektedir. Dolayısıyla programcının iyi bir sonuç elde etmek 
+için max_trials parametresini yüksek bir değerde tutması uygun olur. Yüksek değerler 
+fit işleminin birkaç gün sürmesine yol açabilmektedir. Bunun için uygulamacı cloud 
+sistemlerini kullanabilir. 
+
+objective parametresi model karşılaştırılırken neye göre karşılaştırılacağını 
+belirtmektedir. 
+
+directory, AutoKeras her model işlemi için bir proje dizini oluşturmaktadır. Bu 
+dizin'in ismi directory parametresi ile ayarlanmaktadır. Bu parametre girilmezse 
+dizin'in ismi project_name parametresi ile belirtilen modelin ismi biçiminde alınır. 
+
+Metodun overwrite parametresi default durumda False biçimdedir. False değeri metodun 
+daha önce oluşturulmuş olan bilgileri kullanacağını belirtmektedir. True değeri 
+ise her defasında eski proje bilgileri var olsa bile yeni değerleri onun üzerine 
+yazacağı anlamına gelmektedir. overwrite parametresi True geçildiğinde daha önce 
+denenmiş ve saklanmış olan modeller doğrudan kullanılmaktadır. Metrik değerler 
+metrics parametresiyle verilebilmektedir. Örneğin:
+
+
+import autokeras as ak
+
+
+ic = ak.ImageClassifier(max_trials=5, overwrite=True)
+
+
+ImageClassifier sınıfının kendi içerisinde pretrained verileri kullanıp kullanmadığı 
+konusunda dokümanlarda bir bilgi yoktur. 
+
+
+2) Modelin derlenmesi işlemi uygulamacı tarafından yapılmaz. Dolayısıyla uygulamacı 
+doğrudan fit işlemi yapar. Buradaki fit metodunun kullanımı tamamen Keras'taki 
+fit metodu gibidir. fit metoduna uygulamacı training_dataset_x ve training_dataset_y 
+verilerini verir. Metodun parametreleri Keras'ta gördüğümüz gibidir. epochs 
+parametresi her denenecek model için ne kadar epoch uygulanacağını belirtir. 
+batch_size parametresi default durumda 32'dir. fit metoduna vereceğimiz resimlerin 
+üç boyutlu bir matris biçiminde olması gerekir. Yani RGB resimler için matris 
+boyutu (width, height, 3) biçiminde gri tonlamalı resimler için (width, height, 1) 
+biçiminde olmalıdır. Tabii fit metodu parçalı eğtim de yapabilmektedir. Yani biz 
+bu metodun birinci parametresine üretici fonksiyonları ya da Dataset nesnelerini 
+geçirebiliriz. fit işlemi sonucunda Keras'ta olduğu gibi bir History callback nesnesi 
+elde edilmektedir. Tabii programcı fit metoduna istediği callback nesnelerini 
+callbacks parametresi yoluyla geçirebilir. fit metodununb parametrik yapısı şöyledir:
+
+
+ImageClassifier.fit(x=None, y=None, epochs=None, callbacks=None, validation_split=0.2, 
+                    validation_data=None, **kwargs)
+
+Örneğin:
+
+
+ic = ak.ImageClassifier(max_trials=5, metrics=['categorical_accuracy'], overwrite=True)
 
 ---------------------------------------------------------------------------------
 """    
