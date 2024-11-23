@@ -12430,10 +12430,13 @@ yöntemleri, bazıları yalnızca istatistiksel yöntemleri bazıları da her ik
 yöntemleri de kullanabilmektedir
 
 ---------------------------------------------------------------------------------
+"""
 
+"""
 ---------------------------------------------------------------------------------
 
 # AUTOKERAS KÜTÜPHANESİNİN KULLANIMI
+---------------------------------------------------------------------------------
 
 AutoKeras yapay sinir ağlarını kullanarak kestirim işlemlerini otomatize eden bir 
 araçtır. İsminden de anlaşılacağı gibi bu araç neticede bir Keras modeli oluşturmaktadır. 
@@ -12592,10 +12595,101 @@ callbacks parametresi yoluyla geçirebilir. fit metodununb parametrik yapısı �
 ImageClassifier.fit(x=None, y=None, epochs=None, callbacks=None, validation_split=0.2, 
                     validation_data=None, **kwargs)
 
-Örneğin:
+
+3) En iyi model AutoKeras tarafından bulunduktan sonra model test edilmelidir. Yine 
+modelin testi için ImageClassifier sınıfının evaluate metodu kullanılmaktadır. 
+evaluate metodu Keras'taki Sequential sınıfının evaluate metodu gibi kullanılmaktadır. 
+Metodun parametrik yapısı şöyledir:
+
+ImageClassifier.evaluate(x, y=None, batch_size=32, verbose=1, **kwargs)
 
 
-ic = ak.ImageClassifier(max_trials=5, metrics=['categorical_accuracy'], overwrite=True)
+4) Seçilen en iyi modelin test işleminden sonra artık kestirim işlemleri yapılabilir. 
+Bunun için ImageClassifier sınıfının predict metodu kullanılmaktadır. predict metodu 
+da tamamen Sequential sınıfının predict metodu gibidir. Parametrik yapısı şöyledir:
+
+
+ImageClassifier.predict(x, batch_size=32, verbose=1, **kwargs)
+
+
+
+5) Elde edilen en iyi model istenirse Keras'ın Model sınıfına dönüştürülebilir. 
+Bunun için ImageClassifier sınıfının export_model metodu kullanılmalıdır. Programcı 
+artık bu işlemden sonra modelini save edebilir. Daha önce görmüş olduğumuz işlemleri 
+bu model nesnesi üzerinde uygulayabilir. 
+
+model = ic.export_model()
+
+
+Yukarıda da belirttiğimiz gibi eğer biz ImageClassifier nesnesini yaratırken overwrite 
+parametresini True geçmezsek aslında aynı proje bir daha çalıştırıldığında eski 
+kalınan yerden devam edilir. Çünkü proje için açılan dizinde tüm deneme bilgileri,
+model bilgileri ve kalınan kalınan  yer not alınmaktadır.
+
+
+AutoKeras modellerinde yine callback nesneleri kullanılabilmektedir. Örneğin eğer 
+biz AutoKeras sınıflarının fit metotlarının callbacks parametresine EarlyStopping 
+callback nesnesi yerleştirirsek bu durumda denenen model belirlediğimiz patience 
+değerine bağlı olarak erken sonlandırılabilecektir. 
 
 ---------------------------------------------------------------------------------
+ImageRegressor sınıfı bir resimden hareketle bir değerin tahmin edilmesi tarzı 
+problemlerde kullanılmaktadır. Sınıfın kullanım biçimi tamamen ImageClassifier 
+sınıfında olduğu gibidir. __init__ metodunun parametrik yapısı şöyledir:
+
+    
+autokeras.ImageRegressor(
+    output_dim=None,
+    loss="mean_squared_error",
+    metrics=None,
+    project_name="image_regressor",
+    max_trials=100,
+    directory=None,
+    objective="val_loss",
+    tuner=None,
+    overwrite=False,
+    seed=None,
+    max_model_size=None,
+    **kwargs
+)
+
+
+Metodun output_dim parametresi çıktı katmanının kaç değişkenden oluşacağını belirtir. 
+Bu parametre için argüman girilemzse çıktı katmanındaki değişken sayısı y verilerinden 
+otomatik olarak elde edilmektedir. Yine bu sınıf da özellik seçimi, özellik 
+ölçeklemesi, one-hot-encoding gibi ön işlemleri kendisi yapmaktadır.
+
+---------------------------------------------------------------------------------
+AutoKeras'ın TextClassifer sınıfı yazıları sınıflandırmak için kullanılmaktadır. 
+Örneğin daha önce yapmış olduğumuz "sentiment analysis" örnekleri TextClassifier 
+sınıfıyla yapılabilir. Sınıfın __init__ metodunun parametrik yapısı şöyledir:
+
+
+autokeras.TextClassifier(
+    num_classes=None,
+    multi_label=False,
+    loss=None,
+    metrics=None,
+    project_name="text_classifier",
+    max_trials=100,
+    directory=None,
+    objective="val_loss",
+    tuner=None,
+    overwrite=False,
+    seed=None,
+    max_model_size=None,
+    **kwargs
+)
+
+
+Metodun parametrik yapısı ImageClassifier sınıfının __init__ metoduna çok benzemektedir. 
+Kullanımı da benzerdir.
+
+TextClassifier sınıfının fit metodunda training_dataset_x yazılardan oluşan bir 
+NumPy dizisi ya da Dataset nesnesi olabilir. training_dataset_y de kategorik değerlere 
+ilişkin bir NumPy dizisi olabilir ya da sayısallaştırılmış kategorik değerlerden 
+oluşabilir. AutoKeras yazının parse edilmesi, vektörel hale getirilmesi, word 
+embedding gibi işlemleri kendisi yapmaktadır. Yani uygulamacının yalnızca yazıları 
+fit metoduna vermesi yeterlidir. 
+
 """    
