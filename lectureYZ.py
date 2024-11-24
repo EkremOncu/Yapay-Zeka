@@ -12512,6 +12512,11 @@ Bu sınıflar kullanılırken uygulamacı özellik ölçeklemesi, değerlerin sa
 dönüştürülmesi, one-hot-encoding gibi işlemleri kendisi yapmaz. Bu işlemleri zaten 
 bu sınıfların kendisi yapmaktadır.
 
+AutoKeras 2 ile birlikte kütüphane üzerinde önemli değişiklikler yapılmıştır. 
+Kütüphaneye pek çok Block sınıfı ve daha genel Input sınıfları eklenmiştir. Biz 
+önce bu temel sınıfları göreceğiz sonra AutoKeras 2 ile birlikte eklenen bu yeni 
+sınıfları göreceğiz.
+
 ---------------------------------------------------------------------------------
 ImageClassifier sınıfının tipik kullanımı şöyledir:
 
@@ -12659,6 +12664,8 @@ Bu parametre için argüman girilemzse çıktı katmanındaki değişken sayıs�
 otomatik olarak elde edilmektedir. Yine bu sınıf da özellik seçimi, özellik 
 ölçeklemesi, one-hot-encoding gibi ön işlemleri kendisi yapmaktadır.
 
+Cifar-100
+
 ---------------------------------------------------------------------------------
 AutoKeras'ın TextClassifer sınıfı yazıları sınıflandırmak için kullanılmaktadır. 
 Örneğin daha önce yapmış olduğumuz "sentiment analysis" örnekleri TextClassifier 
@@ -12692,4 +12699,178 @@ oluşabilir. AutoKeras yazının parse edilmesi, vektörel hale getirilmesi, wor
 embedding gibi işlemleri kendisi yapmaktadır. Yani uygulamacının yalnızca yazıları 
 fit metoduna vermesi yeterlidir. 
 
+IMDB dataset
+
+---------------------------------------------------------------------------------
+TextRegressor sınıfı bir yazdıdan sayısal bir değer kstirmek için kullanılmaktadır.
+Sınıfın __init__ metodunun parametrik yapısı şöyledir:
+
+
+autokeras.TextRegressor(
+    output_dim=None,
+    loss="mean_squared_error",
+    metrics=None,
+    project_name="text_regressor",
+    max_trials=100,
+    directory=None,
+    objective="val_loss",
+    tuner=None,
+    overwrite=False,
+    seed=None,
+    max_model_size=None,
+    **kwargs
+
+
+Sınıfın kullanımı TextClassifier sınıfına oldukça benzemektedir. 
+
+---------------------------------------------------------------------------------
+Resim ve yazı dışındaki sınıflandırma problemleri için AutoKeras'ta StructuredDataClassifier 
+sınıfı kullanılmaktadır. Sının __init__ metodunun parametrik yapısı benzerdir:
+
+
+autokeras.StructuredDataClassifier(
+    column_names=None,
+    column_types=None,
+    num_classes=None,
+    multi_label=False,
+    loss=None,
+    metrics=None,
+    project_name="structured_data_classifier",
+    max_trials=100,
+    directory=None,
+    objective="val_accuracy",
+    tuner=None,
+    overwrite=False,
+    seed=None,
+    max_model_size=None,
+    **kwargs
+)
+
+
+StructuredDataClassifer sınıfında girdi olarak iki boyutlu NumPy matrisi verilir. 
+Özellik ölçeklemesi ve kategorik verilerin sayısal biçime dönüştürülmesi gibi işlemler 
+sınıf tarafından yapılmaktadır. y verileri yine yazı içeren bir NumPy dizisi olarak 
+ya da bunların sayısallaştırılmış haliyle girilebilmektedir. 
+
+AutoKeras'ın 2'li versiyonlarıyla birlikte izleyen paragraflarda ele alacağımız 
+yeni birtakım sınıflar eklenmiştir. Proje ekibi bu yeni sınıfların kullanılmasını 
+teşvik etmek amacıyla bu sınıfı tamamen AutoKeras'tan kaldırmıştır. Yani eğer siz 
+kütüphanenin 2'li versiyonlarını kullanıyorsanız bu sınıf kütüphanenizde bulunmayacaktır. 
+Ancak biz burada yine sınıf hakkında bilgiler vereceğiz.
+
+Bu sınıfın bir uygulaması olarak Titanik veri kümesini kullanacağız. Titanik veri 
+kümesi Titanik'te yolcu olanların hayatta kalıp kalmayacağına yönelik hazırlanmış 
+bir veri kümesidir. Böylece veri kümesindeki çeşitli özellekler bilindikten sonra 
+kişinin o faciada hayatta kalıp kalamayacağı tahmin edilmeye çalışılmaktadır. 
+
+
+Titanik veri kümesi aşağıdaki bağlantıdan indirilebilir:
+
+
+https://www.kaggle.com/datasets/yasserh/titanic-dataset
+
+---------------------------------------------------------------------------------
+StructuredDataRegressor yine resimsel ve metinsel olmayan regresyon problemleri 
+için kullanılmaktadır. Sınıfın __init__ metdounun parametrik yapısı yine diğer 
+sınıflardakine oldukça benzerdir:
+
+
+autokeras.StructuredDataRegressor(
+    column_names=None,
+    column_types=None,
+    output_dim=None,
+    loss="mean_squared_error",
+    metrics=None,
+    project_name="structured_data_regressor",
+    max_trials=100,
+    directory=None,
+    objective="val_loss",
+    tuner=None,
+    overwrite=False,
+    seed=None,
+    max_model_size=None,
+    **kwargs
+)
+
+Ancak yukarıda da belirttiğimiz gibi kütüphanenin 2'li versyionlarıyla birlikte 
+bu sınıf da kütüphaneden kaldırılmıştır. 
+
+Boston Housing Prices
+
+---------------------------------------------------------------------------------
+
+---------------------------------------------------------------------------------
+Yukarıda da belirttiğimiz gibi AutoKeras 2 ile birlikte kütüphane üzerinde önemli 
+değişiklikler yapılmıştır. Örneğin kütüphaneden  StructuredDataClassifier ve 
+StructuredDataRegressor sınıfları tamamen kaldırılmıştır ve kütüphaneye pek çok 
+Block sınıfı eklenmiştir. AutoKeras 2'de üç çeşit Input sınıfı bulunmaktadır:
+
+
+Input
+TextInput
+ImageInput
+
+
+Input sınıfı sütunlara sahip klasik "tabular" veri kümeleri için kullanılmaktadır. 
+TextInput sınıfı ismi üzerinde metinsel girdiler için ImageInput sınıfı ise resimsel 
+girdiler için bulundurulmuştur. 
+
+Eğer girdi için Input sınıfı kullanılacaksa fit işlemi sırasında fit metoduna 
+verilen x verilerinin hepsinin nümerik olması gerekmektedir. Ön işlemler AutoModel 
+sınıfı tarafından yapılmaktadır. Dolayısıyla bizim kategorik veriler için one-hot-
+encoding yapmamıza gerek yoktur. Ancak kategorik verileri bizim sayısal hale 
+getirmemiz gerekir. 
+
+
+Bu sınıflar AutoModel sınıfına girdi yapılmaktadır. AutoModel sınıfının __init__ 
+metodunun parametrik yapısı şöyledir:
+
+autokeras.AutoModel(
+    inputs,
+    outputs,
+    project_name="auto_model",
+    max_trials=100,
+    directory=None,
+    objective="val_loss",
+    tuner="greedy",
+    overwrite=False,
+    seed=None,
+    max_model_size=None,
+    **kwargs
+)
+
+
+Metodun inputs parametresine yukarıdaki Input sınıfları türünden nesneler argüman 
+olarak verilmektedir. outputs parametresine ise aşağıdaki iki sınıf türünden 
+nesneler girilmelidir.
+
+
+ClassificationHead
+RegressionHead
+
+
+Yine metodun max_trials parametresi kaç modelin deneneceğini belirtmektedir. Diğer 
+parametreler daha önce görmüş olduğumuz sınıfların parametrelerine benzerdir. 
+
+Örneğin:
+
+import autokeras as ak
+
+inp = ak.Input()
+out = ak.ClassificationHead()
+auto_model = ak.AutoModel(inputs=inp, outputs=out, max_trials=20, overwrite=True)
+
+
+Bu biçimde AutoModel nesnesi oluşturulduktan sonra artık AutoModel sınıfının fit 
+metodutla eğitim, evalute metoduyla test işlemi ve predict metoduyla da kestirim 
+işlemi yapılabilir. Örneğin:
+
+
+hist = auto_model.fit(training_dataset_x, training_dataset_y, validation_split=0.2, epochs=50)
+...
+eval_result = auto_model.evaluate(test_dataset_x, test_dataset_y)
+...
+predict_result = auto_model.predict(predict_dataset_x)
+
+---------------------------------------------------------------------------------
 """    
