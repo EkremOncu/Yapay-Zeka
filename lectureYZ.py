@@ -12432,10 +12432,12 @@ yöntemleri de kullanabilmektedir
 ---------------------------------------------------------------------------------
 """
 
+
 """
 ---------------------------------------------------------------------------------
 
 # AUTOKERAS KÜTÜPHANESİNİN KULLANIMI
+
 ---------------------------------------------------------------------------------
 
 AutoKeras yapay sinir ağlarını kullanarak kestirim işlemlerini otomatize eden bir 
@@ -12800,6 +12802,8 @@ Boston Housing Prices
 ---------------------------------------------------------------------------------
 
 ---------------------------------------------------------------------------------
+
+---------------------------------------------------------------------------------
 Yukarıda da belirttiğimiz gibi AutoKeras 2 ile birlikte kütüphane üzerinde önemli 
 değişiklikler yapılmıştır. Örneğin kütüphaneden  StructuredDataClassifier ve 
 StructuredDataRegressor sınıfları tamamen kaldırılmıştır ve kütüphaneye pek çok 
@@ -12820,6 +12824,15 @@ verilen x verilerinin hepsinin nümerik olması gerekmektedir. Ön işlemler Aut
 sınıfı tarafından yapılmaktadır. Dolayısıyla bizim kategorik veriler için one-hot-
 encoding yapmamıza gerek yoktur. Ancak kategorik verileri bizim sayısal hale 
 getirmemiz gerekir. 
+
+AutoModel kullanırken resim ve yazılardan oluşmayan klasik tablo biçiminde veri 
+kümelerinde girdi katmanı içinm Input sınıfı kullanılmalıdır. Ancak Input sınıfı 
+için girdiler verilirken tüm sütunların nümerik biçimde olması gerekmektedir. 
+One-hot-encoding gibi işlemleri AutoKeras kendisi yapıyor olsa da kategorik sütunlar 
+LabelEncoder gibi bir sınıfla sayısal biçime dönüştürülmelidir. Ayrıca AutoKeras 
+2'de Input katmanı için girdilerde hiç eksik veri ve NaN verinin olmaması gerekir. 
+Yani Imputation uygulamacı tarafından uygulanmalıdır. 
+
 
 
 Bu sınıflar AutoModel sınıfına girdi yapılmaktadır. AutoModel sınıfının __init__ 
@@ -12851,7 +12864,7 @@ RegressionHead
 
 Yine metodun max_trials parametresi kaç modelin deneneceğini belirtmektedir. Diğer 
 parametreler daha önce görmüş olduğumuz sınıfların parametrelerine benzerdir. 
-
+z
 Örneğin:
 
 import autokeras as ak
@@ -12871,6 +12884,107 @@ hist = auto_model.fit(training_dataset_x, training_dataset_y, validation_split=0
 eval_result = auto_model.evaluate(test_dataset_x, test_dataset_y)
 ...
 predict_result = auto_model.predict(predict_dataset_x)
+
+---------------------------------------------------------------------------------
+AutoKeras'ın 2'li versiyonlarıyla eklenen AutoModel sistemi fonksiyonel bir kullanıma 
+sahiptir. Yani AutoModel aslında bizim Keras'ta gördüğümüz fonksiyonel tarzda 
+tasarlanmıştır. Fonkisyonel kullanımda katman nesneleri birbirilerine verilerek 
+eklenebilmektedir. Örneğin:
+
+
+inp = ak.Input(...)
+x = ak.DenseBlock(...)(inp)
+x = ak.DenseBlock(...)(x)
+x = ak.DenseBlock(...)(x)
+output = ak.ClassificationHead(...)(x)
+
+auto_model = ak.AutoModel(inputs=inp, outputs=out)
+
+
+Burada önce bir Input nesnesi oluşturulmuş sonra DenseBlock nesneleri bunun üzerine 
+eklenmiş ve nihayetinde bir çıktı nesnesi elde edilmiştir. Buradaki kullanım biçimi 
+Keras'ta görmüş olduğumuz fonksiyonel modele çok benzemektedir. 
+
+Eğer bu Input ile Output arasında bu biçimde bağlama yapılmaz ise tüm ara katmanlar 
+ve hyper parametreler AutoKeras tarafından elde edilmektedir. 
+
+---------------------------------------------------------------------------------
+AutoKeras'ın fonksiyonel kullanımında artık uygulamacı katmanların neler olacağını 
+ve kaç tane olacağını ana hatlarıyla kendisi oluşturmaktadır. Katmanlar Block 
+denilen sınıflarla temsil edilmiştir. Block sınıfları şunlardır:
+
+ConvBlock
+DenseBlock
+ResNetBlock
+RNNBlock
+XceptionBlock
+ImageBlock
+TextBlock
+
+
+Bu Block sınıflarının yanı sıra ayrıca yardımcı birkaç sınıf da vardır:
+
+Normalization
+Merge
+SpatialReduction
+TemporalReduction
+Normalization
+
+---------------------------------------------------------------------------------
+DenseBlock AutoKeras'a şunları söylemektedir: "Modele bir ya da birden fazla Dense 
+katman ekleyebilirsin, bunların nöron sayılarını ayarlayabilirsin". Örneğin:
+
+
+inp = ak.Input(...)
+output = ak.DenseBlock()(inp)
+out = ak.ClassificationHead()(output)
+auto_model = ak.AutoModel(inputs=inp, outputs=out)
+
+
+Burada biz AutoKeras'a girdi katmanından sonra istenildiği kadar Dense katman 
+kullabileceğini söylemekteyiz. Ancak biz istersek DenseBlock sınıfında hangi sayıda 
+Dense katmanın kullanılacağını metodun num_layers parametresiyle belirleyebiliriz. 
+Örneğin:
+
+
+inp = ak.Input()
+output = ak.DenseBlock(num_layers=2)(inp)
+out = ak.ClassificationHead()(output)
+auto_model = ak.AutoModel(inputs=inp, outputs=out)
+
+
+Burada artık girdi katmanından sonra AutoKeras kesinlikle iki tane Dense katman 
+kullanacaktır. Ancak bu katmanın nöron sayılarını ve diğer özelliklerini kendisi 
+belirleyecektir. Biz DenseBlock ile eklenecek olan Dense katmanlardaki nöron 
+sayılarını da num_units parametresiyle belirleyebilmekteyiz. Örneğin:
+
+
+inp = ak.Input(...)
+output = ak.DenseBlock(num_layers=2, num_units=32)(inp)
+out = ak.ClassificationHead()(output)
+auto_model = ak.AutoModel(inputs=inp, outputs=out)
+
+
+Artık burada iki tane Dense katman kullanılacak ve bu katmanların nöron sayıları 
+32 olacaktır. 
+
+---------------------------------------------------------------------------------
+Şimdi de AutoKeras 2 ile AutoModel kullanarak evrişimli bir resim sınıflandırma 
+örneği yapalım. AutoKeras 2'deki ConvBlock bir ya da birden fazla evrişim katmanını 
+temsil etmektedir. Yani biz ImageInput nesnesindne sonra fonksiyonel modele ConvBlock 
+nesnesini eklersek aslında modele bir ya da birden fazla evrişim katmanı eklemiş 
+oluruz. Burada da eklenecek evrişim katmanlarının bazı özellikleri uygulamacı 
+tarafından belirlenebilmektedir. ImageInput sınıfında girdiler iki biçimde 
+belirtilebilmektedir. Gri tonlamalı resimler (samples, width, height) biçiminde 
+RGB resimler de (samples, width, height, channels) biçiminde girilebilir. MNIST 
+örneği için AutoModel şöyle oluşturulabilir:
+
+
+inp = ak.ImageInput()
+x = ak.ConvBlock()(inp)
+x = ak.DenseBlock(num_layers=2)(x)
+out = ak.ClassificationHead()(x)
+auto_model = ak.AutoModel(inputs=inp, outputs=out, max_trials=1, overwrite=True)
 
 ---------------------------------------------------------------------------------
 """    
