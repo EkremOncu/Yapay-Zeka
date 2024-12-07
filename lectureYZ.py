@@ -12826,13 +12826,12 @@ encoding yapmamıza gerek yoktur. Ancak kategorik verileri bizim sayısal hale
 getirmemiz gerekir. 
 
 AutoModel kullanırken resim ve yazılardan oluşmayan klasik tablo biçiminde veri 
-kümelerinde girdi katmanı içinm Input sınıfı kullanılmalıdır. Ancak Input sınıfı 
+kümelerinde girdi katmanı için Input sınıfı kullanılmalıdır. Ancak Input sınıfı 
 için girdiler verilirken tüm sütunların nümerik biçimde olması gerekmektedir. 
 One-hot-encoding gibi işlemleri AutoKeras kendisi yapıyor olsa da kategorik sütunlar 
 LabelEncoder gibi bir sınıfla sayısal biçime dönüştürülmelidir. Ayrıca AutoKeras 
 2'de Input katmanı için girdilerde hiç eksik veri ve NaN verinin olmaması gerekir. 
 Yani Imputation uygulamacı tarafından uygulanmalıdır. 
-
 
 
 Bu sınıflar AutoModel sınıfına girdi yapılmaktadır. AutoModel sınıfının __init__ 
@@ -12986,5 +12985,161 @@ x = ak.DenseBlock(num_layers=2)(x)
 out = ak.ClassificationHead()(x)
 auto_model = ak.AutoModel(inputs=inp, outputs=out, max_trials=1, overwrite=True)
 
+
+Resim sınıflandırma işlemleri için ResNet modeli daha iyi sonuçlar vermektedir. 
+AutoKeras'ta ResNetBlock sınıfı bu modeli otomatik kullanmak için bulundurulmuştur. 
+Model içerisindeki katmanlar ve onların hyper parametreleri ResNetBlock tarafından 
+otomatik ayarlanmaktadır. ResNetBock kullanımına tipik örnek şöyle verilebilir:
+
+
+inp = ak.ImageInput()
+x = ak.Normalization()(inp)
+x = ak.ResNetBlock()(x)
+x = ak.DenseBlock(num_layers=2)(x)
+out = ak.ClassificationHead()(x)
+auto_model = ak.AutoModel(inputs=inp, outputs=out, max_trials=100, overwrite=True)
+
 ---------------------------------------------------------------------------------
 """    
+
+
+# ---------------------------- Denetimsiz Öğrenme (Unsupervised Learning) ----------------------------
+
+
+""" 
+---------------------------------------------------------------------------------
+Anımsanacağı gibi makine öğrenmesi kabaca üç bölümde ele alınıyordu:
+
+1) Denetimli Öğrenme (Supervised Learning)
+2) Denetimsiz Öğrenme (Unsupervised Learning)
+3) Pekiştirmeli Öğrenme (Reinforcement Learning)
+
+Biz şimdiye kadar "yapay sinir ağları ile denetimli öğrenme" konularını inceledik. 
+Tabii denetimli öğrenme yalnızca yapay sinir ağlarıyla değil istatistiksel ve 
+matematiksel başka yöntemlerle de gerçekleştirilebilmektedir. 
+
+x ve y verileri arasında eğitim yoluyla bir ilişki kurmaya çalışan öğrenme yöntemlerine 
+denetimli öğrenme yöntemleri denilmektedir. Yani denetimli öğrenmede bir eğitim 
+süreci vardır. Ancak eğitimden sonra kestirim yapılabilmektedir. Örneğin elimizde 
+elma, armut ve kayısı olmak üzere üç meyve olsun. Biz önce eğitim sırasında hangi 
+resmin ne olduğunu modele veririz. Model bunlardan hareketle x ve y değerleri arasında 
+bir ilişki kurar. Sonra biz bir resim verdiğimizde model onun elma mı, armut mu, 
+kayısı mı olduğunu bize söyler.
+
+Denetimsiz (unsupervised) modellerde ise elimizde yalnızca x verileri vardır. 
+Dolayısıyla biz bu öğrenme yöntemlerinde bir eğitim uygulamayız. Denetimsiz öğrenmede 
+biz modele birtakım verileri veririz. Model bu verileri inceler. Bunlar arasındaki 
+benzerlik ve farklılıkaladan hareketle bunları gruplayabilir. Dolayısıyla bu gruplama 
+için bir y veri kümesine ihtiyaç duyulmaz. Örneğin elimizde bol miktarda elma, 
+armut, kayısı resimleri olsun. Biz modele "bu resimler bazı bakımlardan birbirlerine 
+benziyor, birbirlerine benzeyenleri gruplandır" deriz. Model de aslında hangi resmin 
+elma, hangi resmin armut ve hangi resmin kayısı olduğunu bilmeden bunların 
+benzerliklerine bakarak bunları bir araya getirebilmektedir. Burada dikkat edilmesi 
+gereken nokta bir eğitim sürecinin olmamasıdır. Peki denetimsiz öğrenmede kestirim 
+yapılabilir mi? Evet yapılabilir. Örneğin biz modele bir resim verip onun hangi 
+gruba daha fazla benzediğini sorabiliriz. Bu da bir çeşit kestirimdir. 
+
+Denetimsiz öğrenme için çeşitli yöntemler bulunmaktadır. Ancak denetimsiz öğrenmede 
+kullanılan en önemli yüntem grubu "kümeleme (clustering)" denilen yöntem grubudur. 
+Bu nedenle denetimsiz öğrenme denildiğinde akla ilk gelen yöntem grubu kümelemedir.    
+
+---------------------------------------------------------------------------------
+Makine öğrenmesinde "sınıflandırma (classification)" ve "kümeleme (clustering)" 
+kavramları farklı anlamlarda kullanılmaktadır. Sınıflandırma belli bir olgunun 
+önceden belirlenmiş sınıflardan birine atanması ile ilgilidir. Kümeleme ise bu 
+sınıfların bizzat oluşturulması ile ilgidir. Yani sınıflandırmada sınıflar zaten 
+bellidir. Kümelemede ise sınıflar benzerliklerden ve farklılıklardan hareketle 
+oluşturulmaya çalışılmaktadır. Dolayısıyla sınıflandırma "denetimli (supervised)" 
+bir yöntem grubunu belirtirken, kümeleme "denetimsiz (unsupervised)" bir yöntem 
+grubunu belirtmektedir. 
+
+Elimizde hem x ve hem y verileri varken genellikle denetimli öğrenme yöntemleri 
+tercih edilmektedir. Ancak bazen elimizde yeteri kadar x verileri olduğu halde y 
+verileri olmayabilir. Örneğin anomali içeren banka işlemlerini tespit etmek isteyelim. 
+Elimizde anomali içerdiğini açıkça bildiğimiz fazlaca y verisi olmayabilir. Bazen 
+x ve y verilerinin çeşitliliğinden dolayı denetimli öğrenme uygun yöntem olmaktan 
+çıkabilir. Örneğin bir dosyanın virüslü olup olmadığına yönelik bir model oluşturmak 
+isteyelim. Elimizde virüslü dosyalarla virüssüz dosyalar bulunuyor olabilir. Ancak 
+virüs yöntemleri sürekli değişebilmektedir. Bu durumda yeni veriler daha oluşmadan 
+biz eğitimi yapamayız. Bu tür durumlarda da denetimsiz öğrenme tarzı yöntemler 
+tercih edilmektedir. 
+
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Kümeleme benzer olanların ya da benzer olmayanların bir araya getirilmesi süreci 
+olduğuna göre benzerlik nasıl ölçülmektedir? Ani bir veri kümesinde satırlar varlıkları 
+temsil ediyorsa, iki satırın birbirine benzer olması nasıl ölçülecektir? Benzerlik 
+insan sezgisi ile ilgili bir kavramdır. Oysa makine öğrenmesinde benzerlik ancak 
+sayısal yöntemle somut hale getirilebilir. 
+
+İşte bir veri kümesindeki satırlar n boyutlu uzayda bir nokta gibi düşünülebilir. 
+Benzerlik de "uzaklık (distance)" temeline dayandırılabilmektedir. Eğer n boyutlu 
+uzayda iki nokta arasındaki uzaklık düşük ise bu iki nokta benzer, yüksek ise bu 
+iki nokta benzer değildir. Ancak uzaklık da aslında farklı yöntemlerle hesaplanabilmektedir. 
+En yaygın kullanılan uzaklık ölçütü "öklit uzaklığı (euclidean distance)" denilen 
+ölçüttür. Öklit uzaklığı n boyutlu uzayda iki nokta arasındaki uzaklıktır. Ancak 
+"hamming uzaklığı (Hamming distance)", gibi "Manhattan uzaklığı (Manhattan distance)" 
+gibi çeşitli uzaklık ölçütleri değişik problemlerde bazen tercih edilebilmektedir. 
+
+Öklit uzaklığı hesaplamak için NumPy içerisinde hazır bir fonksiyon yoktur. Ancak 
+bunun için SciPy içerisinde scipy.spatial.distance modülünde euclidean isimli 
+bir fonksiyon bulunmaktadır. 
+
+
+import numpy as np
+from scipy.spatial.distance import euclidean
+
+a = np.array([1, 4, 6, 2])
+b = np.array([4, 2, -1, 7])
+
+dst = euclidean(a, b)
+print(dst)
+
+---------------------------------------------------------------------------------
+Ökltit uzaklığının dışında daha az kullanılıyor olsa da birkaç önemli uzaklık tanımı 
+daha vardır. Manhattan uzaklığı (Manhattan distance) iki nokta arasındaki birbirine 
+dik doğrularla gidilebilen uzaklıktır.
+
+Matematiksel olarak a ve b noktalar i'ise uzayın boyut indeksi olmak üzere 
+Manhattan uzaklığı sum(abs(ai - bi)) biçiminde hesaplanmaktadır.  
+
+
+import numpy as np
+from scipy.spatial.distance import cityblock
+
+a = np.array([1, 2, 3, 4])
+b = np.array([5, 6, 7, 8])
+
+mdist = cityblock(a, b)
+print(mdist)
+
+---------------------------------------------------------------------------------
+Özellikle görüntü işleme gibi sayısal işaret işleme uygulamalarında "Hamming uzaklığı 
+(Hamming distance)" denilen bir uzaklık da kullanılmaktadır. Hamming uzaklığı 
+"ikili (binary)" kategorik sütunlara sahip noktalar için tercih edilen bir uzaklık 
+türüdür. Hamming uzaklığı farklı olanların toplam eleman sayısına oranı ile hesaplanmaktadır. 
+
+
+ankara
+ayazma
+
+Bu iki yazının hamming uzaklığı 4/6'dır. 
+
+
+Hamming uzaklığı SciPy kütüphanesinde scipy.spatial.distance modülündeki hamming 
+isimli fonksiyonla hesaplanabilir. Örneğin:
+
+
+import numpy as np
+from scipy.spatial.distance import hamming
+
+a = np.array([1, 0, 0, 1])
+b = np.array([1, 1, 0, 0])
+
+hdist = hamming(a, b)
+print(hdist)           # 0.5  
+
+---------------------------------------------------------------------------------
+"""    
+
+
