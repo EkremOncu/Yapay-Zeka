@@ -13140,6 +13140,62 @@ hdist = hamming(a, b)
 print(hdist)           # 0.5  
 
 ---------------------------------------------------------------------------------
+Kosinüs uzaklığı da bazı uygulamalarda kullanılmaktadır. İki nokta arasındaki 
+açının kosinüsü ile hesaplanmaktadır. Bu uzaklık da scipy.spatial.distance modülündeki 
+cosine fonksiyonu ile hesaplanmaktadır. Örneğin:
+
+
+import numpy as np
+from scipy.spatial.distance import cosine
+
+
+a = np.array([1, 0, 0, 1])
+b = np.array([1, 1, 0, 0])
+
+
+hdist = cosine(a, b)
+print(hdist)                # 0.5 
+
+---------------------------------------------------------------------------------
+Pek çok uzaklıklık türü sütunsal biçimde hesaplandığına için sütunlar arasındaki 
+skala farklılıkları bu uzaklık hesaplarını olumsuz etkileyecektir. Uzaklık hesaplarında 
+sütunların skalalarını benzer hale getirmemiz gerekir. Yani kümeleme işlemlerinde 
+çoğu kez özellik ölçeklemesinin uygulanması gerekebilmektedir. Tabii bazı uzaklık 
+ölçütleri (örneğin kosinüs uzaklığı gibi) sütunların skala farklılıklarından olumsuz 
+etkilenmez. Ancak Öklit uzaklığı gibi, Manhattan uzaklığı gibi uzaklıklar bu skala 
+farklılıklarından etkilenmektedir. 
+
+Veri kümesinde kategorik veriler varsa uzaklık yöntemlerinin bir bölümü bu kategorik 
+verilerde anlamlı olmaktan çıkabilecektir. Kategorik sütunları one-hot-encoding 
+yaptığımızda da bu kategoriler arasında bir farklılık oluşmayacaktır. İşte buradan 
+da görüldüğü gibi aslında kategorik sütunlar için başka uzaklık ölçütlerinin 
+kullanılması uygun olmaktadır. Örneğin Hamming uzaklığı bu amaçla kullanılabilmektedir. 
+Pekiyi bir veri kümesi hem nümerik hem de kategorik sütunlar içeriyorsa bu durumda 
+nasıl bir uzaklık yöntemi uygulanmalıdır? İşte bu tür durumlarda seçeneklerden 
+biri hem nümerik hem de kategorik sütunlarla çalışabilecek başka bir uzaklık yöntemi 
+seçmektir. Diğeri ise kümeleme algoritmasını bu duruma uygun olarak değiştirmektir. 
+
+Kategorik verilerin de bulunduğu veri kümelerinde kategorik sütunları farklı bir 
+biçimde ele alan "Gower Uzaklığı" denilen bir uzaklık da kulanılmaktadır. 
+
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Bu bölümde kümeleme işlemlerinde kullanılan kümeleme algoritmaları ve bu algoritmaları 
+uygulayan fonksiyonlar ve sınıflar üzerinde duracağız.
+
+Yüzün üzerinde kümeleme algoritması oluşturulmuştur. Bazı algoritmalar bazı 
+algoritmaların biraz değiştirilmiş biçimleri gibidir. Ancak bazı algoritmalar tamamen 
+farklı fikirlere dayanmaktadır. Kümeleme algoritmaları kendi aralarında algortimanın 
+dayandığı fikir bakımından beş gruba ayrılabilir:
+
+    
+1) Ağırlık Merkezi (Centroid) Tamelli Algoritmalar
+2) Bağlantı (Connectivity) Temelli Algoritmalar (Hiyerarşik Kümeleme Algoritmaları)
+3) Yoğunluk Temelli (Density Based) Algoritmalar
+4) Dağılım Temelli (Distribution Based) Algoritmalar
+5) Bulanık Temelli (Fuzzy Based) Algortimalar
+
+---------------------------------------------------------------------------------
 """    
 
 
