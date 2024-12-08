@@ -13299,6 +13299,115 @@ bakılarak belirlenebilir. Yani bu yöntem bize bir kestirim yapma olanağı da
 sağlamaktadır. 
 
 ---------------------------------------------------------------------------------
+K-Means kümeleme algoritması sklearn.cluster modülü içerisinde KMeans isimli 
+sınıfla gerçekleştirilmiştir. Sınıfın __init__ metodunun parametrik yapısı şöyledir:
+
+
+class sklearn.cluster.KMeans(n_clusters=8, *, init='k-means++', n_init='auto', max_iter=300, 
+                             tol=0.0001, verbose=0, random_state=None, copy_x=True, algorithm='lloyd')
+
+
+Metodun birinci parametresi ayrıştırılacak küme sayısını (k değerini) belirtmektedir. 
+
+Metodun init parametresi başlangıçtaki rastgele ağırlık merkezlerinin nasıl 
+oluşturulacağını belirtmektedir. Bu parametrenin default değeri "kmeans++" biçimindedir. 
+Bu parametreye "random" değeri de girilebilir. Bu durumda ilk ağırlık merkezleri 
+rastgele seçilecektir. Ayrıca bu parametreye programcı kendi ağırlık merkezlerini 
+bir NumPy matrisi biçiminde de girebilir. 
+
+Metodun n_init parametresi algoritmanın kaç kere çalıştırılıp en iyisinin bulunacağını 
+belirtmektedir. Bu parametrenin default değeri "auto" biçimdedir. Bu "auto" default 
+değeri kullanıldığında algoritmanın keç kez çalıştırılacağı metodun init parametresine 
+bağlı olarak değişmektedir. Eğer init parametresi "k-means++" ya da dizi 
+biçimindeyse algoritma bir kez çalıştırılır, "random" biçimindeyse ise algoritma 
+10 kez çalıştırılır. En iyi değer "atalete (inertia)" bağlı olarak belirlenmektedir. 
+
+Metodun max_iter parametresi bir çalıştırmanın toplamda en fazla kaç iterasyon 
+süreceğini belirtmektedir. Bu parametrenin default değeri 300'dür. Yani algoritma 
+300 adımda kararlı noktaya gelmezse sonlandırılmaktadır. 
+
+Metodun algorithm parametresi kullanılacak algoritmanın varyasyonunu belirtmektedir. 
+Bu parametrenin default değeri "llyod" biçimindedir. K-Means algoritmaları arasında 
+küçük farklılıklar vardır. Yukarıda açıkladığımız algoritma Llyod algoritmasıdır. 
+Ancak noktaların durumuna göre bu varyasyonlar arasında hız açısından farklılıklar 
+söz konusu olabilmektedir. 
+
+---------------------------------------------------------------------------------
+KMeans nesnesi yaratıldıktan sonra kümeleme algoritması fit metodu ile çalıştırılır. 
+fit metodu parametre olarak veri kümesini iki boyutlu bir matris biçiminde bizden 
+alır ve kümelemeyi yapar,  nesnenin kendisiyle geri döner. Kümeleme işlemi bittikten 
+sonra nesnenin aşağıda belirttiğimiz özniteliklerinden kümeleme sonucundaki bilgiler 
+elde edilebilmektedir. 
+
+
+cluster_centers_: Bu öznitelik nihai durumdaki ağırlık merkezlerini vermektedir. 
+
+labels_: Her noktanın hangi küme içerisinde yer aldığına yönelik tek boyutlu bir 
+       NumPy dizisini belirtir. Buradaki kümeler 0'dan başlanarak numaralandırılmıştır. 
+       Örneğin biz labels_ özniteliğinden aşağıdaki gibi bir NumPy dizisi elde edebiliriz:
+
+
+array([2, 1, 0, 1, 0, 2, 1, 1, 0, 2, 2, 1])
+
+
+Burada sırasıyla noktaların kaç numaralı kümeye ilişkin olduğu belirtilmektedir. 
+Kümelemede kümelenmiş olan olguların ne olduğu bilinmemektedir. Yani bunlara bir 
+isim verilememektedir. KMeans sınıfı bize ayrıca kümelerdeki noktaları vermemektedir. 
+Ancak biz bu öznitelikten hareketle hangi noktaların hangi kümelerin içerisinde 
+olduğunu dataset[km.labels_ == n] işlemi ile elde edebiliriz. 
+
+inertia_: Bu öznitelik tüm noktaların kendi ağırlık merkezlerine uzaklıklarının 
+        karelerinin toplamını vermektedir. Bu değerin bir performans ölçütü olarak 
+        kullanıldığını belirtmiştik.
+
+
+n_iter_: Bu öznitelik sonuca varmak için kaç iterasyonun uygulandığını bize verir. 
+
+n_features_in_: Veri kümesindeki sütunların sayısıdır. 
+
+
+Sınıfın transform metodu önemli bir işlem yapmamaktadır. transform metoduna biz 
+birtakım noktalar verdiğimizde metot bize o noktaların tüm ağırlık merkezlerine 
+uzaklığını vermektedir. Benzer biçimde fit_transform metodu da önce fit işlemi 
+yapıp kümelemeyi gerçekleştirir sonra da transform işlemi yapar. Ancak bu sınıfta 
+transform ve fit_transform çok kullanılan metotlar değildir. Yani:
+
+
+km.fit(dataset)
+result = km.transform(dataset)
+
+
+işlemi ile:
+
+
+result = fit_transform(dataset)
+
+
+aynı işleve sahiptir. fit_transform işlemi ile biz önce K-Means algoritmasını uygulayıp 
+sonra her noktanın tüm ağırlık merkezlerine uzaklıklarını iki boyutlu bir NumPy 
+dizisi biçiminde elde ederiz. 
+
+
+Sınıfın predict metodu bizden alınan noktaların hangi kümeler içerisinde yer 
+alabileceğini belirtmektedir. Yani aslında metot aldığı noktaların tüm ağırlık 
+merkezlerine uzaklığını hesaplayıp en yakın ağırlık mrkezinin ilişkin olduğu kümeyi 
+vermektedir. 
+
+
+Sınıfın fit_predict isimli metodu önce fit işlemi yapıp sonra predict işlemi 
+yapmaktadır. Yani:
+
+
+predict_result = km.fit(dataset).predict(dataset)
+
+
+İşleminin eşdeğeri şöyledir:
+
+
+predict_result = fit_predict(dataset)
+
+
+---------------------------------------------------------------------------------
 """    
 
 
