@@ -13171,7 +13171,7 @@ yaptığımızda da bu kategoriler arasında bir farklılık oluşmayacaktır. �
 da görüldüğü gibi aslında kategorik sütunlar için başka uzaklık ölçütlerinin 
 kullanılması uygun olmaktadır. Örneğin Hamming uzaklığı bu amaçla kullanılabilmektedir. 
 Pekiyi bir veri kümesi hem nümerik hem de kategorik sütunlar içeriyorsa bu durumda 
-nasıl bir uzaklık yöntemi uygulanmalıdır? İşte bu tür durumlarda seçeneklerden 
+nasıl bir uzaklık yöntemi uygulanmalıdır? İşte bu tür durumlarda seçeneklerden
 biri hem nümerik hem de kategorik sütunlarla çalışabilecek başka bir uzaklık yöntemi 
 seçmektir. Diğeri ise kümeleme algoritmasını bu duruma uygun olarak değiştirmektir. 
 
@@ -13179,6 +13179,7 @@ Kategorik verilerin de bulunduğu veri kümelerinde kategorik sütunları farkl�
 biçimde ele alan "Gower Uzaklığı" denilen bir uzaklık da kulanılmaktadır. 
 
 ---------------------------------------------------------------------------------
+
 ---------------------------------------------------------------------------------
 Bu bölümde kümeleme işlemlerinde kullanılan kümeleme algoritmaları ve bu algoritmaları 
 uygulayan fonksiyonlar ve sınıflar üzerinde duracağız.
@@ -13194,6 +13195,108 @@ dayandığı fikir bakımından beş gruba ayrılabilir:
 3) Yoğunluk Temelli (Density Based) Algoritmalar
 4) Dağılım Temelli (Distribution Based) Algoritmalar
 5) Bulanık Temelli (Fuzzy Based) Algortimalar
+
+---------------------------------------------------------------------------------
+Kümeleme algortimalarının en popüler ve yaygın olanı ve en iyi bilineni K-Means 
+denilen algoritmadır. K-Means ağırlık merkezi temelli bir algoritmadır. Buradaki 
+"Means" ağırlık merkezi oluştururken ortalamanın dikkate alınması nedeniyle kullanılmış 
+olan biz sözcüktür. Aslında ağırlık merkezi oluşturulurken ortalamanın dışında 
+başka hesaplamalar da kullanılabilmektedir. Dolayısıyla bu yöntemin K-XXX biçiminde 
+(burada XXX alt yöntemi belirten bir isimdir) varyasyonları vardır. Bu varyasyonların 
+bazıları şunlardır:
+
+
+K-medoids
+K-mode
+K-prototype
+K-center
+K-medians
+K-nearest neighbors
+
+Ancak bu aileden en çok kullanılanı ve K-Means isimli algoritmadır. 
+
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+
+# K-Means kümeleme algoritması
+
+K-Means kümeleme algoritmasında işin başında uygulamacının noktalardan kaç küme 
+oluşturulacağını belirlemiş olamsı gerekir. Küme sayıları bazı uygulamalarda zaten 
+biliniyor durumda olabilir. Örneğin çok sayıda resim söz konusu olabilir ve bu 
+resimlerin 10 farklı meyveye ilişkin olduğu zaten biliniyor olabilir. Ancak bazı 
+uygulamalarda küme sayısını uygulamacı da bilmiyor olabilir. Bu tür durumlarda 
+uygun küme sayısının belirlenmesi ayrı bir problem biçiminde karşımıza çıkmaktadır. 
+Biz burada küme sayısının başkan bilindiğini ve bunun k olduğunu varsayacağız. 
+K-Means ismindeki K harfi de k tane kğme sayısını temsil etmektedir.    
+
+Algoritmanın tipik işleyişi şöyledir:
+
+
+1) k tane küme için işin başında rastgele k tane ağırlık merkezi belirten nokta üretilir. 
+
+
+2) Tüm noktaların bu k tane ağırlık merkezine uzaklıkları hesaplanır. Noktalar 
+   hangi ağırlık merkezine daha yakınsa o kümenin içerisine dahil edilir. Artık 
+   k tane kümeden olulan ilk kümeleme yapılmıştır.
+
+3) Kümelerin yeni ağırlık merkezleri küme içerisindeki noktalardan hareketle hesaplanır. 
+   Küme içerisindeki noktaların ağırlık merkezleri her boyutun kendi aralarındaki 
+   ortalamaları ile hesaplanmaktadır. Örneğin x, y, z boyutlarına sahip a, b, c 
+   noktalarının ağırlık merkezleri şöyle hesaplanır:
+
+    centroidx = (ax + bx + cx) / 3
+    centroidy = (ay + by + cy) / 3
+    centroidz = (az + bz + cz) / 3
+
+
+Zaten bu yönteme ağırlık merkezi bulunurken her boyutun kendi aralarındaki ortalamasının 
+hesaplanması nedeniyle K-Means ismi verilmiştir.
+
+
+Aslında burada yapılan işlem noktalar dataset biçiminde iki boyutlu bir NumPy matrisi 
+biçiminde ise np.mean(dataset, axis=0) işlemidir. 
+
+
+4) Tüm noktaların yeniden bu yeni ağırlık merkezlerine uzaklığı hesaplanır. Hangi 
+   noktalar hangi ağırlık merkezine daha yakınsa o kümeye dahil edilir. Böylece 
+   bazı noktalar küme değiştirecekir. Sonra 3'üncü adıma geri dönülür ve işlemler 
+   bu biçimde devam ettirlir. 
+
+
+5) Eğer yeni ağırlık merkezine göre hiçbir nokta küme değiştirmiyorsa artık yapılacak 
+   bir şey kalmamıştır ve algoritma sonlandırılır.
+
+   
+K-Means yönteminin burada uygulanan algoritmasına "Lloyd" algoritması denilmektedir. 
+Bu algoritma Stuart Lloyd tarafından 1957 yılında geliştirilmiştir.
+
+---------------------------------------------------------------------------------
+K-Means yönteminde işin başında ağırlık merkezleri rastgele alındığı için algoritmanın 
+her çalıştırılmasında birbirinden farklı kümeler elde edilebilmektedir. (Tabii 
+bu kümelerin çok az sayıda elemanı farklı olabilmektedir.) Bu tür durumlarda 
+algoritma birden fazla kez çalıştırılıp en iyi kümeleme seçilebilir. 
+
+Peki K-Means yönteminde performas ölçütü olarak neyi kullanabiliriz? Yani iki 
+alternatif kümelemede hangi kümelemenin daha iyi olduğunu nasıl ölçebiliriz? İşte 
+en çok kullanılan performans ölçütü "atalet (inertia)" denilen ölçüttür. 
+
+Atalet "her noktanın kendi ağırlık merkezine uzaklığının karelerinin toplamına" 
+denilmektedir. Bu aslında istatistikteki varyans işlemi gibidir. Yani aslında bu 
+yöntemde en küçük toplam varyansa bakılmaktadır. O halde biz K-Means algoritmasını 
+birden fazla kez çalıştırıp her kümelemenin ataletine bakıp en iyi atalete sahip 
+olan kümelemeyi seçebiliriz. 
+
+
+Algoritmanın başlangıcında rastgele nokta seçmek için çeşitli yöntemler de önerilmiştir. 
+Bunlardan en yaygın kullanılanı "kmeans++" denilen yöntemdir. 
+
+
+Pekiyi biz K-Means algoritmasında kestirimde bulunabilir miyiz? Yani kümeleme 
+işleminden sonra elimizdeki bir noktanın hangi kümeye ilişkin olabileceğini kestirebilir 
+miyiz? Eğer bir kez kümeleme yapılmışsa yeni bir noktanın bu kümelerden hangisinin 
+içerisine girebileceği basit bir biçimde noktanın tüm ağırlık merkezlerine uzaklığına 
+bakılarak belirlenebilir. Yani bu yöntem bize bir kestirim yapma olanağı da 
+sağlamaktadır. 
 
 ---------------------------------------------------------------------------------
 """    
