@@ -13408,6 +13408,51 @@ predict_result = fit_predict(dataset)
 
 
 ---------------------------------------------------------------------------------
+
+---------------------------------------------------------------------------------
+K-Means yönteminde bizim işin başında noktaları kaç kümeye ayıracağmızı belirlemiş 
+olmamız gerekir. Peki biz bunu nasıl belirleyebiliriz? İşte bazen problemin kendi 
+içerisinde zaten küme sayısı bilinmektedir. Tabii pek çok durumda biz küme sayısını 
+da bilmiyor durumda oluruz. En iyi küme sayısının belirlenmesi için birkaç yöntem 
+kullanılmaktadır. En çok kullanılan iki yöntem şöyledir:
+
+    
+1) Dirsek Noktası Yöntemi (Elbow Point Method)
+2) Silhouette Yöntemi (Silhouette Method)
+
+---------------------------------------------------------------------------------                                                                   
+
+# 1) Dirsek Noktası Yöntemi
+
+Dirsek noktası yönteminde önce 1'den başlanarak n'e kadar küme sayıları ile kümeleme 
+yapılır. Her kümedeki toplam atalet elde edilir. (Toplam ataletin KMeans sınıfının 
+inertia_ elemanı ile verildiğini anımsayınız. Toplam atalet her noktanın kendi 
+ağırlık merkezine uzaklığının kareleri toplamıdır.) Sonra yatay eksende küme sayısı 
+düşey eksende toplam atalet olacak biçimde bir grafik çizilir. Bu grafikte 
+"eğrinin yataya geçtiği nokta" gözle tespit edilir. Eğrinin yataya geçtiği noktaya 
+"dirsek noktası (elbow point)" denilmektedir. 
+
+
+Aşağıdaki örnekte daha önce kullanmış olduğumuz "points.csv" noktaları için dirsek 
+grafiği çizilmiştir. Bu örnekte toplam ataletler aşağıdaki gibi bir liste içlemi 
+ile elde edilmiştir:
+
+
+inertias = [KMeans(n_clusters=i, n_init=10).fit(dataset).inertia_  for i in range(1, 10)]
+
+
+Grafik şöyle çizdirilmiştir:
+
+
+plt.title('Elbow Point Method', fontsize=12)
+plt.plot(range(1, 10), inertias)
+plt.show()
+
+
+Buradan elde edilen grafiğe bakıldığında dirsek noktasının 3 ya da 4 olabileceği 
+anlaşılmaktadır. 
+
+---------------------------------------------------------------------------------        
 """    
 
 
