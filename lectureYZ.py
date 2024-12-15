@@ -13003,7 +13003,10 @@ auto_model = ak.AutoModel(inputs=inp, outputs=out, max_trials=100, overwrite=Tru
 """    
 
 
-# ---------------------------- Denetimsiz Öğrenme (Unsupervised Learning) ----------------------------
+
+
+
+# --------------------------------- Denetimsiz Öğrenme (Unsupervised Learning) ---------------------------------
 
 
 """ 
@@ -13216,6 +13219,7 @@ K-nearest neighbors
 Ancak bu aileden en çok kullanılanı ve K-Means isimli algoritmadır. 
 
 ---------------------------------------------------------------------------------
+
 ---------------------------------------------------------------------------------
 
 # K-Means kümeleme algoritması
@@ -13383,9 +13387,9 @@ işlemi ile:
 result = fit_transform(dataset)
 
 
-aynı işleve sahiptir. fit_transform işlemi ile biz önce K-Means algoritmasını uygulayıp 
-sonra her noktanın tüm ağırlık merkezlerine uzaklıklarını iki boyutlu bir NumPy 
-dizisi biçiminde elde ederiz. 
+aynı işleve sahiptir. fit_transform işlemi ile biz önce K-Means algoritmasını 
+uygulayıp sonra her noktanın tüm ağırlık merkezlerine uzaklıklarını iki boyutlu 
+bir NumPy dizisi biçiminde elde ederiz. 
 
 
 Sınıfın predict metodu bizden alınan noktaların hangi kümeler içerisinde yer 
@@ -13453,6 +13457,119 @@ Buradan elde edilen grafiğe bakıldığında dirsek noktasının 3 ya da 4 olab
 anlaşılmaktadır. 
 
 ---------------------------------------------------------------------------------        
+
+# 2) Silhouette Yöntemi
+
+Silüet (silhouette) yönteminde yine 2'den başlanarak belli sayıda küme için çözümler 
+yapılır. Sonra her çözüm için "silüet skoru (silhouette score)" denilen bir değer 
+elde edilmektedir. Bu değerin en yüksek olduğu küme sayısından bir fazla küme 
+sayısı en iyi küme sayısı olarak belirlenmktedir. Silüet skoru sklearn.metrics 
+modülündeki silhouette_score isimli fonksiyonla elde edilebilmektedir. Bu fonksiyona 
+parametre olarak veri kümesi ve kümelenmiş sonuçlar (yani labels_ değeri) verilir. 
+Silüet skor işlemi tek kümeyle yapılamamaktadır. Yani bu yöntemde silüet skorları 
+kümesi 2'den başlatılarak hesaplanmalıdır. 
+
+silhouette_score fonksiyonun parametrik yapısı şöyledir:
+
+
+sklearn.metrics.silhouette_score(X, labels, *, metric='euclidean', sample_size=None, 
+                                 random_state=None, **kwds)
+
+
+Fonksiyonun birinci parametresi kümelenecek veri kümesini ikinci parametresi ise 
+kümeleme sonucunda elde edilmiş olan kümeleme bilgisini (yani KMeans nesnesinin 
+labels_ özniteliğini) almaktadır. 
+
+
+Şimdi yukarıdaki "points.csv" veri kümesi için en iyi küme sayısını silüet skoru 
+ile tespit edelim. Aşağıdaki gibi bir döngü ile küme sayıları için silüet skor 
+değerleri elde edilebilir:
+
+
+ss_list = []
+for i in range(2, 10):
+    labels = KMeans(n_clusters=i, n_init=10).fit(dataset).labels_
+    ss = silhouette_score(dataset, labels)
+    ss_list.append(ss)
+    print(f'{i} => {ss}')
+
+Buradan elde edilen skorlar şöyledir:
+
+
+2 => 0.5544097423553467
+3 => 0.47607627511024475
+4 => 0.4601795971393585
+5 => 0.4254012405872345
+6 => 0.3836685121059418
+7 => 0.29372671246528625
+8 => 0.21625620126724243
+9 => 0.11089805513620377
+
+
+Bizim amacımız en yüksek skora ilişkin küme sayısından bir bir fazlasını elde 
+etmektir. Gözle baktığımızda en yüksek değerin 0.5544097423553467 olduğu görülmektedir. 
+Bu değer 2 kümeye ilişkin olan değerdir. O halde en iyi küme sayısı 3'tür.
+
+
+Bu işlemi şöyle de yapabiliriz:
+
+
+optimal_cluster = np.argmax(ss_list) + 3
+
+
+Tabii aslında fonksiyonel tarzda bu tespit işlemi tek bir ifade ile de yapılabilirdi:
+
+
+optimal_cluster = np.argmax([silhouette_score(dataset, KMeans(i, n_init=10).fit(dataset).labels_) for i in range(2, 10)]) + 3
+
+
+silüet skorun nasıl elde edildiği üzerinde durmayacağız. Bunun için ilgili 
+kaynaklara başvurabilir.
+
+---------------------------------------------------------------------------------  
 """    
+
+"""
+---------------------------------------------------------------------------------
+
+# K-Medoids kümeleme algoritması
+
+K-Medoids yönteminde ana algoritma K-Menas yöntemindeki gibidir. Ancak kümenin 
+ağırlık merkezi o kümedeki noktaların boyutsal temelde ortalaması ile değil bu 
+noktalardan bir tanesinin seçilmesiyle yapılmaktadır. Yani bu yöntemde her zaman
+kümenin ağırlık merkezi zaten var olan noktalardan biri olarak seçilir. ("Medoid" 
+sözcüğü zaten İngilizce "bir grup verideki onu temsil eden bir tanesi" anlamına 
+gelmektedir.) K-Means yönteminde kümeler için ağırlık merkezleri aslında küme 
+içerisinde hiç bulunmayan bir nokta olarak elde edilmektedir. Ancak bu yöntemde 
+küme içerisindeki noktalardan biri ağırlık merkezi olarak seçilir. 
+
+Peki küme içerisindeki hangi nokta en iyi ağırlık merkezi olmaya adaydır? İşte 
+tipik olarak küme içerisindeki her noktanın ağırlık merkezi olduğunu varsayarak 
+bu noktaya toplam uzaklık (ya da atalet) hesaplanır. Bu toplam uzaklığın en az 
+olduğu küme noktası yeni ağırlık merkezi olarak seçilir. K-Medoids yöntemi "ağırlık 
+merkezlerinin var olan noktalardan biri olması gerektiği durumlarda ve/veya aşırı 
+uçta değerlerin (outliars) bulunduğu veri kümelerinde" tercih edilebilir. Ancak 
+bu yöntem K-Means yöntemine göre daha fazla işlem zamanına gereksinim duymaktadır. 
+(Örneğin K-Means yönteminde yeni ağırlık merkezi için noktaların orta noktalarını 
+hesaplamak O(N) karşıklıkta bir işlem olduğu halde nokta sayısı fazlalıştığında
+K-Medoids yönteminde ağırlık merkezi O(N^2) karmaşıklıkta hesaplanabilmektedir.)
+
+
+K-Medoids yöntemi doğrudan scikit-learn tarafından desteklenmemektedir. Ancak bu 
+kütüphanenin extra modülünde KMedoids isimli bir sınıf bulunmaktadır. (scikit-learn
+-extra paketi scikit-learn kütüphanesşnde bulunmayan bazı özelliklerin eklenmesiyle 
+oluşturulmuş, onun eksiklerini kapatmayı hedefleyen bir kütüphanedir.) Tabii bunun 
+için önce scikit-learn-extra paketini aşağıdaki gibi kurmalısınız:
+
+
+pip install scikit-learn-extra
+
+
+K-Medoids sınıfının kullanımı KMeans sınıfı ile çok benzerdir. K-Medoids yöntemi 
+"pyclustering" isimli kütüphane içerisinde de gerçekleştirilmiştir. Bu kütüphane 
+de kullanılabilir.    
+
+---------------------------------------------------------------------------------
+"""
 
 
