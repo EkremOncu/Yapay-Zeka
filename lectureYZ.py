@@ -13572,4 +13572,172 @@ de kullanılabilir.
 ---------------------------------------------------------------------------------
 """
 
+"""
+---------------------------------------------------------------------------------
 
+# K-Medians kümeleme algoritması
+
+K-Medians yöntemi de K-Means yöntemi gibidir. Ancak kümeler oluşturulduktan sonra 
+kümelerin ağırlık merkezleri sütun ortalamaları ile değil sütunlarım median değerleriyle 
+yapılmaktadır. Böylece uç değerlerin ortalamadaki olumsuz etkisi giderilmiş olur. 
+Tabii median bulma bir sıraya dizme gerektirdiği için daha fazla zaman alan bir 
+işlemdir. 
+
+Bu yöntem ancak uç değerlerin bulunduğu ve bunların veri kümelerinden atılmadığı 
+durumlarda uygulanabilecek bir yöntemdir. Ayrıca K-Medians yönteminde noktaların 
+biribirine uzaklığını hesaplamak için genellikle Öklit uzaklığı yerine Manhatten 
+uzaklığı tercih edilmektedir. Manhattan uzaklığı medyan işlemiyle daha uyumludur. 
+
+
+K-Medians yöntemi sckit-learn kütüphanesi tarafından gerçekleştirilmemiştir. 
+Bunun için pyclustering kütüphanesi kullanılabilir. 
+
+---------------------------------------------------------------------------------
+
+import pandas as pd
+from pyclustering.cluster.kmedians import kmedians
+
+df = pd.read_csv('points.csv')
+dataset = df.to_numpy(dtype='float32')
+
+
+km = kmedians(dataset, initial_medians=[[5, 4], [1, 2]])
+km.process()
+
+
+clusters = km.get_clusters()
+print(clusters)
+
+---------------------------------------------------------------------------------
+"""
+
+"""
+---------------------------------------------------------------------------------
+
+# K-Modes kümeleme algoritması
+
+K-Modes tüm sütunların kategorik ölçekte olduğu veri kümelerinde kullanılabilen 
+bir kümeleme yöntemidir. Örneğin aşağıdaki gibi bir veri kümesi olsun:
+
+
+    İndex   Renk	    Cinsiyet	Ülke
+    ------------------------------------
+    0       Kırmızı	    Kadın	    Türkiye
+    1       Mavi	    Erkek	    Almanya
+    2       Yeşil	    Kadın	    Fransa
+    3       Mavi	    Kadın	    İngiltere
+    4       Kırmızı	    Erkek	    Türkiye
+    5       Yeşil	    Erkek	    Almanya
+    6       Kırmızı	    Kadın	    Fransa
+    7       Mavi	    Erkek	    Türkiye
+    8       Yeşil	    Kadın	    İngiltere
+    9       Mavi	    Kadın	    Almanya
+
+
+Bu veri kümesinde biz kümeleme yapmak isteyelim. K-Means bunun için uygun değildir. 
+Çünkü K-Means Öklit uzaklığını kullanır. Buradaki kategorilerin Öklit uzaklığına 
+dönüştürülmesi anlam kaybına yol açacaktır. İşte sütunların hepsinin kategorik
+olduğu durumlarda K-Means yerine k-Modes yöntemi tercih edilmelidir. 
+
+K-Modes algoritmasının ana fikri K-Means gibidir. Ancak uzaklıklar "Hamming uzaklığı" 
+ile hesaplanır. Anımsanacağı gibi Hamming uzaklığı "aynı ise 1, farklı ise 0" başka 
+bir deyişle "aynı olanların sayısı" biçiminde hesaplanmaktadır. K-Modes algoritmasında 
+yine başlangıçta kaç kümenin oluşturulacağı uygulamacı tarafından belirlenmelidir. 
+Örneğin biz yukarıdaki veri kümesi için 2 kümenin oluşturulmasını isteyelim. Küme 
+sayısı belirlendikten sonra küme sayısı kadar rastgele nokta alınmaktadır. Bu iki 
+reastgele nokta şunlar olsun:
+
+
+0'ıncı küme için  rastgele ağırlık merkezi  ===>       Yeşil	    Kadın	    Fransa
+1'inci küme için  rastgele ağırlık merkezi  ===>       Mavi	        Erkek	    Türkiye
+
+
+Bundan sonra K-Means algoritmasında olduğu gibi tüm noktaların bu iki noktaya 
+uzaklıklarını hesaplayıp bu noktalar hangisine yakınsa o kümeye dahil etmektir. 
+Ancak uzaklık hesabı Öklit uzaklığı ile değil Hamming uzaklığı ile yapılmalıdır. 
+Ancak burada Hamming uzaklığı için ortalama almaya gerek yoktur. Doğrudan aynı 
+olanların sayısına bakılabilir. Örneğin ilk elemanın ("Kırmızı Kadın Türkiye") 
+her iki noktaya Hamming uzaklığını hesaplayalım: 
+
+
+"Kırmızı Kadın Türkiye"  ile  "Yeşil  Kadın  Fransa" arasındakşi Hamming uzaklığı 1'dir.
+"Kırmızı Kadın Türkiye"  ile  "Mavi  Erkek  Türkiye" arasındaki Hamming uzaklığı 1'dir.
+
+
+"Kırmızı Kadın Türkiye" noktasının her iki noktaya Hamming uzaklığı aynı olduğuna 
+göre biz bu noktayı bu kümelerden herhangi birine dahil edebiliriz. Şimdi 
+"Mavi Erkek Almanya" noktasının iki noktaya Hamming uzaklıklarını hesaplayalım:
+
+
+"Mavi Erkek Almanya"  ile  "Yeşil  Kadın  Fransa" arasındakşi Hamming uzaklığı 0'dır.
+"Mavi Erkek Almanya"  ile  "Mavi  Erkek  Türkiye" arasındaki Hamming uzaklığı 2'dir.
+
+
+O halde bu nokta 1 numaralı nokta 1 numaralı kümeye atanmalıdır. İşte böyle her 
+nokta Hamming uzaklığı temelinde bir kümeye atanır. Bunun sonucunda ilk kümeleme 
+yapılmış olur. Bundan sonra K-Means yönteminde olduğu gibi kümelerin gerçek ağırlık 
+merkezleri kendi elemanlarına göre belirlenmelidir. K-Means yönteminde biz kümedeki 
+elemanların sütunsal ortalamaları ile yeni ağırlık merkezini buluyorduk. Sütunlar 
+kategorik olduğuna göre K-Modes yönteminde biz her sütunun ortalama yerine mod'unu 
+alarak yeni ağırlık merkezini buluruz. Örneğin kümelerden biri şu noktalara sahip 
+olsun:
+
+
+Mavi	    Erkek	    Türkiye
+Mavi	    Kadın	    Almanya
+Yeşil	    Erkek	    Türkiye
+Kırmızı	    Erkek	    Türkiye
+
+
+Buradaki yeni ağırlık merkezleri şöyle oluşturulacaktır:
+
+
+Mavi Erkek Türkiye
+
+
+Görüldüğü gibi nasıl K-Means yönteminde her sütunun ortalaması alınarak yeni ağırlık 
+merkezleri bulunuyorsa K-Modes yönteminde her sütunun mod değeri alınarak ortalama 
+bulunmaktadır. K-Means ismi nasıl "ortalama almakla yeni ağırlık merkezinin bulunmasından" 
+geliyorsa K-Modes ismi de "mod alarak yeni ağırlık merkezinin bulunmasından" gelmektedir. 
+
+---------------------------------------------------------------------------------
+Peki biz tüm sütunların kategorik olduğu durumda en uygun kğme sayısını nasıl 
+belirleyebiliriz? Bunun için dirsek yöntemi kullanılabilir fakat uygun bir yöntem 
+değildir. Silhouette yöntemi "hamming uzaklığı temelinde" uygulanabilir. scikit-learn 
+içerisindeki silhouette_score fonksiyonun parametrik yapısını hatırlayınız:
+
+
+sklearn.metrics.silhouette_score(X, labels, *, metric='euclidean', sample_size=None, 
+                                 random_state=None, **kwds)
+
+
+Fonksiyonun metric parametresi "hamming" geçilirse fonksiyon silüet yöntemini 
+"hamming uzaklığını" kullanarak uygulayacaktır. Ancak kategorik verilerin de önce 
+LabelEncoder sınıfı ile sayısal biçime dönüştrülmesi gerekmektedir. 
+
+---------------------------------------------------------------------------------
+K-Modes yöntemi scikit-learn kütüphanesinde gerçekleştirilmemiştir.  Bu yöntemin 
+"kmodes" kütüpanesinde ve "pyclustering" kütüphanesinde gerçekleştirimi bulunmaktadır. 
+Biz burada örneğimizi "kmodes" kütüphanesini kullanarak verelim. Kütüphanenin kurulumu 
+şöyle yapılabilir:
+
+    
+pip install kmodes
+
+
+Kütüphane içerisinde K-Modes yöntemi KModes isimli sınıfla uygulanmaktadır. Sınıfın 
+kullanımı tamamen KMeans sınıfının kullanımına benzetilmiştir. Sınıfın __init__ 
+metodunun parametrik yapısı şöyledir:
+
+
+KModes(n_clusters=8, max_iter=100, cat_dissim=matching_dissim, init='Cao', n_init=10, verbose=0, 
+    random_state=None, n_jobs=1):
+    
+
+Yine önce KModes sınıfı türünden nesne yaratılır. Sonra fit işlemi yapılır. Kümeleme 
+işlemi sonucunda elde edilen bilgiler yine nesnenin özniteliklerinden elde edilebilir. 
+Örneğin nesnenin labels_ özniteliğinden biz hangi noktaların hangi kümelere 
+atandığını belirleyebiliriz
+
+---------------------------------------------------------------------------------
+"""
