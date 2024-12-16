@@ -13741,3 +13741,66 @@ atandığını belirleyebiliriz
 
 ---------------------------------------------------------------------------------
 """
+
+"""
+---------------------------------------------------------------------------------
+
+# K-Prototypes kümeleme algoritması
+
+K-Prototypes hem sayısal hem de kategorik sütunlara sahip olan veri kümeleri için 
+tercih edilen kümeleme yöntemlerinden biridir. Biz daha önce bu tür karma (mixed) 
+veri kümeleri için K-Means yönteminin de kullanılabileceğini belirtmiştik. Ancak 
+K-Means yöntemi uygulanmadan önce kategorik sütunların one-hot-encoding yoluyla 
+sayısallaştırılması gerekiyordu. One-hot-encoding yoluyla sayıllaştırmanın bazı 
+dezavantajlarından da bahsetmiştik. 
+
+
+K-Prototypes yönteminde sayısal sütunlarla kategorik sütunlar birbirlerinden ayrıştırılır. 
+Ağırlık merkezi sayısal sütunların ortalaması elde edilerek, kategorik sütunların 
+ise mod'ları elde edilerek oluşturulur. Örneğin aşağıdaki gibi bir karma veri kümesi 
+söz konusu olsun:
+
+
+Yaş	    Gelir (Bin TL)	Eğitim Süresi	Cinsiyet	Şehir
+---------------------------------------------------------------------
+25	    45.3	        5	            Kadın	    İstanbul
+34	    52.1	        12	            Erkek	    Ankara
+29	    63.5	        8	            Kadın	    İzmir
+41	    58.7	        15	            Erkek	    İstanbul
+23	    49.4	        4	            Kadın	    Antalya
+37	    54.8	        10	            Erkek	    İstanbul
+30	    61.3	        9	            Kadın	    İzmir
+28	    57.9	        7	            Erkek	    Ankara
+26	    50.2	        6	            Kadın	    Antalya
+35	    62.4	        11	            Erkek	    İzmir
+
+
+Buradaki Yaş, Gelir ve Eğitim Süresi sütunları sayısal, Cinsiyet ve Şehir sütunları 
+ise kategorik bilgiler içermektedir. Örneğin bir kümenin noktaları aşağıdaki gibi olsun:
+
+
+37	    54.8	        10	            Erkek	    İstanbul
+26	    50.2	        6	            Kadın	    Antalya
+29	    63.5	        8	            Kadın	    İzmir
+41	    58.7	        15	            Erkek	    İstanbul
+35	    62.4	        11	            Erkek	    İzmir
+
+Bu noktaların ağırlık merkezleri oluşturulurken nümerik sütunların ortalamaları, 
+kategorik sütunların ise modları elde edilmektedir. Böylece aşağıdaki gibi bir 
+ağırlık merkezi oluşmaktadır:
+
+
+33.6    57.92           10              Erkek       İstanbul
+
+
+Görüldüğü gibi burada nümerik sütunların ortalamaları kategorik sütunların mod'ları 
+alınmıştır. Elde edilen bu bilgiye "prototip (prototype)" de denilmektedir. 
+
+
+K-Prototypes algoritmasında da başlangıçta küme sayısı kadar rastgele ağırlık merkezleri 
+elde edilir. (Bu noktalar genellikle var olan noktalardan seçilmektedir.) Sonra 
+her noktanın bu ağırlık merkezlerine uzaklığı hesaplanır. Peki bu uzaklıklar nasıl 
+hesaplanmaktadır. Örneğin aşağıdaki iki nokta arasındaki uzaklık nasıl hesaplanacaktır?
+
+---------------------------------------------------------------------------------
+"""
