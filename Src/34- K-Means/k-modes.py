@@ -1,3 +1,6 @@
+# Tüm sütunların kategorik ölçekte olduğu veri kümelerinde kullanılabilen bir kümeleme yöntemidir.
+
+
 import pandas as pd
 
 dataset_dict = {
