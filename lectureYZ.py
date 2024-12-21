@@ -13701,7 +13701,7 @@ bulunmaktadır. K-Means ismi nasıl "ortalama almakla yeni ağırlık merkezinin
 geliyorsa K-Modes ismi de "mod alarak yeni ağırlık merkezinin bulunmasından" gelmektedir. 
 
 ---------------------------------------------------------------------------------
-Peki biz tüm sütunların kategorik olduğu durumda en uygun kğme sayısını nasıl 
+Peki biz tüm sütunların kategorik olduğu durumda en uygun küme sayısını nasıl 
 belirleyebiliriz? Bunun için dirsek yöntemi kullanılabilir fakat uygun bir yöntem 
 değildir. Silhouette yöntemi "hamming uzaklığı temelinde" uygulanabilir. scikit-learn 
 içerisindeki silhouette_score fonksiyonun parametrik yapısını hatırlayınız:
@@ -13797,10 +13797,87 @@ Görüldüğü gibi burada nümerik sütunların ortalamaları kategorik sütunl
 alınmıştır. Elde edilen bu bilgiye "prototip (prototype)" de denilmektedir. 
 
 
-K-Prototypes algoritmasında da başlangıçta küme sayısı kadar rastgele ağırlık merkezleri 
-elde edilir. (Bu noktalar genellikle var olan noktalardan seçilmektedir.) Sonra 
-her noktanın bu ağırlık merkezlerine uzaklığı hesaplanır. Peki bu uzaklıklar nasıl 
-hesaplanmaktadır. Örneğin aşağıdaki iki nokta arasındaki uzaklık nasıl hesaplanacaktır?
+K-Prototypes algoritmasında da başlangıçta küme sayısı kadar rastgele ağırlık 
+merkezleri elde edilir. (Bu noktalar genellikle var olan noktalardan seçilmektedir.) 
+Sonra her noktanın bu ağırlık merkezlerine uzaklığı hesaplanır. Peki bu uzaklıklar 
+nasıl hesaplanmaktadır. Örneğin aşağıdaki iki nokta arasındaki uzaklık nasıl 
+hesaplanacaktır?
+
+30	        61.3	        9	      Kadın	    İzmir
+33.6        57.92           10        Erkek     İstanbul
+
+
+Eğer sütunların hepsi nümerik olsaydı biz Öklit uzaklığını kullanırdık. Sütunların 
+hepsi kategorik olsaydı bu durumda da Hamming uzaklığını kullanırdık. Ancak burada 
+bazı sütunları nümerik olan bazı sütunları kategorik olan bir veri kümesi söz 
+konusudur. İşte bu tür karma sütunların bulunduğu durumda iki nokta arasındaki 
+uzaklık da karma bir biçimde yani nümerik uzaklıklarla kategorik uzaklıkların 
+toplamı biçiminde hesaplanmaktadır. Hesaplama şöyle yapılır:
+
+
+Uzaklık = Nümerik sütunların uzaklığı + gamma * kategorik sütunların uzaklığı
+
+
+
+Nümerik sütunların uzaklığı için Öklit uzaklığı, kategorik sütunların uzaklığı 
+için Hamming uzaklığı kullanılabilir. Buradaki gamma deneme yanılma yoluyla ya da 
+sezgisel yolla belirlenecek olan iki tür sütunun uyumlandırılmasında kullanılacak 
+çarpansal bir değerdir. Tabii bu uzaklık hesabı yapılmadan önce nümerik sütunlar 
+özellik ölçeklemesine sokulmalıdır. Ölçekleme için standart ölçekleme ya da min-max 
+ölçeklemesi kullanılabilir. 
+
+Peki gamma çarpanı deneme yanılma yoluyla nasıl tespit edilebilir? Bunun için 
+çeşitli gamma değerleriyle kümeleme yapılıp bunlar arasından en uygunu seçilmektedir. 
+
+
+Gamma değerinin deneme yanılma yöntemi kullanılmadan seçilmesine yönelik çeşitli 
+yaklaşımlar bulunmaktadır. Bu yaklaşımların bazıları gamma değerini nümerik sütunların 
+standart sapmalarının ortalamasıyla ilişkilendirmektedir. Örneğin kmodes 
+kütüphanesindeki KPrototypes sınıfında gamma değeri programcı tarafından belirtilmediyse 
+aşağıdaki gibi elde edilmiştir:
+
+
+ gamma = 0.5 * np.mean(Xnum.std(axis=0))
+
+
+ Burada Xnum nümerik sütunları belirtmektedir. 
+
+---------------------------------------------------------------------------------
+K-Prototypes yöntemi scikit-learn içerisinde gerçekleştirilmemiştir. Ancak kmodes 
+kütüphanesinde ve pyclustering kütüphanesinde gerçekleştirilmiştir. Biz burada 
+sciklit-learn kütüphanesine benzer bir kullanıma sahip olduğu için kmodes kütüphanesindeki
+gerçekleştirim için bir örnek vereceğiz. 
+
+kmodes kütüphanesindeki KPrototypes sınıfı şöyle kullanılmaktadır:
+
+
+
+1) Önce veri kümesindeki sayısal ve kategorik sütunlar belirlenir. 
+
+2) Nümerik sütunlar özellik ölçeklemesine sokulur.
+
+3) Kategorik sütunlar LabelEncoder sınıfı ile sayısallaştırılır. 
+
+
+Bu işlemler sonucunda dataset isimli bir NumPy dizisinin elde edildiğini varsayalım. 
+
+
+4) Şimdi KPrototypes nesnesi oluşturulur. Örneğin:
+
+
+kp = KPrototypes(n_clusters=5)
+
+
+5) fit işlemi yapılır. fit işleminde tüm veri kümesi ve kategorik sütunların 
+  indeksleri categorical parametresiyle metoda verilir. Örneğin:
+
+
+kp.fit(dataset, categorical=[0, 1, 3, 5, 6])
+
+
+Artık sınıfın labels_ örnek özniteliğinden hangi satırların hangi kümeye atandığı 
+bilgisini elde edebiliriz. Yine nesnenin cluster_centroids_ özniteliğinden kümelerin 
+ağırlık merkezleri elde edilebilmektedir.  
 
 ---------------------------------------------------------------------------------
 """
