@@ -9377,7 +9377,7 @@ MaxPooling2D(pool_size=(2, 2), strides=None, padding='valid', data_format=None,
 AveragePooling2D(pool_size=(2, 2), strides=None, padding='valid', data_format=None, 
                  **kwargs)
 
-Metotların pool_size parametreleri çerçevenin büyüklüğünü belirtmektedir. Default 
+Metotların pool_size parametreleri çerçevenin büyüklügünü belirtmektedir. Default 
 olarak 2x2'lik çerçeve kullanılmaktadır. 2x2'lik çerçeve kullanımı tipiktir. 
 Metotların strides parametreleri yine kaydırma miktarını belirtir. Default durumda 
 kaydırma pools_size parametresiyle aynı değerdedir. Yani bu parametreye None 
@@ -13193,7 +13193,7 @@ farklı fikirlere dayanmaktadır. Kümeleme algoritmaları kendi aralarında alg
 dayandığı fikir bakımından beş gruba ayrılabilir:
 
     
-1) Ağırlık Merkezi (Centroid) Tamelli Algoritmalar
+1) Ağırlık Merkezi (Centroid) Temelli Algoritmalar
 2) Bağlantı (Connectivity) Temelli Algoritmalar (Hiyerarşik Kümeleme Algoritmaları)
 3) Yoğunluk Temelli (Density Based) Algoritmalar
 4) Dağılım Temelli (Distribution Based) Algoritmalar
@@ -13878,6 +13878,52 @@ kp.fit(dataset, categorical=[0, 1, 3, 5, 6])
 Artık sınıfın labels_ örnek özniteliğinden hangi satırların hangi kümeye atandığı 
 bilgisini elde edebiliriz. Yine nesnenin cluster_centroids_ özniteliğinden kümelerin 
 ağırlık merkezleri elde edilebilmektedir.  
+
+---------------------------------------------------------------------------------
+"""
+"""
+---------------------------------------------------------------------------------
+
+# K-means parçalı eğitim
+
+Kümeleme işlemlerinde kümelenecek nokta sayısı çok fazla ise ve bu bakımdan bir 
+bellek sorunu ortaya çıkıyorsa tine parçalı eğitim uygulamak gerekebilir. Ancak 
+her kümeleme yöntemi parçalı eğitime uygun değildir. K-Means kümeleme yöntemi 
+parçalı eğitim yapmaya nispetem uygun bir yöntemdir. 
+
+Scikit-learn kütüphanesinde K-Means yöntemi ile parçalı eğitim yapmak için 
+MiniBatchKMeans isimli bir sınıf da bulundurulmuştur. Bu sınıfın fit metoduna biz 
+veri kümesini bir bütün olarak versek bile fit aslında bu veri kümesinden satırları 
+batch batch alıp işleme sokmaktadır. Ancak sınıfın asıl önemli özelliği partial_fit 
+isimli bir metoda sahip olmasıdır. Bu sayede biz bir dosyadan satırları parça parça 
+okuyup fit işlemi yapabiliriz. MiniBatchKMeans sınıfının __init__ metodunun parametrik
+yapısı şöyledir:
+
+
+class sklearn.cluster.MiniBatchKMeans(n_clusters=8, *, init='k-means++', max_iter=100, batch_size=1024, 
+    verbose=0, compute_labels=True, random_state=None, tol=0.0, max_no_improvement=10, init_size=None, 
+    n_init='auto', reassignment_ratio=0.01)[source]
+
+
+
+Buradaki batch_size veri kümesinden satırların kaçarlı çekilip işleme sokulacağını 
+belirtmektedir. partial_fit metoduna burada belirtilen batch_size kadar satırın 
+verilmesi gerekmektedir. MiniBatchKMeans nesnesi yaratıldıktan partial_fit
+işlemi yapılabilir. partial_fit metodunun parametrik yapısı şöyledir:
+
+
+partial_fit(X, y=None, sample_weight=None)
+
+
+"kmodes" ve "pyclustering" kütüphanelerindeki K-XXX algoritmalarında bir parçalı 
+eğitim olanağı yoktur.
+
+
+Pandas'ın read_csv fonksiyonu chunksize parametresi ile kullanıldığında bize bir 
+iteratör nesnesi verir. Bu iteratör her dolaşıldığında chunskize kadar elemandan 
+oluşan DataFrame nesnesi elde edilmektedir. Tabii fonksiyon tüm dosyayı tek hamlede 
+belleğe okuyarak bu işlemi yapmaz. Kendi içerisinde her defasında chunksize kadar 
+kısmı okumaktadır. 
 
 ---------------------------------------------------------------------------------
 """
