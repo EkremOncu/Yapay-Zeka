@@ -14007,5 +14007,53 @@ kümelerle birleştirildiğine yönelik bir ağaç grafiği çizilebilmektedir. 
 Agglomaerative hiyerarşik kümelemede her kümeleme işleminde aynı kümeler elde edilmektedir. 
 
 ---------------------------------------------------------------------------------
+Agglomerative hiyerarşik kümeleme işlemleri için scikit-learn kütüphanesinde 
+AgglomerativeClustering isimli bir sınıf bulundurulmuştur. Sınıfın __init__ metodunun 
+parametrik yapısı şöyledir:
 
+
+class sklearn.cluster.AgglomerativeClustering(n_clusters=2, *, metric='euclidean', memory=None, 
+                                              connectivity=None, compute_full_tree='auto', linkage='ward', 
+                                             distance_threshold=None, compute_distances=False)
+
+
+
+Metodun n_clusters parametresi oluşturulacak nihai küme sayısını belirtmektedir. 
+
+metrik parametresi uzaklık hesaplama yöntemini belirtmektedir.
+
+linkage parametresi kümeye ilişkin noktaların temsil edildiği noktanın nasıl 
+belirleneceğini belirlemek için kullanılmaktadır. Yani bu parametre eğer bir küme 
+birden fazla nokta içeriyorsa bu kümenin tek nokta gibi ele alınabilmesi için hangi 
+hesaplama yönteminin kullanılacağını belirtmektedir. Bu parametreye şu değerlerden 
+biri girilebilir: "ward", "average", "complete ya da maximum", "single". Bu 
+parametrenin default değeri "ward" biçimindedir. Bu durum kümenin tüm noktalarına 
+uzaklıklarının karelerinin ortalaması yönteminin kullanılacağını belirtir. "average" 
+grup ortalaması anlamına, "complete ya da maximum" maksimum uzaklık anlamına "single" 
+ise minimum uzaklık anlamına gelir. 
+
+Metodun compute_distances parametresi default durumda False biçimdedir. eğer bu 
+parametre True geçilirse bu durumda fit işlemi sonrasında nesnede noktaların 
+uzaklığına ilişkin bilgi veren distances_ özniteliği oluşturulmaktadır. 
+
+-------------
+
+AgglomerativeClustering nesnesi yaratıldıktan sonra yine sınıfın fit metoduyla 
+işlemler yapılır. Yani kümeleme işlemini asıl yapan metot fit metodudur. fit işleminden 
+sonra sonuçlar nesnenin özniteliklerinden alınabilir. Nesnenin özniteliklerleri 
+şunlardır:
+
+n_clusters_: Elde edilen küme sayısını belirtmektedir.
+
+labels_: Tıpkı KMenas sınıfında olduğu gibi noktaların sırasıyla hangi kümeler 
+        içerisinde yer aldığını blirten bir NumPy dizisidir. 
+
+n_features_in_: fit işlemine sokulan veri kümesindeki sütun sayısını belirtmektedir. 
+
+distances_: Eğer nesne yaratılırken compute_distances parametresi True geçilmişse 
+            bu örnek özniteliği oluşturulur. Bu durumda bu elemanda uzaklık değerleri 
+            bulunur. Bu uzaklık değerleri dendrogram çizerken kullanılabilmektedir. 
+
+---------------------------------------------------------------------------------
+"""
 
