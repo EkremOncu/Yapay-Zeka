@@ -13219,7 +13219,13 @@ K-nearest neighbors
 Ancak bu aileden en çok kullanılanı ve K-Means isimli algoritmadır. 
 
 ---------------------------------------------------------------------------------
+"""
 
+
+# Ağırlık Merkezi (Centroid) Temelli Algoritmalar
+
+
+"""
 ---------------------------------------------------------------------------------
 
 # K-Means kümeleme algoritması
@@ -13534,7 +13540,7 @@ kaynaklara başvurabilir.
 
 # K-Medoids kümeleme algoritması
 
-K-Medoids yönteminde ana algoritma K-Menas yöntemindeki gibidir. Ancak kümenin 
+K-Medoids yönteminde ana algoritma K-Means yöntemindeki gibidir. Ancak kümenin 
 ağırlık merkezi o kümedeki noktaların boyutsal temelde ortalaması ile değil bu 
 noktalardan bir tanesinin seçilmesiyle yapılmaktadır. Yani bu yöntemde her zaman
 kümenin ağırlık merkezi zaten var olan noktalardan biri olarak seçilir. ("Medoid" 
@@ -13927,3 +13933,8 @@ kısmı okumaktadır.
 
 ---------------------------------------------------------------------------------
 """
+
+
+
+# Bağlantı (Connectivity) Temelli Algoritmalar (Hiyerarşik Kümeleme Algoritmaları)
+
