@@ -13938,3 +13938,74 @@ kısmı okumaktadır.
 
 # Bağlantı (Connectivity) Temelli Algoritmalar (Hiyerarşik Kümeleme Algoritmaları)
 
+
+"""
+---------------------------------------------------------------------------------
+Çok kullanılan diğer bir kümeleme yöntem grubu da "bağlantı temelli (connecivity based)" 
+ya da "hiyerarşik kümeleme (hierarchical clustering)" denilen yöntem grubudur. 
+Bu yöntem grubu kendi içerisinde "agglomerative" ve "divisive" olmak üzere ikiye 
+ayrılmaktadır. 
+
+-- Agglomerative yöntemler "aşağıdan yukarı (bottom-up)", 
+-- Divise yöntem ise "yukarıdan aşağıya (top-down)" yöntemlerdir. 
+
+
+Uygulamada hemen her zaman agglomerative yöntemler tercih edilmektedir. Bu yöntemlere 
+de "agglomerative hiyerarşik kümeleme" denilmektedir. 
+
+---------------------------------------------------------------------------------
+Agglomerative kümeleme algoritması tipik olarak şöyle yürütülmektedir. Toplam n 
+tane nokta olduğunu varsaylım:
+
+
+1) Önce her nokta ayrı bir küme gibi ele alınır. 
+
+
+2) Tüm noktalarla tüm noktalar arasındaki uzaklık hesaplanır. Bu simetrik bir 
+   matris oluşturacaktır. 
+
+
+3) En yakın iki nokta tespit edilip bir küme olarak birleştirilir. Artık bu küme 
+  tek bir nokta gibi ele alınacaktır. Dolayısıyla artık elimizde n - 1 tane nokta 
+  bulunmaktadır. Burada 2. Adıma dönülerek yine tüm noktalarla tüm noktalar 
+  arasındaki uzaklıklar hesaplanır. Ancak iki elemanlı küme sanki tek bir nokta 
+  gibi değerlendirilecektir. Bu aşamadan sonra yeniden bir birleştirme yapılır. 
+  Böylece n - 2 tane nokta elde edilir. İşlemler istenen k tane küme elde edilene 
+  kadar devam ettirilir. 
+
+
+Algoritmadaki önemli noktalar şunlardır:
+
+- Noktalar arasındaki uzaklıklar değişik yöntemlerle ölçülebilmektedir. En çok 
+  kullanılan uzaklık ölçütü yine Öklit uzaklığıdır.
+
+- Birden fazla noktadan oluşan küme tek nokta olarak nasıl ele alınmaktadır? Bu 
+  durumda bu kümeye olan uzaklık nasıl hesaplanacaktır? İşte burada birkaç hesaplama 
+  yöntemi kullanılabilmektedir:
+
+
+Min Yöntemi: Kümelerin en yakın elemanları tespit edilip uzaklık bu en yakın elemanlara 
+             göre hesaplanır.
+
+Max Yöntemi: Kümelerin en uzak elemanları tespit edilip uzaklık bu en uzak elemanlara 
+             göre hesaplanır.
+
+Grup Ortalaması Yöntemi: Noktalarla kümenin tüm noktalarının uzaklıkları hesaplanıp 
+                         ortalama uzaklık elde edilir ve bu ortalama uzaklık dikkate alınır.
+
+Ward Yöntemi: Noktalarla kümenin tüm noktalarının uzaklıklarının karesi elde edilir 
+              ve bu kareli ortalama uzaklık olarak dikkate alınır.
+
+
+Uygulamada en fazla "ward yöntemi" denilen yöntem kullanılmaktadır. 
+
+
+Agglomerative hiyerarşik kümelemede hangi noktaların ve kümelerin hangi nokta ve 
+kümelerle birleştirildiğine yönelik bir ağaç grafiği çizilebilmektedir. Buna 
+"dendrogram" denilmektedir. 
+
+Agglomaerative hiyerarşik kümelemede her kümeleme işleminde aynı kümeler elde edilmektedir. 
+
+---------------------------------------------------------------------------------
+
+
