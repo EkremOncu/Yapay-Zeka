@@ -1,4 +1,4 @@
-"""
+    """
 ---------------------------------------------------------------------------
 C ve Sistem Programcıları Derneği Sınıfta Yapılan Örnekler ve Özet Notlar
                                 
@@ -14053,6 +14053,23 @@ n_features_in_: fit işlemine sokulan veri kümesindeki sütun sayısını belir
 distances_: Eğer nesne yaratılırken compute_distances parametresi True geçilmişse 
             bu örnek özniteliği oluşturulur. Bu durumda bu elemanda uzaklık değerleri 
             bulunur. Bu uzaklık değerleri dendrogram çizerken kullanılabilmektedir. 
+
+---------------------------------------------------------------------------------
+KMeans sınıfında bir predict metodu vardı. Bu metot mevcut ağırlık merkezlerini 
+dikkate alarak noktanın hangi ağırlık merkezine yakın olduğunu hesaplayıp noktanın 
+sınıfını ona göre belirliyordu. Ancak AgglomerativeClustering sınıfında bir predict 
+metodu yoktur. Çünkü yöntemde bir ağırlık mekezi olmadığı için kestirimi yapılacak 
+noktanın neye göre kestiriminin yapılacağı belli değildir. Kümeleme işlemi bütün 
+noktalar temelinde yapılmaktadır. Gerçi sınıfın fit_predict isimli bir metodu vardır. 
+Ancak bu metot önce fit işlemi yapıp sonra labels_ örnek özniteliği ile geri dönmektedir.
+
+
+result = ac.fit_predict(dataset) 
+
+    işlemi ile aşağıdaki işlem eşdeğerdir:
+
+ac.fit(dataset)
+result = ac.labels_
 
 ---------------------------------------------------------------------------------
 """
