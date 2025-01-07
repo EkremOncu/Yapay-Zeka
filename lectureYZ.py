@@ -14074,3 +14074,92 @@ result = ac.labels_
 ---------------------------------------------------------------------------------
 """
 
+"""
+---------------------------------------------------------------------------------
+
+# Kümeleme ve Sınıflandırma işlemleri için rastgele veri üreten bazı fonksiyonlar
+
+
+scikit-learn içerisinde kümeleme ve sınıflandırma işlemleri için rastgele veri 
+üreten bazı fonksiyonlar da oluşturulmuştur. Bunlar sklearn.datasets modülü içerisindedir. 
+make_blobs fonksiyonu belli merkezlerden hareketle onun çevresinde rastgele noktalar 
+üretmektedir. Fonksiyonun parametrik yapısı şöyledir:
+
+
+sklearn.datasets.make_blobs(n_samples=100, n_features=2, *, centers=None, cluster_std=1.0, center_box=(-10.0, 10.0), 
+        shuffle=True, random_state=None, return_centers=False)
+
+
+Buradaki n_samples parametresi üretilecek noktaların sayısını belirtmektedir. 
+
+n_features parametresi üretilecek rastgele verilerin kaç sütundan oluşacağını 
+belirtmektedir. (Başka bir deyişle n_features kaç boyutlu uzay için nokta üretileceğini 
+belirtmektedir.) 
+
+centers parametresi etiket sayısını belirtir. Yani toplam kaç merkezden hareketle 
+rastgele noktalar üretilecektir? 
+
+cluster_std parametresi rastgele noktaların küme içerisinde birbirinden uzaklığını 
+ayarlamakta kullanılır. Bu değer küçültülürse noktalar kendi merkezlerine daha 
+yakın, büyütülürse kendi merkezlerinden daha uzak olabilecek biçimde üretilmektedir.
+
+center_box parametresi ikili bir demet almaktadır. Rastgele üretilecek değerlerin 
+aralığını belirtir. Default değerler -10 ile +10 arasındadır. 
+
+random_state parametresi rassal sayı üreticisi için tohum değeri belirtmektedir. 
+Bu parametreye spesifik bir değer girilirse hep aynı noktalar elde edilir. Bu 
+parametreye değer girilmezse programın her çalışmasında farklı noktalar elde edilecektir.
+
+Fonksiyon bize normal olarak iki elemanlı NumPy dizilerindne oluşan bir demet vermektedir. 
+Bu demetin birinci elemanı üretilmiş olan rastgele noktaları, ikinci elemanı ise 
+onların sınıflarını belirtmektedir. 
+
+Eğer fonksiyonda return_centers parametresi True girilirse bu durumda fonksiyon 
+üçlü bir demete geri döner. Demetin üçüncü elemanı kümelere ilişkin merkez 
+noktalarını belirtir. 
+
+
+
+from sklearn.datasets import make_blobs
+
+dataset, labels = make_blobs(100, 3, cluster_std=1, centers=3)
+
+import matplotlib.pyplot as plt
+
+plt.title('make_blobs Sample points')
+plt.scatter(dataset[:, 0], dataset[:, 1])
+plt.show()
+
+---------------------------------------------------------------------------------
+sklearn.datasets modülünde make_classification isimli benzer bir fonksiyon da bulunmaktadır. 
+Bu fonksiyon özellikle sınıflandırma problemleri için rastgele noktalar üretmektedir. 
+Fonksiyonun parametrik yapısı şöyledir:
+
+
+sklearn.datasets.make_classification(n_samples=100, n_features=20, *, n_informative=2, n_redundant=2, n_repeated=0, 
+        n_classes=2, n_clusters_per_class=2, weights=None, flip_y=0.01, class_sep=1.0, hypercube=True, shift=0.0, 
+        scale=1.0, shuffle=True, random_state=None)
+
+
+Fonksiyonun birinci parametresi üretilecek nokta sayısını 
+
+ikinci parametresi sütun sayısını belirtmektedir.
+
+Fonksiyonun n_classes parametresi ise üretilecek noktaların ilişkin olduğu sınıfların 
+sayısını belirtir. Bu parametrenin default değeri 2'dir. Fonksiyon yine bize ikili 
+bir demet verir. Demetin birinci elemanı rastgele üretilen noktalardan ikinci elemanı 
+ise bunların ilişkin olduğu sınıflardan oluşmaktadır. 
+
+make_classification fonksiyonu standart normal dağılma uygun rastgele noktalar üretmektedir. 
+
+
+
+from sklearn.datasets import make_classification
+
+dataset, labels = make_classification(100, 10, n_classes=4, n_informative=4)
+
+print(dataset)
+print(labels)
+
+---------------------------------------------------------------------------------
+"""
