@@ -14046,7 +14046,7 @@ sonra sonuçlar nesnenin özniteliklerinden alınabilir. Nesnenin özniteliklerl
 n_clusters_: Elde edilen küme sayısını belirtmektedir.
 
 labels_: Tıpkı KMenas sınıfında olduğu gibi noktaların sırasıyla hangi kümeler 
-        içerisinde yer aldığını blirten bir NumPy dizisidir. 
+         içerisinde yer aldığını blirten bir NumPy dizisidir. 
 
 n_features_in_: fit işlemine sokulan veri kümesindeki sütun sayısını belirtmektedir. 
 
@@ -14086,8 +14086,8 @@ make_blobs fonksiyonu belli merkezlerden hareketle onun çevresinde rastgele nok
 üretmektedir. Fonksiyonun parametrik yapısı şöyledir:
 
 
-sklearn.datasets.make_blobs(n_samples=100, n_features=2, *, centers=None, cluster_std=1.0, center_box=(-10.0, 10.0), 
-        shuffle=True, random_state=None, return_centers=False)
+sklearn.datasets.make_blobs(n_samples=100, n_features=2, *, centers=None, cluster_std=1.0, 
+                            center_box=(-10.0, 10.0), shuffle=True, random_state=None, return_centers=False)
 
 
 Buradaki n_samples parametresi üretilecek noktaların sayısını belirtmektedir. 
@@ -14160,6 +14160,109 @@ dataset, labels = make_classification(100, 10, n_classes=4, n_informative=4)
 
 print(dataset)
 print(labels)
+
+---------------------------------------------------------------------------------
+sklearn.datasets modülü içerisindeki make_circles isimli fonksiyon eliptik tarzda 
+veri üretmek için kullanılmaktadır. Eliptik tarzda veriler birbirlerini çevreleyen 
+tarzda verilerdir. Bunlar özellikle bazı kümeleme algoritmalarını test etmek için 
+kullanılmaktadır. Fonksiyonun parametrik yapısı şöyledir:
+
+
+sklearn.datasets.make_circles(n_samples=100, *, shuffle=True, noise=None, 
+                              random_state=None, factor=0.8)
+
+
+Fonksiyon her zaman iki sütuna ilişkin (yani kartezyen koordinat sistemi için) nokta 
+üretmektedir. Fonksiyonun birinci parametresi üretilecek noktaların sayısını belirtir. 
+Default durumda fonksiyon iki sınıfa ilişkin eşit sayıda rastgele nokta üretmektedir. 
+Eğer birinci parametre iki elemanlı bir demet olarak girilirse bu durumda 0 ve 1 
+sınıflarından kaçar tane değer üretileceği de gizlice belirtilmiş olur. Örneğin:
+
+
+dataset, labels = make_circles((100, 200))
+
+Burada 100 tane 0, 200 tane 1 sınıfına ilişkin rastgele nokta üretilecektir. 
+
+Fonksiyonun factor parametresi iç içe çemberlerin birbirine yakınlığını ayarlamak 
+için kullanılmaktadır. Bu parametre (0, 1) arasında değer alır. 1'ye yaklaşıldıkça 
+çemberler birbirine yaklaşır, Bu parametrenin default değeri 0.8 biçimindedir. 
+
+Fonksiyonun noise parametresi çemberlerin düzgünlüğü konusunda etkili olmaktadır. 
+Bu parametre de 0 ile 1 arasında değer alır. Noise değeri yükseltildikçe gürültü 
+artar yani çemberler çember görünümünden çıkar. Testlerde 0.05 gibi değerleri 
+kullanabilirsiniz.
+
+
+
+from sklearn.datasets import make_circles
+
+dataset, labels = make_circles(100, factor=0.8, noise=0.05)
+
+import matplotlib.pyplot as plt
+
+plt.figure(figsize=(10, 8))
+plt.title('Clustered Points')
+
+for i in range(2):
+    plt.scatter(dataset[labels == i, 0], dataset[labels == i, 1])    
+plt.show()
+
+---------------------------------------------------------------------------------
+"""
+
+"""
+---------------------------------------------------------------------------------
+
+ K-Means yöntemiyle Agglomerative Hiyerarşik kümeleme yöntemlerini şöyle karşılaştırabiliriz:
+
+
+- K-Means algoritması oldukça etkindir. Algoritmik karmaşıklığı O(n * k) biçimindedir. 
+  (Burada n nokta sayısını k ise sınıf sayısını belirtiyor.) Halbuki Aglomerative 
+  hiyerarşik kümelemede karmaşıklık O(n ** 3) biçimine kadar yükselmektedir. Her 
+  ne kadar Agglomerative yöntemin SLINK, CLink gibi özelleştirilmiş gerçekleştirimlerinde 
+  karmaşıklık O(n ** 2)'ye düşürülüyor olsa da K-Means her zaman Agllomerative 
+  kümelemeden çok daha hızlıdır.
+
+
+- K-Means yöntemi uç dğerlerden (outliers) oldukça etkilenmektedir. Çünkü bir 
+  ağırlık merkezi oluşturulurken küme içerisindeki tüm noktalar dikkate alınmaktadır. 
+  Halbuki Agglomerative kümeeleme uç değerlerden etkilenmemektedir. 
+
+
+- K-Means algoritmasında ilk ağırlık merkezlerinin seçimine göre algoritmanın her 
+  çalıştırılmasında farklı kümeler elde edilebilmektedir. Halbuki Agglomerative 
+  kümelemede her zaman aynı kümeler elde edilir. Çünkü her noktanın her noktaya 
+  uzaklığı hep aynıdır.
+
+
+- K-Means yönteminde her kümenin bir ağırlık merkezi olduğu için atalet (inertia) 
+  hesabı yapılabilmektedir. Halbuki Agglomerative yöntemde atalet kavramı kullanılmamaktadır. 
+
+
+- K-Means yönteminde dendrogram çilemez. Halbuki Agglomerative yöntemde hangi kümenin 
+  hangi kümeyle birleştirildiğini belirten bir dendrogram çizilebilmektedir. 
+
+
+- K-Means yönteminde ağırlık merkezlerine uzaklıklar minimize edilmeye çalışıldığı 
+  için kestirim yapılabilmektedir. Örneğin KMeans sınıfının bir predict metodu 
+  vardır. Ancak Agglomerative yöntemde bu anlamda bir kestirim yapılamamaktadır. 
+  AgglomerativeClustering sınıfının bir predict metodu yoktur. 
+
+
+- K-Means yönteminde küme sayısı işin başında kesinlikle sabit bir biçimde belirlenmiş 
+  olmak zorundadır. Halbuki Agglomerative yöntemde aslında birleştirme tek küme 
+  oluşana kadar devam ettirilebilir. Örneğin bu yöntemde her birleştirmedeki durum 
+  kaydedilerek farklı miktarda kümeler için kümeleme tek hamlede yapılabilmektedir. 
+  Oysa K-Means yönteminde her küme sayısı için algoritmayı tamamen baştan başlatmak 
+  gerekir. (Tabii biz AgglomerativeCllustering sınıfında yazlnızca son durumdaki 
+  kümelemeyi elde etmekteyiz.)
+
+
+- K-Means ve Agglomerative yöntemin her ikisi de küresel (spherical) olmayan veri 
+  kümelerinde başarısız olmaktadır. Küresel veri demekle bir merkez etrafında 
+  serpişmiş veriler anlaşılmaktadır. Eliptik tarzda veriler bu anlamda küresel 
+  değildir. Dolayısıyla örneğin make_circles gibi fonksiyonlar elde ettiğimiz birbirini 
+  kapsayan çembersel verilerde bu iki yöntem de başarız olmaktadır. 
 
 ---------------------------------------------------------------------------------
 """
