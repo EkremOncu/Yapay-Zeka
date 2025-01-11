@@ -14266,3 +14266,151 @@ plt.show()
 
 ---------------------------------------------------------------------------------
 """
+
+
+
+
+# Yoğunluk Temelli (Density Based) Algoritmalar
+
+
+"""
+---------------------------------------------------------------------------------
+Yoğunluk tabanlı kümeleme yöntemlerinde "yoğunluk (density)" en önemli unsurdur. 
+Bir bölge yoğunsa onun bir küme belirtmesi olasıdır. Peki yoğunluk nasıl ölçülmektedir? 
+Yoğunluk belli bir küresel alan içerisinde kalan nokta sayısına göre ölçülmektedir. 
+
+Yöntemde iki parametre başlangıçta uygulamacı tarafından tespit edilir. Bu parametrelere 
+"eps (epsilon)" ve "min_samples" denilmektedir. Eps parametresi küresel bölgenin 
+yarı çapını, min_samples parametresi ise o küresel bölgenin yoğun kabul edilebilmesi 
+için gerekli olan minimum nokta sayısını belirtmektedir. 
+
+Örneğin eps = 1, min_samples = 10 demek, "eğer 1 yarıçaplı küre içerisinde en az 
+10 nokta varsa o küresel alan yoğun" demektir. Burada biz "küresel (spherical)" 
+terimini kullandık. Aslında söz konusu uzay iki boyutluysa bir daire, üç boyutluysa 
+bir küre çok boyutluysa o uzayın bir küresini kastetmekteyiz. Üç boyuttan daha 
+fazla boyuta sahip uzaylarda küre (sphere) terimi yerine "hiper küre (hypersphere)" 
+terimi kullanılmaktadır. Yani aslında buradaki küresel kavramının genel terimi 
+hiper küresel (hyperspherical) biçimindedir.   
+
+İki boyutlu kartezyen koordinat sisteminde boyutlar x ve y olmak üzere merkezi 
+(a, b) noktasında ve yarıçapı r olan daire denklemi şöyledir:
+
+(x - a) ** 2 + (y - b) ** 2 = r ** 2
+
+Yarıçağı r olan ve merkez koordibnatı ci'lerden oluşan N boyutlu uzayın küresinin 
+denklemi de genel olarak şöyle ifadeedilebilir:
+
+sigma((xi - ci) ** 2) = r ** 2
+
+---------------------------------------------------------------------------------
+"""
+"""
+---------------------------------------------------------------------------------
+
+# DBSCAN (Density Based Spatial Clustering of Applications with Noise) 
+
+Yoğunluk tabanlı algoritmaların en çok kullanılanı DBSCANisimli algoritmadır. 
+Algoritmanın anlaşılması için birkaç terimden faydalanılmaktadır. Bu terimler ve 
+anlamları şöyledir:
+
+
+- Ana Noktalar (Core Points): 
+    
+    Eğer bir nokta merkez kabul edildiğinde onun "eps" yarıçaplı küresinde en az 
+"min_pts" kadar nokta varsa o nokta bir ana noktadır. Bu durumda bir nokta belirlenen 
+"eps" ve "min_samples" değerlerine göre ya ana noktadır ya da değildir. 
+
+
+
+- Bir Ana Noktadan Doğrudan Erişilebilen Noktalar (Direct Reachable Points): 
+    
+    Bir ana noktanın küresi içerisinde kalan noktalar o ana noktanın doğrudan 
+erişilen noktalarıdır. 
+
+
+
+- Ana Bir Noktanın Yoğunluk Yoluyla Erişilebilen Noktaları (Density Reachable Points): 
+    
+    Bir noktanın doğrudan erişilebilen noktalarından biri bir ana nokta ise o ana 
+noktanın da doğrudan erişilebilen noktaları ilk ana noktanın yoğunluk yoluyla 
+erişileben noktaları olur. Yani yoğunluk yoluyla erişilebilen noktalar "arkadaşımın 
+arkadaşı arkadaşımdır" gibi geçişli olarak devam etmektedir. Bu geçişlilik yoğunluk 
+yoluyla erişilebilen noktaların uzayabilmesi anlamına gelir. Burada şu duruma dikkat 
+ediniz: Bir ana noktanın yoğunluk yoluyla erişilebilen noktaları içerisindeki tüm 
+ana noktaların yoğunluk yoluyla erişilebilen noktaları aynıdır. Yani başka bir 
+deyişle bir ana noktanın tüm yoğunluk yoluyla erişilebilen noktalarındaki ana noktaların 
+yoğunluk yoluyla erişilebilen noktaları aynıdır. DBSCAN algoritması aslında bir 
+ana noktanın yoğunluk yoluyla erişilebilen noktalarını bir küme olarak ele alır. 
+ 
+
+
+- Bir Ana Noktanın Sınır Noktaları(Border Points): 
+    Bir ana noktanın yoğunluk yoluyla erişilebilen fakat ana nokta olmayan noktaları 
+o ana noktanın sınır noktalarıdır. Sınır noktalar ana nokta olmadığı için alanı 
+genişletememektedir. Yani yoğunluk geçişli olarak o noktalardan öteye geçememektedir. 
+
+
+
+- Gürültü Noktaları (Noise Points): 
+    
+    Bir nokta hiçbir ana noktanın yoğunluk yoluyla erişilebilen noktası durumunda 
+değilse o noktaya "gürültü noktası" denilmektedir. Gürültü noktaları aslında yoğun 
+bölgelerden kopuk olarak genellikle izole biçimde bulunan noktalardır. 
+
+---------------------------------------------------------------------------------
+Bu durumda algoritma şöyle işletilir:
+
+
+1) Önce "Kalan Noktalar Kümesi", "Gürültü Noktaları Kümesi" biçiminde iki küme 
+oluşturulur. İşin başında tüm noktalar "Kalan Noktalar Kümesine" yerleştirilir. 
+Gürültü Noktaları Kümesi Boştur. 
+
+
+2) Kalan Noktalar Kümesinden rastgele bir nokta alınır. Eğer o nokta bir ana nokta 
+değilse o nokta Kalan Noktalar Kümesinden çıkartılıp Gürültü Noktaları Kümesine 
+yerleştirilir. Eğer alınan nokta bir ana nokta ise o noktanın yoğunluk yoluyla 
+erişilebilen tüm noktaları elde edilir. Bu noktalar Kalan Noktalar Kümesinden çıkartılır 
+ve bir küme yaratılarak o kümeye dahil edilir. Tabii başta Gürültü Noktaları Kümesine 
+girmiş olan bir nokta sonra bir kümeye dahil edilebilmektedir. 
+
+
+3) Yeniden 2. Adıma dönülür. Algoritma Kalan Noktalar Kalan Noktalar Kümesinde 
+nokta kalmayana kadar devam ettirilir. Bu işlemlerin sonucunda K tane küme ve bir 
+de Gürültü Noktaları Kümesi elde edilmiş olur. 
+
+---------------------------------------------------------------------------------
+Algoritmadaki önemli noktalar şunlardır:
+
+
+- Bu algoritmada yoğunluk yoluyla erişilebilen noktalar bir küme olarak elde edilmektedir. 
+
+- Kümeler arasında yoğun bir bölge oluşturmayan noktalar bulunuyor olabilir. Bu 
+noktalar gürültü noktaları haline gelmektedir. Bu durumu şöyle bir örnekle açıklayabiliriz. 
+Uzayda galaksi yoğun yıldızların olduğu bölgelere denilmektedir. İki galaksi arasında 
+yine tek tük yıldızlar olabilir. İşte bu yıldızlar hiçbir galaksiye dahil olmayan 
+gürültü noktalarıdır. 
+
+- Bu algoritmada biz algoritmaya yalnızca eps (yarıçap) ve min_samples değerlerini 
+veririz. Küme sayısını biz vermeyiz. Küme sayısı bu değerlerden hareketle algoritma 
+tarafından belirlenecektir. 
+
+- Bu algoritmada iki hyper parametre vardır: eps ve min_samples. Bu değerlerin 
+farklı seçimleri farklı kümelerin oluşturulmasına yol açacaktır. 
+
+- eps ve min_samples parametresi sabit kalmak üzere algoritmanın her çalıştırılmasından 
+yine aynı kümeler elde edilmeketdir. 
+
+- Algortimada yine bir uzaklık hesaplama yöntemi (yani metrik) söz konsudur. Yine 
+tipik olarak Öklit uzaklığı kullanılmaktadır. 
+
+- DBSCAN algoritmasında bir kestirim olanağı yoktur. 
+
+- DBSCAN algortimasında da bir uzaklık hesabı söz konusu olduğu için farklı skalalara 
+ship veri kümelerinde özellik ölçeklemesi yapılmalıdır. 
+
+---------------------------------------------------------------------------------
+"""
+
+
+
+
