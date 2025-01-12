@@ -14409,8 +14409,238 @@ tipik olarak Öklit uzaklığı kullanılmaktadır.
 ship veri kümelerinde özellik ölçeklemesi yapılmalıdır. 
 
 ---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+DBSCAN algoritması için sklearn.cluster modülündeki DBSCAN isimli sınıf bulundurulmuştur. 
+Sınıfın __init__ metodunun parametrik yapısı şöyledir:
+
+
+class sklearn.cluster.DBSCAN(eps=0.5, *, min_samples=5, metric='euclidean', metric_params=None, 
+                             algorithm='auto', leaf_size=30, p=None, n_jobs=None)[source]
+
+
+Metodun ilk parametresi yarıçap belirten eps parametresidir. Bu parametrenin default 
+değerinin 0.5 olduğunu görüyorsunuz. Özellik ölçeklemesinden sonra bu 0.5 değeri 
+denemek için uygun bir değerdir. 
+
+İkinci parametre olan min_samples bir noktanın ana nokta olması için gereken minimum 
+nokta sayısını belirtmektedir. metric parametresi uzaklık ölçütü için kullanılacak 
+yöntemi belirtir. Diğer parametreler için dokümanlara bakabilirsiniz. 
+
+
+DBSCAN sınıfı türünden nesne yaratıldıktan sonra yine klasik sklearn işlemleri 
+yapılmaktadır. Kümeleme sınıfın fit metodu ile gerçekleştirilir. fit işlemi sonrasında 
+nesnenin özniteliklerinden kümeleme bilgileri alınabilir . Sınıfın örnek öznitelikleri 
+şunlardır:
+
+
+labels_: Bu öznitelik hangi noktaların hangi kümeler içerisinde kümelendiğini belirtmektedir. 
+        Buradaki -1 değeri gürültü noktası anlamına gelir. 
+
+core_sample_indices_: Ana noktaların veri kümesindeki indeks numalaralarını vermektedir.
+
+components_: Ana noktaların hepsinin bulunduğu NumPy dizisini vermektedir.
+
+n_features_in_: Veri kümesindeki sütun sayısını vermektedir.   
+
+
+
+DBSCAN algoritmasında uygulamacının eps ve min_samples değerlerini belirlemiş olması 
+gerekmektedir. Eğer bu değerler geniş belirlenirse küme sayısı azalır, dar belirlenirse 
+küme sayısı artar. Pekiyi uygulamacı bu değerleri nasıl belirlemelidir? 
+
+Epsilon değerinin belirlenmesi için "en yakın komuşuğa (nearest neighbours)" yönelik 
+yöntemler önerilmiştir. Ancak bu değerin deneme yanılma yöntemiyle belirlenmesi 
+daha iyi bir sonucun elde edilmesini sağlayacaktır. O halde uygulamacı önce min_samples 
+parametresini belirleyip daha sonra eps parametresiyle oynayarak nihai ayarlamayı 
+yapabilir. 
+
+---------------------------------------------------------------------------------
+import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt
+
+df = pd.read_csv("C:/Users/pc/Desktop/GitHub/YapayZeka/Src/36- DBSCAN/points.csv")
+dataset = df.to_numpy(dtype='float32')
+
+
+from sklearn.cluster import DBSCAN
+
+dbs = DBSCAN(eps=1.5, min_samples=3)
+dbs.fit(dataset)
+
+nclusters = np.max(dbs.labels_) + 1;
+
+if nclusters == -1:
+    nclusters = 0
+
+
+plt.title('DBSCAN Clustered Points', fontsize=12)
+
+for i in range(nclusters):
+    plt.scatter(dataset[dbs.labels_ == i, 0], dataset[dbs.labels_ == i, 1])     
+
+plt.scatter(dataset[dbs.labels_ == -1, 0], dataset[dbs.labels_ == -1, 1], marker='x', color='black')
+
+legends = [f'Cluster-{i}' for i in range(1, nclusters + 1)]
+legends.append('Noise Points')
+plt.legend(legends)
+plt.show()
+
+---------------------------------------------------------------------------------
+Bir merkez etrafında yayılmayan (yani küresel olmayan) veri kümelerinde (örneğin 
+iç içe geçmiş elips'ler gibi noktalara sahip) daha önce K-Means ve Agglomerative 
+hiyerarşik kümeleme yöntemlerinin iyi çalışmdığını görmüştük. İşte bu tarzdaki veri 
+kümelerinde yoğunluk tabanlı yöntemler iç ve dış elips verilerini iyi bir biçimde 
+kümeleyebilmektedir. 
+
+Aşağıdaki örnekte iç içe iki eliptik veri kümesi oluşturulup DBSCAN yöntemiyle 
+bunlar kümelendirilmiştir. Bu örnekte biz min_samples değerini default değer olan 
+5'te tuttuk ve eps 0.35 olarak aldık. 
+
+
+from sklearn.datasets import make_circles
+
+dataset, labels = make_circles(100, factor=0.4, noise=0.06)
+
+import matplotlib.pyplot as plt
+
+plt.figure(figsize=(10, 8))
+plt.title('Random Points')
+for i in range(2):
+    plt.scatter(dataset[labels == i, 0], dataset[labels == i, 1])    
+plt.show()
+
+from sklearn.cluster import DBSCAN
+
+dbs = DBSCAN(eps=0.35)
+dbs.fit(dataset)
+
+
+import numpy as np
+
+nclusters = np.max(dbs.labels_) + 1
+
+plt.figure(figsize=(10, 8))
+plt.title('DBSCAN Clustered Points', fontsize=12)
+for i in range(nclusters):
+    plt.scatter(dataset[dbs.labels_ == i, 0], dataset[dbs.labels_ == i, 1])     
+
+plt.scatter(dataset[dbs.labels_ == -1, 0], dataset[dbs.labels_ == -1, 1], marker='x', color='black')
+
+legends = [f'Cluster-{i}' for i in range(1, nclusters + 1)]
+legends.append('Noise Points')
+plt.legend(legends)
+plt.show()
+
+---------------------------------------------------------------------------------
 """
+"""
+---------------------------------------------------------------------------------
+
+# OPTICS  (Ordering Points To Identify Clustering Structure)
+
+OPTICS algoritması DBSCAN algoritmasının bir uzantısı gibidir. OPTICS algortimasında 
+bir yoğunluk grafiği elde edilir. Bu yoğunluk grafiğinden hareketle kümeleme yapılır. 
+Dolayısıyla algoritma yalnızca kümeleme işlemi dışında değişik amaçlarla da 
+kullanılabilmektedir. OPTICS algoritmasında iki temel uzaklık kavramı vardır: Ana 
+uzaklık (core distance) ve erişilebilir uzaklık (reachability distance). Algoritma 
+için öncelikle bu uzaklıkların ne anlama geldiğinin anlaşılması gerekir. Algoritmada 
+yine yarıçap belirten eps ve en az nokta sayısını belirten min_pts değerlerinin 
+girdi olarak verildiğini düşünelim. 
+
+Ana uzaklık (core distance) bir ana nokta için söz konusu olan bir uzaklıktır.Yani 
+eğer bir noktanın eps yarıçapında min_pts kadar nokta varsa bu noktanın bir ana 
+uzaklığı vardır. Ana uzaklık tam olarak min_pts kadar noktayı içine alan uzaklıktır. 
+
+Örneğin bir ana noktanın eps uzaklığında 10 tane nokta olsun. Ancak min_pts değerinin 
+3 olduğunu düşünelim. Bu durumda ana uzaklık bu ana noktanın tam olarak 3 tane 
+noktayı içine alacak yarıçapının uzunluğudur. Yani başka bir deyişle biz bu ana 
+noktanın eps komşuluğunda olan 10 tane noktayı ele alıp bunların bu ana noktadan 
+uzaklıklarını küçükten büyüğe sıraya dizersek 3'üncü sıradaki uzaklık bu ana noktanın 
+ana uzaklığı olacaktır. Eps değerinin çok büyük seçildiğini düşünelim. Bu durumda 
+tüm noktalar eps komşuluğunda kalacaktır. İşte bu noktaya en yakın min_pts'inci 
+nokta o ana noktanın ana uzaklığıdır. OPTICS algoritmasında tüm ana noktalar için 
+bir ana uzaklık hesaplanabilmektedir. Tabii ana nokta olmayan noktaların ana uzaklığı 
+söz konusu değildir. Eps değerinin çok büyük seçildiği durumda tüm noktaların ana 
+nokta haline geleceğine dikkat ediniz. 
+
+Bir ana noktanın eps komşuluğundaki tüm noktalarının bir erişilebilir uzaklığı 
+vardır. Ana nokta cp olmak üzere bu ana noktanın eps komuşusundaki nokta da pp 
+olmak üzere bu pp noktasının erişilebilir uzaklığı şöyle hesaplanmaktadır:
+
+max(cp'nin_ana_uzaklığı, cp_ile_pp'nin_uzaklığı)
 
 
+Böylece bir ana noktanın eps komşuluğundaki bir naktasının erişilebilir uzaklığı 
+için şu durum söz konusudur:
 
 
+- Eğer ana noktadan bu noktaya uzaklık ana noktanın ana uzaklığından düşükse bu 
+    noktanın erişebilir uzaklığı ana uzaklık olacaktır.
+
+- Eğer ana noktadan bu noktaya uzaklık ana noktanın erişilebilir uzaklığından yüksekse 
+    bu noktanın erişilebilir uzaklığı ana noktanın bu noktaya uzaklığı olacaktır.
+
+
+Burada bir noktaya dikkatiniz çekmek istiyoruz. Bir nokta birden fazla ana noktanın 
+eps komşuluğunda bulunuyor olabilir. Bu durumda bu noktanın erişilebilir uzaklığı 
+en küçük erişilebilir uzaklığı olarak ele alınmaktadır. 
+
+OPTICS algoritmasında yukarıdaki işlemler uygulanıp verilen eps ve min_pts için 
+her noktaya ilişkin bir erişilebilir uzaklık elde edilmektedir. Bu erişilebilirlik 
+uzaklıklarının oluşturduğu grafiğe "erişilebilirlik grafiği" denilmektedir. Algoritmanın
+amacı her noktanın erişilebilirlik uzaklığını tespit etmektir. Kümeleme işlemi 
+noktaların elde edilmiş olan erişilebilirlik uzaklıkları göz önüne alınarak birkaç 
+yöntemle yapılmaktadır. 
+
+
+OPTICS algoritmasında eps değerinin çok büyük olduğunu varsayalım. Bu durumda ne 
+olur? İşte bu durumda her nokta bir ana nokta durumuna gelir. Bu durumda her noktanın 
+bir erişilebilirlik uzaklığı söz konusu olacaktır. 
+
+OPTICS algoritmasında bir nokta hiçbir ana noktanın eps komşuluğunda değilse bu 
+nokta yine gürültü noktası olarak tespit edilecektir. Eğer eps değeri çok yüksek 
+tutulursa bu durumda erişilebilirlik uzunluklarına bakılarak da gürültü noktaları 
+tespit edilebilir. 
+
+Her noktanın erişilebilirlik uzaklığı belirlendikten sonra kümelemenin nasıl 
+yapılacağına yönelik çeşitli yöntemler bulunmaktadır. Örneğin erişilebilirlik uzaklıkları 
+sıraya dizilebilir. Bu sıralamada yüksek atlamaların olduğu yerler küme geçişleri 
+olarak belirlenebilir. Biz burada bu ayrıntılara girmeyeceğiz. 
+
+---------------------------------------------------------------------------------
+OPTICS algoritması scikit-learn kütüphanesindeki sklearn.cluster modülünde bulunan 
+OPTICS isimli sınıflar geçekleştirilmiştir. Sınıfın __init__ metodunun parametrik 
+yapısı şöyledir:
+
+
+class sklearn.cluster.OPTICS(*, min_samples=5, max_eps=inf, metric='minkowski', p=2, metric_params=None, 
+        cluster_method='xi', eps=None, xi=0.05, predecessor_correction=True, min_cluster_size=None, 
+        algorithm='auto', leaf_size=30, memory=None, n_jobs=None)
+
+
+Metottaki cluster_method parametresi "xi" biçimde ya da "dbscan" biçiminde geçilebilir. 
+Default durumda bu parametre "xi" biçiminde geçilmiştir. Bu durumda algortima 
+yukarıda açıkladığımız biçimde yürütülür. Erişilebilen uzaklıklarına dayalı olarak 
+bir kümeleme yapılmaktadır. Buradaki kümelemede xi parametresi etkili olur. Bu 
+parametre kümeleri tespit edebilmek için sıraya dizilmiş erişilebilen uzaklıklardaki 
+farklılaşma ile ilgilidir. Eğer cluster_method parametresi "dbscan" olarak girilirse 
+bu durumda DBSCAN algoritması uygulanır. Yani bunun DBSCAN algoritmasından bir 
+farkı kalmaz. Ancak ek olarak bize erişilebilen uzaklıklar da verilir. Eğer 
+cluster_method parametresi "dbscan" olarak girilirse bu durumda DBSCAN algoritması 
+kullanılacağı için bizim eps parametresini de girmemiz gerekir. Aksi takdirde sanki 
+eps=0 gibi tüm noktalar gürültü noktası biçimind eoluşacaktır. 
+
+
+OPTICS nesnesi yaratıldıktan sonra yine fit işlemi ile eğitim yapılır. Yine kümeleme 
+bilgisi nesnenin labels_ özniteliğinden elde edilmektedir. Nesnenin ordering_ 
+özniteliği noktaların hangi sırada ele alındığına ilişkin bir bilgi vermektedir. 
+
+Nesnenin reachability_ özniteliği noktaların erişilebilen uzaklıklarını, 
+
+core_distances_ özniteliği ise noktaların ana uzaklıklarını bize vermeketdir. 
+
+Nesnenin cluster_hierarchy_ özniteliği erişilebilen uzaklıklardan hareketle bir 
+dendgrogram çizilmesini sağlamak için bir bağlantı matrisi vermektedir. 
+
+---------------------------------------------------------------------------------
