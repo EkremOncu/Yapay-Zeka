@@ -14644,3 +14644,75 @@ Nesnenin cluster_hierarchy_ özniteliği erişilebilen uzaklıklardan hareketle 
 dendgrogram çizilmesini sağlamak için bir bağlantı matrisi vermektedir. 
 
 ---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Yoğunluk tabanlı DBSCAN algoritmasıyla OPTICS algoritmasını şöyle karşılaştırabiliriz:
+
+
+- OPTICS algoritması daha fazla bellek kullanmaktadır. Çünkü algoritmanın işleyişinde 
+bir "öncelik kuyruğundan (priority queue) faydalanılmaktadır.
+
+
+- OPTICS algoritması DBSCAN algoritmasına göre daha yavaş çalışma eğilimindedir. 
+Çünkü eps değeri büyük tutulduğunda tüm noktalar arasında uzaklık hesabı yapılmak 
+zorunda kalnır.
+
+
+- OPTICS yöntemi veri kümesinde farklı yoğunluklu kümeler bulunduğu durumda daha 
+iyi performans gösterebilir. DBSCAN yönteminde farklı yoğunluklu bölgeler eps sınırları 
+dışında kalabilir. Halbuki OPTICS yönteminde erişim uzaklıkları dikkate alındığı 
+için farklı yoğunluklu bölgeler tespit edilebilecektir. 
+
+
+- OPTICS algoritmasında biz yalnızca min_samples parametresini ve xi değerini belirleriz. 
+Halbuki DBSCAN algoritmasında biz epsilon değerini de belirlemek zorundayız. 
+
+
+- DBSCAN algortiması daha esnektir. DBSCAN'de epsilon değeri uygulamacı tarafından 
+istenildiği gibi alınıp kümeleme üzerinde daha fazla kontrol sağlanabilmektedir. 
+
+
+- Hem DBSCAN hem de OPTICS algoritmaları küresel olmayan (eliptik) verilerde K-Means 
+ve Agglomerative hiyerarşik yönteme göre daha iyi sonuç vermektedir. 
+
+
+- OPTICS algoritmasındaki erişilebilen uzaklıklar hesaplandığı için bu uzaklık 
+bilgilerinden başka amaçlarla da faydalanılabilmektedir. 
+
+---------------------------------------------------------------------------------
+"""
+
+
+
+
+
+# --------------------------------- K-Nearest Neighbors (KNN) Sınıflaması---------------------------------
+
+
+"""
+---------------------------------------------------------------------------------
+Makine öğrenmesinde kullanılan naif yöntemlerden biri de KNN (K-Nearest Neighbors) 
+denilen yöntemdir. Bu yöntem temelde denetimli (supervised) bir yönteme benzemektedir. 
+Ancak yöntemin denetimsiz (unsupervised) modellerde uygulama alanları da vardır. 
+En yakın k komşuluk yöntemi fikir olarak makine öğrenmesinin başka alanlarında 
+da çeşitli aşamalarda kullanılmaktadır. 
+
+KNN yönteminin dayandığı fikir oldukça basittir. Yöntemdeki K harfi en yakın kaç 
+komşuya bakılacağına ilişkin değeri temsil eder. Bu K değeri yöntemin bir hyper 
+parametresidir. Örneğin bu yöntemde K = 3 "en yakın 3 komşuya başvur" anlamına
+gelmektedir. Yöntem özellikle sınıflandırma problemlerinde kullanım alanı bulmaktadır. 
+Ancak regresyon problemlerinde de duruma göre kullanılabilmektedir. Yöntemde eğitim 
+veri kümesi ile kestirilecek değerler aynı anda işleme sokulmaktadır. Yani bu yöntemde 
+önce eğitim yapılıp oradan bilgiler elde edilip kestirim sırasında o bilgilerden 
+faydalanılmamaktadır. Eğitim verileriyle kesitirim verileri doğrudan işleme sokulmaktadır. 
+
+
+Yöntemin dayandığı temel şudur: Bir kestirim yapılacaksa kestirim yapılacak noktaya 
+en yakın k tane noktanın durumuna bakılır. Sınıflandırma işleminde kesitirilecek 
+noktaya en yakın k tane noktada hangi değerler daha fazla ise noktanın o sınıfa 
+ilişkin olduğu kabul edilir. Yöntem şuna benzetilebilir: Birisinin belli bir özelliği 
+hakkında bilgi elde etmek isteyen kişi onun en yakın k tane arkadaşını inceleyip 
+o arkadaşlarının o özelliğine bakarak yargıda bulunur. Tabii buradaki yargı oldukça 
+naif bir temele dayanmaktadır. (Bana arkadaşını söyle senin kim olduğunu söyleyeyim). 
+
+---------------------------------------------------------------------------------
+"""
