@@ -14269,7 +14269,6 @@ plt.show()
 
 
 
-
 # Yoğunluk Temelli (Density Based) Algoritmalar
 
 
@@ -14714,5 +14713,95 @@ hakkında bilgi elde etmek isteyen kişi onun en yakın k tane arkadaşını inc
 o arkadaşlarının o özelliğine bakarak yargıda bulunur. Tabii buradaki yargı oldukça 
 naif bir temele dayanmaktadır. (Bana arkadaşını söyle senin kim olduğunu söyleyeyim). 
 
+k-NN yönteminde k değeri bir hyper parametredir. Yani bunun uygulamacı tarafından 
+algortimaya verilmesi gerekir. Pekiyi bu değerini uygulamacı nasıl tespit etmelidir? 
+Aslında bu konuda kesin bir yöntem önermek mümkün değildir. En çok uygulanan yöntem 
+veri kümesini değişik k değerleri için sınıflandırmak ve en iyi k değerini deneme 
+yanılma yoluyla tespit etmektir. Uygulamacıların bazıları k değerini görsel ya da 
+nümerik olarak bir çeşit dirsek grafiği eşliğinde belirlemeye çalışmaktadır.Eğer 
+k değeri çok büyük seçilirse yakınlığın bir anlamı kalmaz. Ayrıca işlemler de zaman 
+bakımından uzar. k değeri çok küçük seçilirse genelleme yeteneği azalır. O halde 
+k değerinin makul bir biçimde seçilmesi gerekir.
+
+Veri kümesi çok küçükse k değerinin azaltılması, çok büyükse daha yüksek tutulması 
+uygun olabilir. 5 gibi bir değer çoğu veri kümesi için ortalama makul bir değerdir. 
+
+
+k-NN yöntemi kullanılmadan önce özellik ölçeklemesi yapılmalıdır. Çünkü uzaklık 
+hesabında belli bir sütunun diğerinden daha etkili olması genellikle istenmez.
+
+---------------------------------------------------------------------------------
+
+k-NN yöntemi scikit-learn kütüphanesinde sklearn.neighbors modülünde bulunan çeşitli 
+sınıflar yoluyla gerçekleştirilmiştir. Biz burada bu kütüphanedeki bazı sınıfların 
+kullanımları üzerinde duracağız. 
+
+
+KNeighborsClassifier sınıfı k-NN yöntemiyle SINIFLANDIRMA yapmak için kullanılmaktadır. 
+Sınıfın __init__ metodunun parametrik yapısı şöyledir:
+
+
+class sklearn.neighbors.KNeighborsClassifier(n_neighbors=5, *, weights='uniform', 
+                                             algorithm='auto', leaf_size=30, p=2, 
+                              metric='minkowski', metric_params=None, n_jobs=None)
+
+
+Burada n_neighbors parametresi kaç komşuluğa bakılacağını belirtmektedir. Yani 
+bu parametre k değerini belirtmektedir. 
+
+algorithm parametresi en yakın komşuluk bulmada kullanılacak algoritmayı belirtmektedir. 
+Algoritma için girilecek iki tipik değer "ball_tree" ve "kd_tree" biçimindedir. 
+Bu parametrenin default değerinin "auto" olduğuna dikkat ediniz. Bu durumda veri 
+kümesine en uygun algoritma seçilmektedir. 
+
+metric parametresi uzaklık ölçmek için kullanılmaktadır. Bu parametrenin default 
+değerinin "minkowski" biçiminde girildiğine dikkat ediniz. Minkowski uzaklığı Öklit 
+uzaklığının genel bir biçimidir. Minkowski uzaklığındaki üs belirten p değeri de 
+p parametresiyle belirlenebilmektedir. Bu p değerinin default durumda 2 olduğunu 
+görüyorsunuz. Bu durumda default uzaklık olarak Öklit uzaklığı kullanılacaktır.
+
+
+KNeighborsClassifier nesnesi yaratıldıktan sonra fit işlemi yapılır. fit işlemi 
+sırasında en yakın komuşulukların hızlı bulunması için bazı hazırlıklar yapılmaktadır.
+
+
+Sınıfın kneighbors isimli metodu verilen noktalara en yakın k tane noktaya olan 
+uzaklıkları ve bu noktaların indekslerini bize ikili bir demet olarak vermektedir. 
+
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+
+k-NN yönetmiyle REGRESYON problemlerinin çözümünde tipik olarak noktaya en yakın 
+k tane noktanın değerlerinin ortalaması hesaplanmaktadır. Bunun için scikit-learn 
+içerisindeki KNeighborsRegressor sınıfı kullanılmaktadır. Sınıfın __init__ metodunun
+parametrik yapısı şöyledir:
+
+
+class sklearn.neighbors.KNeighborsRegressor(n_neighbors=5, *, weights='uniform', 
+                                            algorithm='auto', leaf_size=30, p=2, 
+        metric='minkowski', metric_params=None, n_jobs=None)
+
+
+Yine metodun n_neighbors parametresi k değerini belirtmektedir. Bu değerin default 
+olarak 5 alındığını görüyorsunuz. Diğer parametreler yine aynıdır. Sınıf benzer 
+biçimde kullanılmaktadır. Örneğin:
+
+
+knr = KNeighborsRegressor(5)
+nr.fit(scaled_dataset_x, dataset_x)
+
+
+Kestirim yine sınıfın predic metoduyla yapılmaktadır. 
+
+
+predict_result = knr.predict(predict_dataset_x)
+
+---------------------------------------------------------------------------------
+sklearn.neigbours modülündeki diğer önemli bir sınıf da NearestNeighbors isimli 
+sınıftır. Bu sınıf sınıflandırma ya da regresyon işlemini yapmaz. Yalnızca en yakın 
+komşuları tespit eder. Modüldeki diğer sınıflar nispeten daha az kullanılmaktadır.
+Bunnları dokümanlardan inceleyebilirsiniz.
+
 ---------------------------------------------------------------------------------
 """
+
