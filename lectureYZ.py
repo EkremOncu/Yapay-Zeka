@@ -14805,3 +14805,70 @@ Bunnları dokümanlardan inceleyebilirsiniz.
 ---------------------------------------------------------------------------------
 """
 
+
+
+
+# --------------------------------- Kovaryans (covariance)---------------------------------
+
+
+"""
+---------------------------------------------------------------------------------
+Varyans standart sapmanın karesine denilmektedir. Varyans işlemi NumPy kütüphanesinde 
+axis temelinde yapılabilmektedir. Standart sapma ve varyans değerlerin ortalama 
+etrafındaki kümelenmesi konusunda bir fikir verebilmektedir. Biribirine yakın 
+değerlerin standart sapması ve varyansı düşüktür.
+
+Kovaryans (covariance) iki olgunun birlikte değişimi ya da doğrusallığı konusunda 
+bilgi veren istatistiksel bir ölçüttür. Örneğin bu olgular x ve y olsun. Eğer x 
+artarken tutarlı biçimde y de artıyorsa aralarında doğrusal bir ilişkiye benzer bir 
+ilişki vardır. Bu durumda iki değişkenin kovaryansları yüksektir. Tabii ilişki 
+doğrusal gibi olduğu halde ters yönde de olabilir. Yani örneğin x artarken y de 
+tutarlı bir biçimde azalıyor olabilir. Burada da kovaryans ters yönde yüksektir. 
+Ancak bir değişken artarken diğeri tutarlı bir biçimde artıp azalmıyorsa bu iki 
+değişken arasında düşük bir kovaryans vardır. Kovaryasn iki değişken arasında ilişkiyi 
+belirtmektedir. İki değişkendne çok değişkenlerin kovaryansları ancak birbirlerine 
+göre elde edilebilir. Bu durumda bir kovaryans matrisi oluşacaktır. 
+
+
+İki değişken arasındaki kovaryans hesabı şöyle hesaplanmaktadır:
+
+
+Kovaryans(x, y) = sigma((xi - xbar) * (yi - ybar)) / n
+
+
+Aynı değişkenin aynı değişkenle kovaryansının zaten varyans anlamına geldiğine 
+dikkat ediniz. Yani cov(x, x) aslında var(x) ile aynı anlamdadır. 
+
+
+İki değişken arasında elde edilen kovaryans başka iki değişken arasında elde edilen 
+kovaryans ile kıyaslanamaz. Bunların arasında bir kıyaslama yapılabilmesi için 
+özellik ölçeklemesi uygulanmalıdır. Zaten özellik ölçeklemesi uygulanmış olan 
+kovaryansa da korelasyon denilmektedir.
+
+---------------------------------------------------------------------------------        
+NumPy kütüphanesindeki cov fonksiyonu iki boyutlu NumPy dizileriyle ya da tek 
+boyutlu Numpy dizileriyle çalışabilmektedir. cov fonksiyonu bize bir kovaryans 
+matrisi verir. Yani her değişkenin her değişkenle kovaryansları matris halinde 
+verilmektedir. Tabi bu matris simetrik bir matrisir. Default durumda cov fonksiyonu 
+n - 1 değerine bölme yapmaktadır. ddof=0 parametresiyle n değerine bölme yaptırabiliriz. 
+Kovaryans matrisinde köşegenler değişkenlerin varyanslarını belirtir. Çünkü 
+cov(x, x) zaten var(x) anlamındadır. Örneğin:
+
+
+x = np.array([1, 2, 3, 4, 5])
+y = np.array([3, 6, 8, 10, 12])
+
+
+result = np.cov(x, y, ddof=0)
+print(result)
+
+
+Buradan şöyle bir sonuç elde edilmiştir:
+
+[[2.   4.4 ]
+[4.4  9.76]]   
+
+---------------------------------------------------------------------------------
+"""
+
+
