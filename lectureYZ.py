@@ -14808,11 +14808,14 @@ Bunnları dokümanlardan inceleyebilirsiniz.
 
 
 
-# --------------------------------- Kovaryans (covariance)---------------------------------
+# ---------------------------- Kovaryans ve Korelasyon (Covariance and Correlation)----------------------------
 
 
 """
 ---------------------------------------------------------------------------------
+
+# Kovaryans
+
 Varyans standart sapmanın karesine denilmektedir. Varyans işlemi NumPy kütüphanesinde 
 axis temelinde yapılabilmektedir. Standart sapma ve varyans değerlerin ortalama 
 etrafındaki kümelenmesi konusunda bir fikir verebilmektedir. Biribirine yakın 
@@ -14867,6 +14870,70 @@ Buradan şöyle bir sonuç elde edilmiştir:
 
 [[2.   4.4 ]
 [4.4  9.76]]   
+
+---------------------------------------------------------------------------------
+
+---------------------------------------------------------------------------------
+
+# Korelasyon
+
+Kovaryans iki değişkenin birlikte değişimi hakkında bize bilgi vermektedir. Ancak 
+kovaryans değerlerini karşılaştırmak zordur. Yani başka bir deyişle x ile y arasındaki 
+kovaryansı m ile z arasındaki kovaryansla karşılaştıramayız. Örneğin biz havası 
+ile yağış miktarı arasındaki kovaryansa baktığımızda ısıyı °C'den Fahrenayt haline 
+getirirsek kovaryans değişir. İşte kovaryansların standardize edilmiş haline 
+"korelasyon katsayısı" denilmektedir. Korelasyon katsayıları için aslında değişik 
+hesaplama yöntemleri önerilmiştir. 
+
+Ancak en çok kullanılan korelasyon katsayı hesaplama yöntemi "Pearson Korelasyon Katsayısı" 
+denilen yöntemdir. Bu yöntem kovaryans değerini [-1, 1] aralığına hapsetmektedir. 
+Dolayısıyla karşılaştırmalar bu sayede yapılabilmektedir. Değişkenler ne kadar 
+doğrusal ilişki içerisindeyse korelasyon katsayısı +1 ya da -1'e o kadar yaklaşır. 
+Bir değişken artarken diğeri de artıyorsa pozitif bir korelasyon söz konusudur. 
+Bir değişken artarken diğeri azalıyorsa negatif bir korelasyon söz konusudur. Pozitif 
+de olsa negatif de olsa korelasyon katsayısı yükseldikçe ilişki doğrusal olmaya 
+yaklaşmaktadır.  Eğer iki değişken arasındaki ilişki tutarsız ve doğrusal olmaktan 
+uzak ise bu durumda korelasyon katsayısı 0'a yaklaşır. 
+
+İki değişken arasında korelasyon için tipik olarak şunlar söylenebilmektedir:
+
+    
+0-0.2 ise çok zayıf korelasyon ya da korelasyon yok
+0.2-0.4 arasında ise zayıf korelasyon
+0.4-0.6 arasında ise orta şiddette korelasyon
+0.6-0.8 arasında ise yüksek korelasyon
+0.8–1 > ise çok yüksek korelasyon 
+
+
+
+İki olgu arasında yüksek bir korelasyon olması bunlar arasında bir neden-sonuç 
+ilişkisinin olacağı anlamına gelmemektedir. İki olgu arasında dolaylı bir ilişki 
+olabilir ancak bu neden-sonuç ilişkisi olmayabilir. Örneğin dondurma satışlarıyla 
+boğulma vakaları arasında yüksek bir korelasyon olabilir. Ancak biz buradan dondurma 
+yemenin boğulmaya yol açtığı gibi bir sonuç çıkartamayız.
+
+---------------------------------------------------------------------------------
+"""
+
+
+
+
+
+# ----------------------------------------- Feature Reduction ----------------------------------------- 
+
+
+"""
+---------------------------------------------------------------------------------
+
+
+
+
+
+
+
+
+
+
 
 ---------------------------------------------------------------------------------
 """
