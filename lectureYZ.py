@@ -14924,16 +14924,110 @@ yemenin boğulmaya yol açtığı gibi bir sonuç çıkartamayız.
 
 """
 ---------------------------------------------------------------------------------
+Makine öğrenmesinde ve veri biliminde veri kümesinde çok fazla sütun (yani özellik) 
+bulunmasının bazı olumsuzlukları vardır. Çok fazla sütun çok fazla işlem anlamına 
+gelir. Dolayısıyla hesaplama zamanları göreli olarak artar. Çok fazla sütun aynı 
+zamanda bellek kullanımı üzerinde de olumsuz etkilere yol açmaktadır. O halde çok 
+fazla sütunun daha az sütuna indirgenmesi önemli önişlem faaliyetlerinden biridir. 
+Buna "boyutsal özellik indirgemesi (dimensionality feature reduction)" denilmektedir. 
+Boyutsal özellik indirgemesi çeşitli Auto ML araçları tarafından otomatik da yapılabilmektedir. 
+Tabii bunun için verilerin iyi bir biçimde analiz edilmesi gerekir.
 
 
+Boyutsal özellik indirgemesi n tane sütundan k < n koşulunu sağlayan k tane sütunun 
+elde edilmesi sürecidir. Bu süreç iki alt gruba ayrılmaktadır:
 
 
+1) n tane sütundan bazılarını atarak ancak diğerlerini değiştirmeden k tane sütun 
+  elde etmeye çalışan yöntemler.
+
+2) n tane sütundan onu temsil eden (ancak bu n tane sütunun hiçbirini içermeyen) 
+  yeni k tane sütun elde etmeye çalışan yöntemler.
+
+---------------------------------------------------------------------------------
+Biz de burada belli başlı yöntemler üzerinde duracağız.
+
+  --- Eksik Değerli Sütunların Atılması Yöntemi (Missing Value Ratio) ---
+
+Bu yöntemde eğer bir sütunda eksik veriler varsa o sütun veri kümesinden çıkartılır. 
+Tabii burada sütundaki eksik verilerin oranı da önemlidir. Örneğin sütunlarda %20'nin 
+yukarısında eksik veri varsa bu sütunları atabiliriz. Çünkü zaten bu sütunların 
+temsil yeteneği azalmıştır.  
 
 
+   --- Düşük Varyans Filtrelemesi (Low Variance Filtering) ---
+   
+Bir sütunun varyansı o sütundaki değişkenliği bize anlatmaktadır. Örneğin veri 
+kümesinde hep aynı değerlerden oluşan bir sütun bulunuyor olsun. Bu sütun bize bir 
+bilgi verebilir mi? Tabii ki hayır. Bu sütunun varyansı 0'dır. O halde biz n tane 
+sütundan bazılarını atarak k tane sütun elde etmek istediğimizde seçeneklerden 
+biri de az bilgiye sahip olan sütunları atmaktır. O da değişkenliği az olan yani 
+düşük varyansa sahip sütunlardır. O halde bu yöntemde sütunların varyanslarına bakılır. 
+n = k + m ise en düşük varyansa sahip m tane sütun atılarak k tane sütun elde 
+edilebilir. Diğer bir yöntem de m tane sütunu atmak yerine belli bir eşik değeri 
+belirlenip o eşik değerinin aşağısında kalan sütunları atmak olabilir. Ancak sütunlardaki 
+skala farklılıkları varyansların karşılaştırılmasını engellemektedir. O halde bu 
+yöntem uygulanmadan önce sütunların aynı skalaya dönüştürülmesi uygun olur. Bunun 
+için Min-Max ölçeklemesi kullanılabilir. 
+
+---------------------------------------------------------------------------------
+
+---------------------------------------------------------------------------------
+scikit-learn içerisinde sklearn.feature_selection modülünde VarianceThreshold isimli 
+bir sınıf bulunmaktadır. Bu sınıf belli bir eşik değerinden küçük olan sütunların 
+atılmasında kullanılmaktadır. Sınıfın kullanımı diğer scikit-learn sınıflarındaki 
+gibidir. Nesne yaratılırken eşik değeri verilmektedir. Sonra fit_transform işlemiyle 
+indirgeme yapılabilmektedir. fit işleminden sonra sınıfın variances_ örnek özniteliğinde 
+sütun varyansları bulunur. Örneğin:
 
 
+from sklearn.feature_selection import VarianceThreshold
 
 
+vt = VarianceThreshold(0.04)
+reduced_dataset_x = vt.fit_transform(dataset_x)
+
+
+Bu sınıf kendi içerisinde özellik ölçeklemesi yapmamaktadır. Bu nedenle sütunların 
+skalaları birbirinden farklıysa önce özellik ölçeklemesinin yapılması gerekir. 
+
+---------------------------------------------------------------------------------
+
+---------------------------------------------------------------------------------
+
+   --- Yüksek Korelasyon Filtrelemesi Yöntemi (High Correlation Filtering) ---
+   
+İki sütun söz konusu olsun. Biri diğerinin iki katı değerlere sahip olsun. Bu iki 
+sütunun bir arada bulunmasının hiçbir yöntemde hiçbir faydası yoktur. Bu iki sütunun 
+Pearson korelasyon katsayısı 1'dir. İşte birden fazla sütun birbirleriyle yüksek 
+derecede korelasyon içeriyorsa bu sütunların yalnızca bir tanesi muhafaza edilip 
+diğerleri atılabilir. Bu yönteme "yüksek korelasyon filtrelemesi" denilmektedir.
+
+Yüksek korelasyon filtrelemesi manuel bir biçimde yapılabilir. Anımsanacağı gibi 
+korelasyon iki değişken arasında hesaplanmaktadır. Dolayısıyla bu işlemden bir 
+korelasyon matrisi elde edilmektedir. Burada programcı matirisn en büyük elemanlarını 
+bulmaya çalışabilir. Onun satır ve sütun değerleri yüksek korelasyonu olan sütunları 
+verecektir. Korelasyon için özellik ölçeklemesi yapmaya gerek yoktur. Çünkü zaten 
+Pearson korelasyon katsayısı bize standardize edilmiş bir değer vermektedir. Tabii 
+yüksek korelasyon filtrelemesi yapılırken yüksek korelasyonun negatif ya da pozitif 
+olmasının da bir önemi yoktur. Pozitif yüksek korelasyon da negatif yüksek korelasyon 
+da neticede aynı durumlara yol açmaktadır. 
+
+Yüksek korelasyon filtrelemesini yapmak biraz daha zahmetlidir. Çünkü korelasyon 
+matrisi büyük olabilir. Bizim de bu büyük matrisi incelememiz gerekebilir. Ayrıca 
+yüksek korelasyona sahip olan sütunlardan hangilerinin atılacağı da bazen önemli 
+olabilmektedir. Örneğin bizim iki sütunuzmuzun korelasyonları 0.95 olsun. Bunlardan 
+birini atmak isteriz. Ama hangisini atmak daha uygun olur? İşte burada uygulamacı 
+başka ölçütleri de göz önüne alabilir. Örneğin düşük varyansa sahip olanı atmak 
+isteyebilir. Konuya hakimse nispeten daha önemsiz kabul ettiği bir sütunu da atmak 
+isteyebilir. 
+
+Yüksek korelasyonlu sütunların görsel bir biçimde tespit edilebilmesi için "heatmap" 
+denilen grafiklerden de faydalanılabilmektedir. Heapmap grafikleri matplotlib 
+içerisinde yoktur ancak seaborn kütüphanesinde bulunmaktadır. Bu heatmap grafiğinde 
+(grafik çeşitli biçimlerde konfigüre edilebilmektedir) yüksek değerler açık renklerle 
+düşük değerler koyu renklerle gösterilirler. Böylece uygulamacı gözle bunları kontrol 
+edebilir. 
 
 ---------------------------------------------------------------------------------
 """
