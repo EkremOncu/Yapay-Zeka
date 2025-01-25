@@ -15030,6 +15030,217 @@ düşük değerler koyu renklerle gösterilirler. Böylece uygulamacı gözle bu
 edebilir. 
 
 ---------------------------------------------------------------------------------
+           
+---------------------------------------------------------------------------------
+
+    --- Temel Bileşenler Analizi (Principle Component Analysis) ---
+   
+En çok kullanılan boyutsal özellik indirgemesi yöntemi "temel bileşenler analizi 
+yöntemidir. Bu yöntemde orijinal n tane sütuna sahip olan veri kümesi k < n olmak 
+üzere k tane sütuna indirgenmektedir. Ancak bu yöntemde elde edilen k sütunlu veri 
+kümesinin sütunları orijinal n sütun ile aynı olmamaktadır. 
+
+Yani bu yöntem n tane sütunlu veri kümesini temsil eden TAMAMEN FARKLI k tane sütun 
+oluşturmaktadır. Yöntemin matematiksel temeli biraz karmaşıktır. Bu yöntemde n 
+boyutlu uzaydaki noktalar dönüştürülerek en yüksek varyans sağlanacak biçimde k < n 
+boyutlu uzaydaki noktalara dönüştürülmektedir. Şüphesiz n tane özelliğe sahip olan 
+veri kümesini k tane özelliğe indirgediğimiz zaman orijinal veri kümesinin temsili 
+zayıflamış olur. Ancak bu yöntem bu veri kümesindeki zayıflamayı en aza indirmeye 
+çalışmaktadır. 
+
+Örneğin n tane sütuna sahip bir veri tablosundan k tane sütuna sahip (k < n) bir 
+veri tablosunu temel bileşenler analizi yöntemiyle elde etmek isteyelim. İşlem 
+adımları şöyle gerçekleştirilir:
+
+
+1) Önce N sütunlu veriler üzerinde gerekli özellik ölçeklendirmesi uygulanır.
+
+2) n sütunlu matristen nxn'lik kovaryans matrisi elde edilir. 
+
+3) Bu kovaryans matrisinden n tane "öz vektör (eigenvector)" bulunur. 
+
+4) Bu n tane özvektör arasından k tanesi seçilerek (seçimin nasıl yapılacağı belirtilecektir) 
+  asıl matrisle çarpılır ve böylece sonuçta k tane sütuna indirgenmiş veri tablosu 
+  elde edilir. 
+
+---------------------------------------------------------------------------------
+
+Şimdi bu işlemleri adım adım Python'da yapalım. Bu örneğimizde iki sütunlu tabloyu 
+tek sütuna indirgemeye çalışacağız. İki sutunlu tablonun bilgileri şöyle olsun:
+
+
+x1	    x2
+0.72	0.13
+0.18	0.23
+2.5	    2.3
+0.45	0.16
+0.04	0.44
+0.13	0.24
+0.30	0.03
+2.65	2.1
+0.91	0.91
+0.46	0.32
+
+
+Bu bilgilerin "dataset.csv" isimli dosyada bulunduğunu varsayacağız. 
+
+Şimdi ilk yapılacak şey bir özellik ölçeklemesi uygulamaktır: 
+
+ss = StandardScaler()
+scaled_dataset = ss.fit_transform(dataset)
+
+
+
+Şimdi orijin noktasını değerlerin ortasına kaydıralım. Bu işlem şöyle yapılabilir: 
+
+pca_dataset = scaled_dataset - np.mean(scaled_dataset, axis=0)
+
+
+
+Şimdi kovaryans matrisini elde edelim:
+
+cmat = np.cov(pca_dataset, rowvar=False)
+
+
+
+Şimdi de kovaryans matrisiin özdeğerlerini ve özvektörlerini elde edelim:
+
+evals, evects = np.linalg.eig(cmat)
+
+
+
+Şimdi bizim projeksiyon işlemini yapmamız gerekir. Biz ölçeklendirilmiş asıl 
+matrisimizi nxn'lik özvektör matrisinin k tanesiyle çarptığımızda artık k tane 
+sütunlu bir matris elde ederiz. Buradaki amacımız iki sütunu tek sütuna indirgemekti. 
+Demek ki biz tek bir özvektörle çarpma yaparak tek sütunumuzu elde edeceğiz. Peki 
+n tane öz vektör arasından hangi k tane özvektörü bu çarpma işlemine sokmalıyız? 
+İşte öz değeri yüksek vektörlerin bu işlem için seçilmesi gerekmektedir. 
+Özdeğeri yüksek olan vektörü (yani sütun indeksini) şöyle elde edebiliriz:
+
+max_index = np.argmax(evals)
+    
+
+
+Şimdi de biz bu özvektörü asıl matrisle çarpmalıyız. 
+
+reduced_dataset = np.matmul(pca_dataset, evects[:, max_index].reshape((-1, 1)))
+
+---------------------------------------------------------------------------------
+Temel bileşenler analizi scikit-learn kütüphanesinde sklearn.decomposition modülü 
+içerisindeki PCA isimli sınıfla temsil edilmiştir. Sınıfın kullanımı diğer scikit-learn 
+sınıflarında olduğu gibidir. Yani PCA sınıfı türünden bir nesne yaratılır. 
+Sonra sınıfın fit ve transform (ya da fit_transform) metotları çağrılır. PCA 
+sınıfın __init__ metodunun parametik yapısı şöyledir:
+
+
+class sklearn.decomposition.PCA(n_components=None, *, copy=True, whiten=False, 
+    svd_solver='auto', tol=0.0, iterated_power='auto', n_oversamples=10, 
+    power_iteration_normalizer='auto', random_state=None)
+
+
+
+Burada zorunlu olan ilk parametre indirgenme sonucunda elde edilecek sütun sayısını 
+belirtmektedir. PCA nesnesi yaratıldıktan sonra önce fit işlemi yapılır. Bu işlem 
+sırasında indirgemede kullanılacak bilgiler elde edilir. Ondan sonra gerçek indirgeme 
+transform metoduyla yapılmaktadır. Tabii fit ve transform işlemleri bir arada da 
+fit_transform metoduyla yapılabilmektedir. 
+
+
+Yukarıda da belirttiğmiz gibi eğer veri kümesinin sütunları arasında skala farklılıkları 
+varsa PCA işleminden önce özellik ölçeklemesi uygulamak gerekir. PCA işlemi için 
+en uygun özellik ölçeklemesi yöntemi "standart ölçekleme" yani StandardScaler 
+sınıfı ile gerçekleştirilen ölçeklemedir. 
+
+
+Yukarıda manuel olarka yaptığımız PCA işlemi aşağıda scikit-learn içerisindeki 
+PCA sınıfıyla gerçekleştirilmiştir. Her iki işlem sonucunda aynı değerlerin elde 
+edildiğine dikkat ediniz. 
+
+---------------------------------------------------------------------------------
+PCA sınıfında fit işlemi sonucunda nesne üzerinde bazı öznitelikler oluşturumaktadır. 
+Bu öznitelikler PCA işleminin matematiksel temeline ilişkin bilgiler vermektedir. 
+Burada uygulamacı için en önemli iki öznitelik explained_variance_ ve explained_variance_ratio_ 
+öznitelikleridir. 
+
+PCA işlemi sonucunda elde edilen "açıklanan varyans (explained variance)" değeri 
+dönüştürmedeki kayıp hakkında bilgi veren en önemli göstergedir. Açıklanan varyans 
+oranları indirgenmiş sütunların asıl veri kümesini temsil etme kuvvetini belirtmektedir.  
+Örneğin bir sütunun açıklanan varyans oranı 0.4 ise bu sütun tek başına tüm veri 
+kümesindeki bilgilerin yüzde 40'ını temsil etmektedir.Açıklanan varyans oranlarının 
+toplam 1 olmaz. Çünkü indirgemede bir kayıp da söz konusudur. Açıklanan varyans 
+oranları indirgenmiş sütunların asıl veri kümesini açıklamakta ne kadar etkili 
+olduğu konusunda da bize fikir vermektedir. Örneğin "Boston Housing Prices" veri 
+kümesini 10 sütuna indirgedidiğimizde bu sütunların açıklanan varyansları PCA 
+sınıfının explained_variance_ratio_ özniteliğinden şöyle elde edilmiştir:
+
+
+array([0.47011107, 0.10884895, 0.09291499, 0.06930587, 0.06372181,  0.05212396, 0.04226861, 
+        0.03040597, 0.02087826, 0.01714009], dtype=float32)
+
+
+Bu değerlerin toplamı 0.9677195865660906 biçimindedir. BU açıklanan varyans oranlarına 
+baktığımızda örneğin ilk sütunun en önemli bilgiyi barındırdığı görülmektedir.
+
+---------------------------------------------------------------------------------
+Pekiyi biz n tane sütuna sahip olan bir veri kümesini kaç sütuna indirgemeliyiz? 
+Bu indirgenecek sütun sayısını nasıl belirleyebiliriz? O halde programcı tüm 
+sütunların açıklanan varyans oranlarını toplayarak indirgenmiş olan veri kümesinin 
+asıl veri kümesinin yüzde kaçını temsil edebildiğini görebilir. Örneğin Boston 
+Housing Prices veri kümesi için bu işlemi 1'den başlayarak n'e kadar tek tek yapalım:
+
+
+for i in range(1, dataset_x.shape[1] + 1):
+    pca = PCA(i)
+    pca.fit(scaled_dataset_x)
+    total_ratio = np.sum(pca.explained_variance_ratio_)
+    print(f'{i} ---> {total_ratio}')
+  
+Programın çalıştırışması sonucunda şöyle bir çıktı elde edilmiştir:
+
+
+    1 ---> 0.471296101808548
+    2 ---> 0.5815482139587402
+    3 ---> 0.6771341562271118
+    4 ---> 0.7431014180183411
+    5 ---> 0.8073177337646484
+    6 ---> 0.8578882217407227
+    7 ---> 0.89906907081604
+    8 ---> 0.929538369178772
+    9 ---> 0.9508417248725891
+    10 ---> 0.9677831530570984
+    11 ---> 0.9820914268493652
+    12 ---> 0.9951147437095642
+    13 ---> 1.0000001192092896
+
+---------------------------------------------------------------------------------
+O halde PCA işleminde indirgenecek sütun sayısı nasıl belirlenmelidir? Bunun için 
+temelde iki yöntem sık kullanılmaktadır. Birinci yöntemde uygulamacı belli bir 
+temsil oranını belirler. Toplam açıklanan varyans yüzdesinin o oranı karşıladığı 
+sütun sayısını elde eder. İkinci yöntemde uygulamacı toplam açıklanan varyans 
+yüzdelerinin grafiğini çizerek grafikten hareketle görsel bir biçimde kararını verir. 
+
+Birinci yöntem özetle aşağıdaki kodda olduğu gibi uygulanabilir:
+
+
+
+TARGET_RATIO = 0.7
+
+for i in range(1, dataset_x.shape[1] + 1):
+    pca = PCA(i)
+    pca.fit(scaled_dataset_x)
+    total_ratio = np.sum(pca.explained_variance_ratio_)
+    if total_ratio >= TARGET_RATIO:
+        break
+    
+---------------------------------------------------------------------------------
+İkinci yöntemde uygulamacı toplam açıklanan varyansın ya da bunun oranının grafiğini 
+çizer. Bu grafikte yatay eksende özellik sayıları düşey eksende açıklanan varyans 
+oranları bulunur. Bu grafik önce sert bir biçimde yükselmekte ve sonra yavaş yavaş 
+yatay bir seyire doğru hareket etmektedir. İşte eğrinin yatay seyire geçtiği nokta 
+gözle tespit edilir. Buna tıpkı kümelemede olduğu gibi "dirsek noktası (elbow point)" 
+da denilmektedir. 
+
+---------------------------------------------------------------------------------
 """
 
 
