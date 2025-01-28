@@ -15244,3 +15244,148 @@ da denilmektedir.
 """
 
 
+
+# ------------------------------------ PIPELINE (boru hattı) ------------------------------------ 
+
+
+"""
+---------------------------------------------------------------------------------
+Makine öğrenmesine ilişkin kütüphanelerin çoğunda "boru hattı (pipeline)" denilen 
+bir mekanizma vardır. Programcı peşi sıra yapılacak işlemleri bu boru hattına verir, 
+sonra tek bir metot çağırarak bu işlemlerin peşi sıra yapılmasını sağlar. Bu da 
+kodun daha sade gözükmesini sağlamaktadır. Scikit-leran kütüphanesinde de Keras 
+kütüphanesinde de boru hattı mekanizması vardır. Tabii boru hattı mekanizması için 
+sınıfların belli metotlara sahip olması gerekir. 
+
+
+Örneğin biz bir veri kümesi üzerinde scikit-learn kullanarak K-Means kümeleme işlemini 
+yapmak isteyelim. Ancak veri kümemizde eksik veriler de bulunuyor olsun. Bizim 
+önce SimpleImputer sınıfı ile imputation yapıp bunun sonucunu StandardScaler sınıfı 
+ile standardize etmemiz gerekir. Bunun da sonucunu KMeans sınıfı ile kümelememiz 
+gerekir. Burada çıktının girdiye verildiği bir dizi işlem söz konusudur. İşte bu 
+tür durumlarda boru hattı mekanizması kodlamyı kısaltmaktadır. Biz buradaki örneği
+boru hattı mekanizmasını kullanmadan aşağıdaki gibi tek tek yapabiliriz:
+
+
+si = SimpleImputer(strategy='mean')
+si.fit(dataset)
+output = si.transform(dataset)
+
+
+ss = StandardScaler()
+ss.fit(output)
+output = si.transform(output)
+
+
+km = KMeans(3)
+km.fit(output)
+final_output = km.tranform(output)
+
+
+
+Biz şimdiye kadar hep bu yöntemi izledik. İşte bu işlem boru hattı yoluyla aslında 
+aşağıdaki gibi de yapılabilmektedir:
+
+
+pl = Pipeline([('Imputation', SimpleImputer(strategy='mean')), ('Scaling', StandardScaler()), ('Clustering', KMeans(3))])
+
+
+pl.fit(dataset)
+output = pl.transform(dataset)
+
+---------------------------------------------------------------------------------
+Scikit-learn içerisindeki Pipeline sınıfı skleran.pipeline modülü içerisinde bulunmaktadır. 
+Sınıfın __init__ metodunun parametrik yapısı şöyledir:
+
+
+class sklearn.pipeline.Pipeline(steps, *, memory=None, verbose=False)
+
+
+Buradaki steps parametresi tipik olarak ikili demetlerdne oluşan bir liste biçiminde 
+girilir. (Aslında bu parametre ikili demetlerden oluşan genel olarak dolaşılabilir 
+bir nesne biçiminde de girilebilmektedir.) İkili elemanlı demetlerin ilk elemanı 
+uygulamacının kendi belirlediği bir isimden ikinci elemanı ise dönüştürücü nesneden 
+oluşmaktadır.
+
+Metodun memory parametresi "cache'leme" yapılıp yapılmayacağını belirtmektedir. 
+Default durumda bir cache'leme yapılmamaktadır. 
+
+Pipeline sınıfı türünden nesne yaratıldıktan sonra uygulamacı fit ve transform 
+işlemlerini yapar. Tabii yine sınıfın fit_transform metodu da vardır. fit ve transform 
+işlemlerinde bir döngü içerisinde önceki nesnenin fit ve transform çıktıları sonrakine 
+verilmektedir. transform işleminden en son nesnenin çıktısı elde edilmektedir. 
+
+---------------------------------------------------------------------------------
+Scikit-learn kütüphanesinde kullanılan terminolojide boru hattına verilen her nesneye 
+"dönüştürücü (transformer)" denilmektedir. (Buradaki "dönüştürücü (tranformer)" 
+terimi ile LLM'lerde kullanılan "dönüştürücü (tranformer)" bir ilişkisi yoktur.) 
+scikit-learn kütüphanesinde son dönüştürücüye de "nihai tahminleyici (final estimator)"
+denilmektedir. 
+
+Peki buradaki nesnelere neden isim verilmektedir? İşte Pipeline sınıfının named_steps 
+isimli property elemanı bize boru hattındaki dönüştürücü nesneleri isimleri ile 
+vermektedir. İsimler bu nesneleri daha sonra elde etmek için kullanılmaktadır. 
+named_steps property'si bir sözlük vermektedir. Bu sözlüğün anahtarları isimlerden 
+değerleri ise dönüştürücü nesnelerden oluşmaktadır. 
+
+
+Pipeline sınıfında __getitem__ metodu yazılmıştır. Biz herhangi bir indeksteki 
+dönüştürücü nesneye indeks numarasını vererek [] operatörü ile erişebiliriz. 
+
+Peki Pipeline sınıfının fit metodu nasıl fit işlemi yapmaktadır? Önceki dönüştürücü 
+nesnenin çıktısı sonraki dönüştürücü nesnenin parametre yapılacağına göre aslında 
+fit işlemi transform olmadan yapılamaz. Gerçekten de biz Pipeline nesnesi üzerinde 
+fit işlemi yaparken aslında nesne dönüştürücüler üzerinde fit_transform metotlarını 
+uygulamaktadır. 
+
+Nesne Yönelimli Programlama Tekniğinde Pipeline sınıfında uygulanan tasarım kalıbına 
+"bileşim (composite)" kalıbı denilmektedir. Bileşim (compoiste) kalbınında bileşim 
+işlemini uygulayan sınıf da aynı metotlara sahip olduğu için başka bir bileşim
+nesnesinde kullanılabilmektedir. Yani biz birkaç tane Pipeline nesnesini de başka 
+Pipeline nesnelerinde dönüştürücü olarak kullanabiliriz. Örneğin:
+
+
+pl1 = Pipeline(....)
+pl2 = Pipeline(....)
+pl3 = Pipeline(....)
+
+
+final_pl = Pipeline(<pl1, pl2, pl2>)
+
+---------------------------------------------------------------------------------
+Şimdi SimpleImputer, StandardScaler ve KMenas nesnelerini bir boru hattında birleştiren 
+bir örnek yapalım. Pipeline nesnesi şöyle oluşturulabilir:
+
+
+steps = [('Imputation', SimpleImputer(strategy='mean')), ('Scaling', StandardScaler()), ('Clustering', KMeans(3))]
+pl = Pipeline(steps)
+
+
+Şimdi biz pl nesnesi ile fit işlemi yaptığımızda tüm dönüştürücüler peşi sıra fit edilecektir:
+
+pl.fit(dataset)
+
+
+transform işlemi yaptığımızda da tüm nesneler peşi sıra transform edilecektir:
+
+distances = pl.transform(dataset)
+print(distances)
+
+
+Biz burada nihai dönüştürücüyü (final estimator) named_steps property'si yoluyla elde edebiliriz:
+
+km = pl.named_steps['Clustering']
+
+
+Sonra da onun elemanlarına erişebiliriz:
+
+print(km.labels_)
+
+
+Aslında Pipeline sınıfının __getitem__ metodu da yazılmış durumdadır. Yani biz 
+bir dönüştürücüye [] operatörü ile de indeks numarası vererek erişebiliriz:
+
+print(pl[2].labels_)
+
+---------------------------------------------------------------------------------
+"""
