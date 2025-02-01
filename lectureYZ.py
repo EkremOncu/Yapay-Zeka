@@ -14308,7 +14308,7 @@ sigma((xi - ci) ** 2) = r ** 2
 
 # DBSCAN (Density Based Spatial Clustering of Applications with Noise) 
 
-Yoğunluk tabanlı algoritmaların en çok kullanılanı DBSCANisimli algoritmadır. 
+Yoğunluk tabanlı algoritmaların en çok kullanılanı DBSCAN isimli algoritmadır. 
 Algoritmanın anlaşılması için birkaç terimden faydalanılmaktadır. Bu terimler ve 
 anlamları şöyledir:
 
@@ -14628,7 +14628,7 @@ bu durumda DBSCAN algoritması uygulanır. Yani bunun DBSCAN algoritmasından bi
 farkı kalmaz. Ancak ek olarak bize erişilebilen uzaklıklar da verilir. Eğer 
 cluster_method parametresi "dbscan" olarak girilirse bu durumda DBSCAN algoritması 
 kullanılacağı için bizim eps parametresini de girmemiz gerekir. Aksi takdirde sanki 
-eps=0 gibi tüm noktalar gürültü noktası biçimind eoluşacaktır. 
+eps=0 gibi tüm noktalar gürültü noktası biçiminde oluşacaktır. 
 
 
 OPTICS nesnesi yaratıldıktan sonra yine fit işlemi ile eğitim yapılır. Yine kümeleme 
@@ -14653,7 +14653,7 @@ bir "öncelik kuyruğundan (priority queue) faydalanılmaktadır.
 
 - OPTICS algoritması DBSCAN algoritmasına göre daha yavaş çalışma eğilimindedir. 
 Çünkü eps değeri büyük tutulduğunda tüm noktalar arasında uzaklık hesabı yapılmak 
-zorunda kalnır.
+zorunda kalınır.
 
 
 - OPTICS yöntemi veri kümesinde farklı yoğunluklu kümeler bulunduğu durumda daha 
@@ -15389,3 +15389,193 @@ print(pl[2].labels_)
 
 ---------------------------------------------------------------------------------
 """
+
+
+
+
+# ------------------------------ Anomalilerin Tespit Edilmesi (Anomaly Detection) ------------------------------
+
+
+
+"""
+---------------------------------------------------------------------------------
+Anomalilerin tespit edilmesi (anomaly detection) makine öğrenmesinin popüler konularından 
+biridir. Elimizde bir veri kümesi olabilir. Burada bazı satırlar diğerlerinden şüphe 
+oluşturacak biçimde farklı olabilir. Biz de bu farklı olan satırlatın belirlenmesini 
+isteyebiliriz. İngilizce "anomalilerin tespit edilmesi (anomaly detection)" terimi 
+yerine "outliers", "novelties", "noise", "deviations", "exceptions" gibi terimler 
+de kullanılabilmektedir. 
+
+
+Anomalilerin tespit edilmesi pek çok alanda kullanılabilecek bir uygulama konusudur. 
+Örneğin bankalardaki şüpheli işlemlerin tespit edilmeye çalışılması, bilgisayarlardaki 
+zararlı unsurların tespit edilmesi (malware detection), biyomedikal görüntülerdeki
+anomalilerin otomatik tespiti gibi pek çok faydalı amaçlar sıralanabilir. Anomalilerin 
+tespit edilmesi "denetimli (supervied)" öğrenme yöntemleriyle yapılabilirse de 
+ana olarak bu konu "denetimsiz (unsupervied)" öğrenme konularının kapsamı içerisine 
+girmektedir. Elimizde anamali içeren ve içermeyen bilgiler varsa biz denetimli 
+yöntemlerle kestirim yapabiliriz. Ancak genellikle bu tür durumlarda elimizde yeteri 
+kadar anomali içeren veri bulunmaz. Bu nedenle bu konuda daha çok denetimsiz (unsupervised) 
+öğrenme yöntemleri kullanılmaktadır. Anomalalierin tespit edilmesi için pek çok 
+yöntemden faydalanılabilmektedir. Örneğin:
+
+
+- Yoğunluk Tabanlı Yöntemler (Isolation Forest, K-Nearest Neighbor, vs.)
+- En Yakın Komuşuk Yöntemleri (k-Nearest Neighbors)
+- Destek Vektör Makineleri (Support Vector Machines)
+- Bayes Ağları (Bayesian Networks)
+- Saklı Markov Modelleri (Hidden Markov Models)
+- Kümeleme Esasına Dayanan Yöntemler (Culestering Based Methods)
+- Bulanık Mantık Kullanılan Yöntemler (Fuzzy Logic Methods)
+- Boyutsal Özellik İndirgemesi ve Yükseltmesi Esasına Dayanan Yöntemler
+
+
+Biz burada "kümeleme esasına dayanan yöntemler" ile "boyutsal özellik indirgemesi 
+ve yükseltmesi esasına dayanan yöntemler" üzerinde duracağız.
+
+---------------------------------------------------------------------------------
+Anomalilerin tespit edilmesinde en çok kullanılan yöntem gruplarından biri 
+"kümeleme tabanlı" yöntem gruplarıdır. Kümeleme tabanlı anomoli tespit sürecinde 
+veri kümesini oluşturan noktalar denetimsiz kümeleme işlemine sokulur. Kümeleme 
+sonucunda kopuk noktalar (gürültü noktaları) tespit edilir. Bunun için daha çok 
+DBSCAN, OPTICS gibi yoğunluk tabanlı kümeleme yöntemleri tercih edilmektedir. 
+
+Anımsanacağı gibi bu yöntemlerde belli bir eps ve min_samples hyper parametreleri 
+uygulamacı tarafından veriliyor ve bunun sonucunda da kümelemedeki gürültü noktaları 
+elde edilebiliyordu. DBSCAN sınıfında fit işleminden sonra gürültü noktalarının 
+labels_ özniteliğindeki -1 değerleriyle belirtildiğini anımsayınız. Uygulamacı 
+eps ve min_samples değerlerini belirleyerek anomali tespit sıkılığını ya da gevşekliğini 
+ayarlayabilmektedir. Örneğin:
+
+
+EPS = 0.70
+MIN_SAMPLES = 5
+
+
+dbs = DBSCAN(eps=EPS, min_samples=MIN_SAMPLES)
+dbs.fit(dataset)
+anomaly_data = dataset[dbs.labels_ == -1]
+
+---------------------------------------------------------------------------------
+Aşağıdaki örnekte zambak veri kümesi üzerinde DBSCAN kümeleme algoritması uygulanmıştır 
+ve eps ve min_samples değeri ayarlanarak anomali içeren noktalar X tespit edilmiş 
+ve grafik üzerinde X sembolüyle gösterilmiştir. Bu örnekte siz de min_samples 
+değerini sabit bırakarak eps değerini değiştirip anomalileri tespit ediniz.
+
+EPS = 0.70
+MIN_SAMPLES = 5
+
+
+import pandas as pd
+
+
+df = pd.read_csv("C:/Users/pc/Desktop/GitHub/YapayZeka/Src/43-  ScikitLearn-Pipeline/Iris.csv")
+dataset = df[['SepalLengthCm','SepalWidthCm','PetalLengthCm','PetalWidthCm']].to_numpy('float32')
+
+
+from sklearn.preprocessing import StandardScaler
+
+
+ss = StandardScaler()
+ss.fit(dataset)
+transformed_dataset = ss.transform(dataset)
+
+
+from sklearn.cluster import DBSCAN
+
+
+dbs = DBSCAN(eps=EPS, min_samples=MIN_SAMPLES)
+dbs.fit(transformed_dataset)
+
+
+import numpy as np
+
+
+nclusters = np.max(dbs.labels_) + 1
+
+
+from sklearn.decomposition import PCA
+
+
+pca = PCA(n_components=2)
+reduced_dataset = pca.fit_transform(dataset)
+
+
+import matplotlib.pyplot as plt
+
+
+plt.figure(figsize=(10, 8))
+plt.title('Clustered Points')
+
+
+plt.title('DBSCAN Clustered Points', fontsize=12)
+for i in range(nclusters):
+    plt.scatter(reduced_dataset[dbs.labels_ == i, 0], reduced_dataset[dbs.labels_ == i, 1])     
+
+
+plt.scatter(reduced_dataset[dbs.labels_ == -1, 0], reduced_dataset[dbs.labels_ == -1, 1], marker='x', color='black')
+
+
+legends = [f'Cluster-{i}' for i in range(1, nclusters + 1)]
+legends.append('Noise Points')
+plt.legend(legends, loc='lower right')
+
+
+plt.show()
+
+
+anomaly_data = dataset[dbs.labels_ == -1]
+
+
+print(f'Number of points with anomly: {len(anomaly_data)}')
+
+---------------------------------------------------------------------------------
+Anomalilerin tespit edilmesi için KMeans kümeleme yöntemi de kullanılabilir. Bu 
+durumda biz K-Means algoritmasını tek küme oluşturacak biçimde belirleriz. Böylece 
+noktaların bir ağırlık merkezini elde ederiz. Sonra da bu ağırlık merkezine en uzak 
+noktaları belirlemeye çalışabiliriz. Tabii aslında burada K-Means algoritması 
+yalnızca ağırlık merkezi bulmak için kullanılmaktadır. Biz bu ağırlık merkezini 
+aslında manuel biçimde de bulabiliriz.
+
+Bu yöntem anomali tespiti için zayıf bir yöntemdir. DBSCAN kümeleme yöntemleri 
+anomali tespiti için daha iyi sonuç vermektedir. 
+
+
+Anomali tespiti için k En Yakın Komşuluk (k-NN) yöntemi de kullanılabilir. Bu yöntemde 
+her noktanın en yakın N tane komşusu elde edilir. Bu komşuların ilgili noktaya 
+uzaklarının ortalaması hesaplanır. Böylece belli bir eşik değeri aşam noktalar 
+anomali olarak belirlenir.
+
+---------------------------------------------------------------------------------
+"""
+
+"""
+---------------------------------------------------------------------------------
+Şimdi de biraz daha gerçekçi bir örnek üzerinde çalışalım. Bu örnekte kredi kartı 
+işlemlerine yönelik çeşitli bilgiler toplanmıştır. Bu bilgiler PCA işlemine sokularak 
+29 sütuna indirilmiştir. İlk sütun işlemin göreli zamanını belirtmektedir. Bu sütun 
+veri kümesinden atılabilir. Son sütun ise işlemin anomali içerip içermediğini 
+belirtmektedir. Bu sütun "0" ise işlem anomali içermemektedir, "1" ise içermektedir. 
+Veri kümesindeki toplam satır sayısı 284807 tanedir. Bunların yalnızca 492 tanesi 
+anomali içermektedir. Veri kümesi aşağıdaki bağlantıdan "creditcard.csv" ismiyle 
+indirilebilir:
+
+https://www.kaggle.com/datasets/mlg-ulb/creditcardfraud?resource=download
+
+
+Veri kümesi üzerinde PCA işlemi uygulanmış durumdadır. Dolayısıyla PCA işleminden 
+önce zaten özellik ölçeklemesi yapılmıştır. Bu nedenle biz bu örnekte özellik 
+ölçeklemesi yapmayacağız. 
+
+
+Aşağıdaki örnekte min_samples=5, eps=10 alınarak 100000 tane kredi kart verisi 
+DBSCAN işlemine sokulmuş bu parametrelerle 707 tane nokta anomali olarak tespit 
+edilmiştir. DBSCAN parametreleriyle oynayarak anomali miktarını ayarlayabilirsiniz. 
+Buradaki kredi kart verilerini sayısı çok yüksektir. İşlemler yerel makinede fazlaca 
+zaman alabilmektedir. 
+
+---------------------------------------------------------------------------------
+"""
+
+
+ 
