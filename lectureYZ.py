@@ -15547,6 +15547,47 @@ uzaklarının ortalaması hesaplanır. Böylece belli bir eşik değeri aşam no
 anomali olarak belirlenir.
 
 ---------------------------------------------------------------------------------
+Anomali tespiti için "k En Yakın Komşuluk (k-NN) yöntemi" de kullanılabilir. Bu 
+yöntemde her noktanın en yakın N tane komşusu elde edilir. Bu komşuların ilgili 
+noktaya uzaklarının ortalaması hesaplanır. Böylece belli bir eşik değerini aşan 
+noktalar anomali olarak belirlenir. Bunun için scikit-learn kütüphanesindeki 
+NearestNeigbors sınıfından faydalanabiliriz. 
+
+
+class sklearn.neighbors.NearestNeighbors(*, n_neighbors=5, radius=1.0, algorithm='auto', leaf_size=30, 
+        metric='minkowski', p=2, metric_params=None, n_jobs=None)
+
+
+Metodun n_neighbors parametresi en yakın kaç komuşu noktanın bulunacağını belirtmektedir. 
+
+metric parametresi yine uzaklık için kullanılacak metriğin ne olduğunu belirtir. 
+
+Diğer parametreler en yakın komşulukların oluşturulması için kullanılan veri yapısı 
+ile ilgilidir. 
+
+Bu sınıf "denetimsiz (unsupervised)" bir işlem yapmaktadır. Yani biz fit işleminde 
+yalnızca dataset_x değerlerini veririz. Sınıfın kneighbors metodu verilen noktaların 
+en yakın k komşusunu bulmaktadır. Tabii biz bu metoda aynı dataset_x noktalarını 
+verirsek bu durumda metot bize mevcut noktaların en yakın k komşularını verecektir. 
+Örneğin:
+ 
+nn = NearestNeighbors(n_neighbors=NNEIGHBORS)
+nn.fit(dataset)
+distances, indices = nn.kneighbors(dataset)
+
+
+kneighbors metodu ikili bir demete geri dönmektedir. Demetin birinci elemanı verilen 
+noktalara en yakın k tane noktaya olan uzaklıkları verir. İkinci elemanı ise bu 
+k noktanın asıl veri kümesindeki indekslarini vermektedir. 
+
+
+Pekiyi biz bu yöntemde her noktanın en yakın k komşusuna uzaklıkları elde ettikten 
+sonra nasıl bir ölçüt kullanarak noktaların anomali oluşturup oluşturmadığına karar 
+verebiliriz? İlk akla gelen yöntem noktalara en yakın k komşusunun uzaklıklarının 
+ortalamalarını hesaplamak sonra bu ortalamaları standart normal dağılıma uydurup 
+tek taraftan kesim uygulamaktır. 
+
+---------------------------------------------------------------------------------
 """
 
 """
