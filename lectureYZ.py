@@ -15609,14 +15609,117 @@ Veri kümesi üzerinde PCA işlemi uygulanmış durumdadır. Dolayısıyla PCA i
 ölçeklemesi yapmayacağız. 
 
 
-Aşağıdaki örnekte min_samples=5, eps=10 alınarak 100000 tane kredi kart verisi 
-DBSCAN işlemine sokulmuş bu parametrelerle 707 tane nokta anomali olarak tespit 
-edilmiştir. DBSCAN parametreleriyle oynayarak anomali miktarını ayarlayabilirsiniz. 
-Buradaki kredi kart verilerini sayısı çok yüksektir. İşlemler yerel makinede fazlaca 
-zaman alabilmektedir. 
-
 ---------------------------------------------------------------------------------
 """
 
 
- 
+
+
+
+# ------------------------------ Naive Bayes Yöntemi Ile Sınıflandırma ------------------------------ 
+
+
+"""
+---------------------------------------------------------------------------------
+İstatistiksel sınıflandırma yöntemlerinin en yalınlarından biri "Naive Bayes" denilen 
+yöntemdir. Burada "naive" sıfatı yöntemde kullanılan bazı varsayımlardan hareketle 
+uydurulmuştur. Naive Bayes yöntemi tamamen olasılık kurallarına göre sınıflandırma 
+yapmaktadır. Naive Bayes "denetimli (supervised)" bir yöntemdir. Yöntemin temeli 
+ünlü olasılık kuramcısı Thomas Bayes'in "Bayes Kuralı (Bayes Rule)" olarak bilinen 
+teoremine dayanmaktadır. İstatistikte Bayes Kuralına "koşulu olasılık (conditional probablity)" 
+kuralı da denilmektedir. 
+
+
+İstatistikte koşullu olasılık bir olayın olduğu kabul edilerek başka bir olayın 
+olasılığının hesaplanması anlamına gelmektedir. Koşullu olasılık genellikle P(A|B) 
+biçiminde gösterilir. Burada P(A|B) ifadesi "B olayı olmuşken A olayının olma olasılığı" 
+anlamına gelmektedir. Yani buradaki olasılıkta zaten B'nin gerçekleştiği ön koşul 
+olarak kabul edilmektedir. 
+
+
+P(A|B) olasılığı "B olmuşken A'nın olasılığı" anlamına geldiğine göre aşağıdaki 
+gibi hesaplanır:
+
+
+P(A|B) = P(A, B) / P(B)
+
+Burada P(A, B) P(A kesişim B) ile aynı anlamdadır. Koşullu olasılık bir aksiyon 
+gibi kabul edilebilir. Ayrıca bir ispatı yapılamamaktadır. Ancak Kolmogorov'un 
+temel aksiyomlarına da uymaktadır. Koşuluu olasılık ifadesine bir kez daha bakınız:
+
+
+P(A|B) = P(A, B) / P(B)
+
+Bu eşitlikten P(A, B) olasılığını elde edebiliriz:
+
+
+P(A, B) = P(A|B) / P(B)
+
+
+Şimdi de bunun tersi olan P(B|A) olasılığını hesaplayalım:
+
+
+p(B|A) = P(A, B) / P(A)
+
+
+Buradan da P(A, B) olasılığını elde edilim:
+
+
+P(A, B) = p(B|A) / P(A)
+
+
+Kesişim işlemi değişme özelliğine sahip olduğuna göre P(A, B) olasılığı iki biçimde 
+de yazılabilmektedir:
+
+
+P(A, B) = P(A|B) / B
+P(A, B) = P(B|A) / A
+
+
+İki eşitliğin sol tarafı eşit olduğuna göre sağ tarafları da birbirlerine eşittir:
+
+
+P(A|B) * P(A) = P(B|A) * P(B)
+
+
+O halde aşağıdaki iki eşitlik elde edilir:
+
+
+P(A|B) = P(B|A) * P(B) / P(A)
+P(B|A) = P(A|B) * P(A) / P(B)
+
+
+Bu eşitliklere "Bayes Kuralı" denilmektedir. 
+
+---------------------------------------------------------------------------------
+Olasılık konusunda koşullu olasılıklara örnek oluşturan tipik sorular "bir koşul 
+altında bir olasılığın verilmesi ve bunun tersinin sorulması" biçimindedir. 
+Örneğin:
+
+"Bir şirket çalışanları arasında üniversite mezunu olan 46 personelin 6'sının, 
+üniversite mezunu olmayan 54 personelin 22'sinin sigara içtiği biliniyor. Buna 
+göre şirketteki sigara odasında sigara içtiği görülen bir çalışanın üniversite 
+mezunu olma olasılığı nedir?"
+
+
+Bu soruda bize verilenler şunlardır: 
+   
+P (sigara içiyor|üniversite mezunu) = 6 / 46
+P (sigara içiyor|üniversite mezunu değil) = 22 / 54
+
+
+Bizden istenen de şudur:
+
+
+P (üniversite mezunu|sigara içiyor)
+   
+Bayes formülünde bunları yerlerine koyalım:
+
+
+P (üniversite mezunu|sigara içiyor)= P(sigare içiyor|üniversite mezunu) * P(üniversite mezunu) / P(sigara içiyor)
+
+
+P (üniversite mezunu|sigara içiyor) = (6 / 46) * (46 / 100)) / (28 / 100)
+
+---------------------------------------------------------------------------------
+"""
