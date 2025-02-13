@@ -1,4 +1,4 @@
-    """
+"""
 ---------------------------------------------------------------------------
 C ve Sistem Programcıları Derneği Sınıfta Yapılan Örnekler ve Özet Notlar
                                 
